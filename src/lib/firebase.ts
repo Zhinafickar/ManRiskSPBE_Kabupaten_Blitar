@@ -1,8 +1,16 @@
-// Import the functions you need from the SDKs you need
+// lib/firebase.ts
+
+// Firebase core + modular SDKs
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
-import { getFirestore, Firestore, initializeFirestore, persistentLocalCache } from 'firebase/firestore';
+import {
+  getFirestore,
+  initializeFirestore,
+  persistentLocalCache,
+  Firestore,
+} from 'firebase/firestore';
 
+// Load from environment variables
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -12,44 +20,48 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Check if all required Firebase config values are provided and are not placeholders
+// Validate that all values are defined and not placeholders
 export const isFirebaseConfigured =
-  firebaseConfig.apiKey &&
+  !!firebaseConfig.apiKey &&
   !firebaseConfig.apiKey.includes('YOUR_API_KEY') &&
-  firebaseConfig.projectId &&
+  !!firebaseConfig.projectId &&
   !firebaseConfig.projectId.includes('YOUR_PROJECT_ID');
 
+// Declare instances
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
 let db: Firestore | null = null;
 
 if (isFirebaseConfigured) {
+  // Initialize app if not already done
   app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+
+  // Auth instance
   auth = getAuth(app);
-  
-  // On the client, we want to initialize with persistence.
+
+  // Firestore instance
   if (typeof window !== 'undefined') {
+    // On the client: try enabling persistent local cache
     try {
-      // initializeFirestore can only be called once, and it throws
-      // if it's called again. This can happen with Next.js's hot reloading.
-      // The try/catch block handles this.
       db = initializeFirestore(app, {
-        cache: persistentLocalCache({})
+        localCache: persistentLocalCache({}),
       });
-    } catch (e) {
-      // If it's already initialized, just get the existing instance
+    } catch (error) {
+      // If already initialized, fall back to default instance
       db = getFirestore(app);
     }
   } else {
-    // On the server, we just get the default instance without persistence.
+    // On the server: use default Firestore without persistence
     db = getFirestore(app);
   }
 } else {
+  // Warn developer if Firebase is not properly configured
   if (typeof window !== 'undefined') {
     console.warn(
-      "Firebase is not configured. Please add your Firebase credentials to the .env file. The app will run in a limited mode without database or authentication features."
+      '⚠️ Firebase not configured correctly. Check your .env.local file. App will run in limited mode.'
     );
   }
 }
 
+// Export for use across the app
 export { app, auth, db };
