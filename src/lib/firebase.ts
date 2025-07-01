@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
-import { getAuth, type Auth } from 'firebase/auth';
-import { getFirestore, enableIndexedDbPersistence, type Firestore } from 'firebase/firestore';
+import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
+import { getAuth, Auth } from 'firebase/auth';
+import { getFirestore, Firestore, initializeFirestore, persistentLocalCache } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -26,16 +26,23 @@ let db: Firestore | null = null;
 if (isFirebaseConfigured) {
   app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
   auth = getAuth(app);
-  db = getFirestore(app);
-
+  
+  // On the client, we want to initialize with persistence.
   if (typeof window !== 'undefined') {
-    enableIndexedDbPersistence(db).catch((err) => {
-      if (err.code === 'failed-precondition') {
-        console.warn('Firebase persistence failed: multiple tabs open.');
-      } else if (err.code === 'unimplemented') {
-        console.warn('Firebase persistence not supported in this browser.');
-      }
-    });
+    try {
+      // initializeFirestore can only be called once, and it throws
+      // if it's called again. This can happen with Next.js's hot reloading.
+      // The try/catch block handles this.
+      db = initializeFirestore(app, {
+        cache: persistentLocalCache({})
+      });
+    } catch (e) {
+      // If it's already initialized, just get the existing instance
+      db = getFirestore(app);
+    }
+  } else {
+    // On the server, we just get the default instance without persistence.
+    db = getFirestore(app);
   }
 } else {
   if (typeof window !== 'undefined') {
