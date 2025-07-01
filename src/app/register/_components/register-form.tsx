@@ -23,7 +23,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, writeBatch } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { useState } from 'react';
 import { isRoleTaken } from '@/services/user-service';
@@ -68,7 +68,6 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
       return;
     }
 
-    // Check if the role is already taken
     const roleTaken = await isRoleTaken(values.role);
     if (roleTaken) {
       toast({
@@ -76,7 +75,6 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
         title: 'Peran Tidak Tersedia',
         description: `Peran '${values.role}' sudah dipilih orang lain. Silakan pilih peran yang berbeda.`,
       });
-      // Reset the role field in the form
       form.setValue('role', '', { shouldValidate: true });
       setIsLoading(false);
       return;
@@ -90,22 +88,26 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
       );
       const user = userCredential.user;
 
-      // After user is created in Auth, create their profile document in Firestore.
-      // The useAuth hook will be listening for this document to appear.
-      await setDoc(doc(db, 'users', user.uid), {
+      const batch = writeBatch(db);
+
+      const userRef = doc(db, 'users', user.uid);
+      batch.set(userRef, {
         uid: user.uid,
         fullName: values.fullName,
         email: values.email,
         role: values.role,
       });
 
+      const roleRef = doc(db, 'roles', values.role);
+      batch.set(roleRef, { uid: user.uid });
+
+      await batch.commit();
+
       toast({
         title: 'Registration Successful',
         description: 'Redirecting to your dashboard...',
       });
       
-      // The useAuth hook will now detect the new profile and automatically
-      // navigate to the root page ('/'), which will then redirect to the correct dashboard.
       router.push('/');
 
     } catch (error: any) {
@@ -122,7 +124,6 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
       });
       setIsLoading(false);
     }
-    // No need to set isLoading to false on success, as a page transition is happening.
   }
 
   return (

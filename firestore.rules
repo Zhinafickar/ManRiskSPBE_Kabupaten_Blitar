@@ -1,62 +1,66 @@
-
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // == Helper Functions ==
-    function isSignedIn() {
+    // HELPER FUNCTIONS
+    function isAuth() {
       return request.auth != null;
     }
-
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
     }
-    
-    function getUserRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    function getUserData(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data;
     }
-
+    function isRole(role) {
+      return isAuth() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && getUserData(request.auth.uid).role == role;
+    }
     function isSuperAdmin() {
-      return isSignedIn() && getUserRole() == 'superadmin';
+      return isRole('superadmin');
     }
-
     function isAdmin() {
-      return isSignedIn() && (getUserRole() == 'admin' || isSuperAdmin());
+      return isRole('admin');
     }
 
-    // == Collection: users ==
+    // USERS COLLECTION
     match /users/{userId} {
-      // FIX: Allow unauthenticated users to query the collection.
-      // This is REQUIRED for the registration page to check if a role is already taken.
-      // Without this rule, the `isRoleTaken` function will always fail with a permission error.
-      allow list: if true;
-
-      // Allow authenticated users to get their own profile.
-      // Admins and Superadmins can get any user's profile.
-      allow get: if isOwner(userId) || isAdmin();
-      
-      // Allow a new user to create their own profile document.
-      // The document ID must match their auth UID.
+      // Admins/SuperAdmins can list users for management.
+      allow list: if isAdmin() || isSuperAdmin();
+      // Owner or Admins/SuperAdmins can read a user profile.
+      allow get: if isOwner(userId) || isAdmin() || isSuperAdmin();
+      // A user can create their own profile.
       allow create: if isOwner(userId);
-
-      // A user can update their own data. Admins/Superadmins can update any user.
-      allow update: if isOwner(userId) || isAdmin();
-
-      // Only Superadmins can delete user documents.
+      // Owner or SuperAdmins can update a profile.
+      allow update: if isOwner(userId) || isSuperAdmin();
+      // Only SuperAdmins can delete.
       allow delete: if isSuperAdmin();
     }
 
-    // == Collection: surveys ==
+    // ROLES COLLECTION
+    match /roles/{roleId} {
+      // ANYONE can check if a role exists by trying to read the document.
+      // This is safe because this collection contains no sensitive user data.
+      allow get: if true;
+
+      // An authenticated user can CREATE their role document during registration.
+      allow create: if isAuth() && request.resource.data.uid == request.auth.uid;
+      
+      // ONLY a superadmin can DELETE a role document (happens when deleting a user).
+      allow delete: if isSuperAdmin();
+
+      // No one can update a role document directly. It must be deleted and re-created by an admin.
+      allow update: if false;
+    }
+    
+    // SURVEYS COLLECTION
     match /surveys/{surveyId} {
-      // Users can read their own surveys. Admins/Superadmins can read all surveys.
-      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
-      
-      // Users can create surveys and must correctly set their own userId.
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      
-      // Surveys cannot be updated or deleted by anyone to ensure data integrity.
-      allow update, delete: if false; 
+      // Any authenticated user can create a survey.
+      allow create: if isAuth();
+      // Users can read their own surveys. Admins/SuperAdmins can read all surveys.
+      allow read: if isAuth() && (resource.data.userId == request.auth.uid || isAdmin() || isSuperAdmin());
+      // Surveys cannot be updated or deleted from the client to ensure data integrity.
+      allow update, delete: if false;
     }
   }
 }
