@@ -89,8 +89,9 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password);
       // On successful login, useAuth hook will detect the change.
-      // The useEffect hook above will then redirect to the root page ('/').
+      // We proactively redirect to the root page to avoid getting stuck.
       // The root page will then handle the final redirection to the correct dashboard.
+      router.replace('/');
     } catch (error: any) {
       let description = 'An unknown error occurred.';
       if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
@@ -103,9 +104,9 @@ export default function LoginPage() {
         title: 'Login Failed',
         description: description,
       });
-    } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
+    // Do not set isLoading to false here on success, as a page transition is happening.
   }
   
   // While the auth state is being checked, or if the user is already
