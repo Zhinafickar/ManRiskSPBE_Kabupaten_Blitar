@@ -1,12 +1,33 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from '@/components/ui/skeleton';
 import { getAllSurveyData } from "@/services/survey-service";
+import type { Survey } from '@/types/survey';
 
-export const dynamic = 'force-dynamic';
+function ResultsTableSkeleton() {
+  return (
+    <div className="space-y-2">
+      <Skeleton className="h-12 w-full" />
+      <Skeleton className="h-12 w-full" />
+      <Skeleton className="h-12 w-full" />
+      <Skeleton className="h-12 w-full" />
+    </div>
+  );
+}
 
-export default async function SuperAdminResultsPage() {
-  const surveys = await getAllSurveyData();
+export default function SuperAdminResultsPage() {
+  const [surveys, setSurveys] = useState<Survey[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getAllSurveyData()
+      .then(setSurveys)
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <Card>
@@ -15,7 +36,9 @@ export default async function SuperAdminResultsPage() {
         <CardDescription>A comprehensive list of all surveys submitted by all users.</CardDescription>
       </CardHeader>
       <CardContent>
-        {surveys.length > 0 ? (
+        {loading ? (
+          <ResultsTableSkeleton />
+        ) : surveys.length > 0 ? (
           <Table>
             <TableHeader>
               <TableRow>

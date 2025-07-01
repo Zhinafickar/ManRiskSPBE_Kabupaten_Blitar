@@ -1,30 +1,12 @@
+'use client';
+
+import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Users, FileText, Bot, AreaChart } from "lucide-react";
-import { Suspense } from "react";
-import { analyzeRiskTrends } from "@/ai/flows/risk-trend-analysis";
+import { analyzeRiskTrends, type AnalyzeRiskTrendsOutput } from "@/ai/flows/risk-trend-analysis";
 import { Skeleton } from "@/components/ui/skeleton";
-
-async function RiskAnalysis() {
-  const analysis = await analyzeRiskTrends({});
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Bot className="h-6 w-6" />
-          AI-Powered Risk Trend Analysis
-        </CardTitle>
-        <CardDescription>
-          Emerging trends, prevalent issues, and potential impacts based on survey data.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-foreground">{analysis.summary}</p>
-      </CardContent>
-    </Card>
-  );
-}
 
 function RiskAnalysisSkeleton() {
     return (
@@ -47,6 +29,45 @@ function RiskAnalysisSkeleton() {
     )
 }
 
+function RiskAnalysisCard() {
+  const [analysis, setAnalysis] = useState<AnalyzeRiskTrendsOutput | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    analyzeRiskTrends({})
+      .then(setAnalysis)
+      .catch(() => setError("Failed to generate AI analysis."))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return <RiskAnalysisSkeleton />;
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Bot className="h-6 w-6" />
+          AI-Powered Risk Trend Analysis
+        </CardTitle>
+        <CardDescription>
+          Emerging trends, prevalent issues, and potential impacts based on survey data.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {error ? (
+           <p className="text-sm text-destructive">{error}</p>
+        ) : (
+           <p className="text-sm text-foreground">{analysis?.summary || "No summary available."}</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+
 export default function SuperAdminDashboard() {
   return (
     <div className="space-y-6">
@@ -56,10 +77,8 @@ export default function SuperAdminDashboard() {
           Full control over the platform, users, and data analysis.
         </p>
       </div>
-
-      <Suspense fallback={<RiskAnalysisSkeleton />}>
-        <RiskAnalysis />
-      </Suspense>
+      
+      <RiskAnalysisCard />
 
       <div className="grid gap-6 md:grid-cols-3">
         <Card>
