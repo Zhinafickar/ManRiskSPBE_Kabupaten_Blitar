@@ -1,8 +1,9 @@
-import { db } from '@/lib/firebase';
+import { db, isFirebaseConfigured } from '@/lib/firebase';
 import { collection, getDocs, addDoc, query, where } from 'firebase/firestore';
 import { Survey } from '@/types/survey';
 
 export async function getAllSurveyData() {
+  if (!isFirebaseConfigured || !db) return [];
   const surveysCol = collection(db, 'surveys');
   const surveySnapshot = await getDocs(surveysCol);
   const surveyList = surveySnapshot.docs.map(doc => {
@@ -18,6 +19,10 @@ export async function getAllSurveyData() {
 }
 
 export async function addSurvey(surveyData: Omit<Survey, 'id' | 'createdAt'>) {
+    if (!isFirebaseConfigured || !db) {
+        console.error("Firebase not configured, cannot add survey.");
+        throw new Error("Firebase not configured");
+    }
     const surveysCollection = collection(db, 'surveys');
     await addDoc(surveysCollection, {
         ...surveyData,
@@ -26,6 +31,7 @@ export async function addSurvey(surveyData: Omit<Survey, 'id' | 'createdAt'>) {
 }
 
 export async function getUserSurveys(userId: string) {
+    if (!isFirebaseConfigured || !db) return [];
     const surveysCol = collection(db, 'surveys');
     const q = query(surveysCol, where("userId", "==", userId));
     const surveySnapshot = await getDocs(q);

@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { db } from '@/lib/firebase';
+import { db, isFirebaseConfigured } from '@/lib/firebase';
 import { doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
@@ -17,6 +17,8 @@ const userSchema = z.object({
 });
 
 export async function updateUser(formData: z.infer<typeof userSchema>) {
+  if (!isFirebaseConfigured || !db) return { success: false, message: 'Firebase is not configured.' };
+
   const validatedData = userSchema.safeParse(formData);
 
   if (!validatedData.success) {
@@ -36,6 +38,8 @@ export async function updateUser(formData: z.infer<typeof userSchema>) {
 }
 
 export async function deleteUser(uid: string) {
+    if (!isFirebaseConfigured || !db) return { success: false, message: 'Firebase is not configured.' };
+
     if (!uid) {
         return { success: false, message: 'User ID is required.' };
     }

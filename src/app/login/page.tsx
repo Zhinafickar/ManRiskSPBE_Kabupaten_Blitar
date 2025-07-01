@@ -17,7 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth, isFirebaseConfigured } from '@/lib/firebase';
 import { Icons } from '@/components/icons';
 import { useState } from 'react';
 
@@ -40,6 +40,15 @@ export default function LoginPage() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!isFirebaseConfigured || !auth) {
+      toast({
+        variant: 'destructive',
+        title: 'Firebase Not Configured',
+        description:
+          'Please add your Firebase credentials to the .env file to enable login.',
+      });
+      return;
+    }
     setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password);

@@ -1,8 +1,9 @@
-import { db } from '@/lib/firebase';
+import { db, isFirebaseConfigured } from '@/lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import type { UserProfile } from '@/types/user';
 
 export async function getAllUsers(): Promise<UserProfile[]> {
+  if (!isFirebaseConfigured || !db) return [];
   const usersCollection = collection(db, 'users');
   const userSnapshot = await getDocs(usersCollection);
   const userList: UserProfile[] = userSnapshot.docs.map(doc => {
@@ -18,6 +19,7 @@ export async function getAllUsers(): Promise<UserProfile[]> {
 }
 
 export async function getAssignedRoles() {
+  if (!isFirebaseConfigured || !db) return [];
   const users = await getAllUsers();
   return users.map(user => user.role);
 }

@@ -24,7 +24,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
+import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { useState } from 'react';
 
 const formSchema = z.object({
@@ -55,6 +55,14 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!isFirebaseConfigured || !auth || !db) {
+      toast({
+        variant: 'destructive',
+        title: 'Firebase Not Configured',
+        description: 'Please add your Firebase credentials to the .env file to enable registration.',
+      });
+      return;
+    }
     setIsLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(

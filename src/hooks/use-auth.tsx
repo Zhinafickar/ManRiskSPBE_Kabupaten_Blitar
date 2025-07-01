@@ -9,7 +9,7 @@ import {
 } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
+import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { UserProfile } from '@/types/user';
 
@@ -31,13 +31,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!isFirebaseConfigured || !auth) {
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setUser(user);
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists()) {
-          setUserProfile(userDoc.data() as UserProfile);
-        } else {
+        if (db) {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            setUserProfile(userDoc.data() as UserProfile);
+          } else {
             // Special handling for hardcoded admin/superadmin accounts
             if (user.email === 'admin@gmail.com') {
                 setUserProfile({ uid: user.uid, email: user.email, fullName: 'Admin', role: 'admin' });
@@ -46,6 +52,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             } else {
                 setUserProfile(null);
             }
+          }
+        } else {
+            setUserProfile(null)
         }
       } else {
         setUser(null);

@@ -8,6 +8,7 @@ import { Users, FileText, Bot, AreaChart } from "lucide-react";
 import { analyzeRiskTrends, type AnalyzeRiskTrendsOutput } from "@/ai/flows/risk-trend-analysis";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAllSurveyData } from "@/services/survey-service";
+import { isFirebaseConfigured } from "@/lib/firebase";
 
 function RiskAnalysisSkeleton() {
     return (
@@ -37,6 +38,12 @@ function RiskAnalysisCard() {
 
   useEffect(() => {
     const generateAnalysis = async () => {
+      if (!isFirebaseConfigured) {
+        setError("Firebase is not configured. Cannot fetch data for analysis.");
+        setLoading(false);
+        return;
+      }
+
       try {
         const surveys = await getAllSurveyData();
         if (surveys.length === 0) {
