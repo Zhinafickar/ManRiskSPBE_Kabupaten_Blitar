@@ -26,8 +26,8 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { useState } from 'react';
-
 import { isRoleTaken } from '@/services/user-service';
+
 const formSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
   email: z.string().email({ message: 'Please enter a valid email.' }),
@@ -56,12 +56,14 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
     if (!isFirebaseConfigured || !auth || !db) {
       toast({
         variant: 'destructive',
         title: 'Firebase Not Configured',
         description: 'Please add your Firebase credentials to the .env file to enable registration.',
       });
+      setIsLoading(false);
       return;
     }
 
@@ -76,7 +78,7 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
       setIsLoading(false);
       return;
     }
-    setIsLoading(true);
+    
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -101,18 +103,23 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
       
       // The useAuth hook will now detect the new profile and automatically
       // navigate to the root page ('/'), which will then redirect to the correct dashboard.
-      // We no longer need to manually push the router here.
       router.push('/');
 
     } catch (error: any) {
+      let description = 'An unknown error occurred.';
+      if (error.code === 'auth/email-already-in-use') {
+        description = 'This email address is already in use by another account.';
+      } else {
+        description = error.message;
+      }
       toast({
         variant: 'destructive',
         title: 'Registration Failed',
-        description: error.message,
+        description: description,
       });
-    } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
+    // No need to set isLoading to false on success, as a page transition is happening.
   }
 
   return (
