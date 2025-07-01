@@ -34,7 +34,7 @@ const formSchema = z.object({
   password: z
     .string()
     .min(6, { message: 'Password must be at least 6 characters.' }),
-  role: z.string({ required_error: 'Please select a role.' }),
+  role: z.string({ required_error: 'Please select a role.' }).min(1, {message: "Please select a role."}),
 });
 
 interface RegisterFormProps {
@@ -52,6 +52,7 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
       fullName: '',
       email: '',
       password: '',
+      role: '',
     },
   });
 
@@ -72,9 +73,11 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
     if (roleTaken) {
       toast({
         variant: 'destructive',
-        title: 'Registration Failed',
-        description: `The role '${values.role}' is already taken by another user.`,
+        title: 'Peran Tidak Tersedia',
+        description: `Peran '${values.role}' sudah dipilih orang lain. Silakan pilih peran yang berbeda.`,
       });
+      // Reset the role field in the form
+      form.setValue('role', '', { shouldValidate: true });
       setIsLoading(false);
       return;
     }
@@ -170,7 +173,7 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Role</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select your role/department" />
