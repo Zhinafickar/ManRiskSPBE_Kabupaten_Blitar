@@ -1,6 +1,5 @@
 'use client';
 
-import { getAssignedRoles } from '@/services/user-service';
 import { ROLES } from '@/constants/data';
 import RegisterForm from './_components/register-form';
 import Link from 'next/link';
@@ -13,20 +12,11 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const assignedRoles = await getAssignedRoles();
-        const roles = ROLES.filter((role) => !assignedRoles.includes(role));
-        setAvailableRoles(roles);
-      } catch (error) {
-        console.error("Failed to fetch roles, falling back to all roles:", error);
-        // Fallback to all roles if Firestore is not available, so registration is still possible.
-        setAvailableRoles(ROLES);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchRoles();
+    // The previous logic tried to fetch all users to determine available roles,
+    // which is not secure for unauthenticated users and was causing permission errors.
+    // This has been simplified to show all available roles from the predefined list.
+    setAvailableRoles(ROLES);
+    setLoading(false);
   }, []);
 
   return (
