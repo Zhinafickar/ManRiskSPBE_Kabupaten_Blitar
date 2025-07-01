@@ -72,6 +72,8 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
       );
       const user = userCredential.user;
 
+      // After user is created in Auth, create their profile document in Firestore.
+      // The useAuth hook will be listening for this document to appear.
       await setDoc(doc(db, 'users', user.uid), {
         uid: user.uid,
         fullName: values.fullName,
@@ -81,9 +83,14 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
 
       toast({
         title: 'Registration Successful',
-        description: 'Your account has been created.',
+        description: 'Redirecting to your dashboard...',
       });
+      
+      // The useAuth hook will now detect the new profile and automatically
+      // navigate to the root page ('/'), which will then redirect to the correct dashboard.
+      // We no longer need to manually push the router here.
       router.push('/');
+
     } catch (error: any) {
       toast({
         variant: 'destructive',

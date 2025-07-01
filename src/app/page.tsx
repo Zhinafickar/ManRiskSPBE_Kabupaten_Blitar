@@ -27,11 +27,11 @@ export default function Home() {
   useEffect(() => {
     // Wait until the authentication status is fully resolved
     if (loading) {
-      return; // Do nothing while loading
+      return; // Do nothing while loading, AuthProvider shows a global skeleton
     }
 
     if (!user) {
-      // If not logged in, redirect to login page
+      // If not logged in after loading, redirect to login page
       router.replace('/login');
     } else if (userProfile) {
       // If logged in and profile exists, redirect based on role
@@ -47,11 +47,12 @@ export default function Home() {
           break;
       }
     }
-    // If user exists but userProfile is somehow null after loading,
-    // the AuthProvider should handle logging them out.
-    // We just show the skeleton in that edge case while the redirect happens.
+    // If user exists but userProfile is null after loading, it means it's a new
+    // user registration in progress, or an error state being handled by useAuth.
+    // In either case, we stay on this page (showing the skeleton) until the
+    // state is fully resolved.
   }, [user, userProfile, loading, router]);
 
-  // Show a skeleton while the redirection logic is running
+  // Show a skeleton while the initial authentication check and redirection logic runs
   return <RootPageSkeleton />;
 }

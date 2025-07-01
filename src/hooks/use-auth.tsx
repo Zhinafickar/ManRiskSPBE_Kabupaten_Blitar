@@ -48,27 +48,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (authUser) {
         const userDocRef = doc(db, 'users', authUser.uid);
         
+        // At this point, we have an authenticated user, but we don't know if their
+        // profile exists yet. We keep loading until we find out.
+        setLoading(true);
+
         profileUnsubscribe = onSnapshot(userDocRef, (profileDoc) => {
           if (profileDoc.exists()) {
-            // Profile found. User is fully authenticated.
+            // Profile found. User is fully authenticated and has a profile.
+            // This is the successful login/registration state.
             setUser(authUser);
             setUserProfile(profileDoc.data() as UserProfile);
             setLoading(false);
           } else {
-            // Profile doesn't exist. This could be a new registration or an error state.
-            const creationTime = new Date(authUser.metadata.creationTime!).getTime();
+            // Profile doesn't exist. This could be a new registration in progress
+            // or an error state for an existing user.
+            const creationTime = authUser.metadata.creationTime ? new Date(authUser.metadata.creationTime).getTime() : 0;
             const now = new Date().getTime();
-            const isNewUser = (now - creationTime) < 10000; // 10-second window for registration
+            
+            // Check if the user was created in the last 10 seconds.
+            const isNewUser = (now - creationTime) < 10000; 
 
             if (isNewUser) {
-              // It's a new user. We wait for the registration form to create the profile.
-              // The app remains in a loading state.
+              // It's a new user registration in progress.
+              // We keep loading and wait for the registration form to create the profile.
               setUser(authUser);
               setUserProfile(null);
               setLoading(true);
             } else {
               // It's an existing user with a missing profile. This is an error state.
-              // Silently log them out to prevent them from getting stuck.
+              // Log them out to prevent them from getting stuck.
               auth.signOut();
             }
           }

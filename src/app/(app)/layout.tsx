@@ -58,24 +58,18 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // This handles redirection after the initial auth check is complete.
+    // This is a safety net. If auth is no longer loading and there's no user,
+    // redirect to login. The root page should handle most cases, but this
+    // prevents accessing protected routes directly.
     if (!loading && !user) {
       router.replace('/login');
     }
   }, [user, loading, router]);
 
-  // The AuthProvider shows a global loading screen, so we don't need a loading check here.
-  // This component only renders after the initial check.
-
-  // If, after the initial load, there's no user, a redirect is imminent.
-  // We show the skeleton to avoid a blank screen flash before redirection.
-  if (!user) {
-    return <AppLayoutSkeleton />;
-  }
-  
-  // If there's a user but the profile is still loading (e.g., during registration),
-  // show the dedicated layout skeleton.
-  if (!userProfile) {
+  // The AuthProvider shows a global loading screen, so we don't need another one here.
+  // However, if we land here and there's no user or profile, a redirect is imminent.
+  // We show the skeleton to avoid a blank screen flash before the redirect happens.
+  if (!user || !userProfile) {
     return <AppLayoutSkeleton />;
   }
 
