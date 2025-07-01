@@ -8,7 +8,7 @@ import {
   ReactNode,
 } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, onSnapshot, Unsubscribe, setDoc } from 'firebase/firestore';
+import { doc, onSnapshot, Unsubscribe } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { UserProfile } from '@/types/user';
@@ -40,35 +40,42 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let profileUnsubscribe: Unsubscribe | undefined;
 
     const authUnsubscribe = onAuthStateChanged(auth, (authUser) => {
+      // If a profile listener is active from a previous user, unsubscribe from it.
       if (profileUnsubscribe) {
         profileUnsubscribe();
       }
-
+      
       if (authUser) {
-        setUser(authUser);
         const userDocRef = doc(db, 'users', authUser.uid);
         
-        profileUnsubscribe = onSnapshot(userDocRef, async (profileDoc) => {
+        profileUnsubscribe = onSnapshot(userDocRef, (profileDoc) => {
           if (profileDoc.exists()) {
+            // Profile found. User is fully authenticated.
+            setUser(authUser);
             setUserProfile(profileDoc.data() as UserProfile);
             setLoading(false);
           } else {
-            // Profile doesn't exist. This could be a new registration.
-            // We'll keep loading until the profile is created by the registration form.
-            // The `onSnapshot` will fire again when it's created.
-            // Special case for pre-defined admin/superadmin accounts.
-             if (authUser.email === 'admin@gmail.com') {
-              const adminProfile = { uid: authUser.uid, email: authUser.email, fullName: 'Admin', role: 'admin' };
-              await setDoc(userDocRef, adminProfile).catch(console.error);
-            } else if (authUser.email === 'superadmin@gmail.com') {
-              const superAdminProfile = { uid: authUser.uid, email: authUser.email, fullName: 'Super Admin', role: 'superadmin' };
-              await setDoc(userDocRef, superAdminProfile).catch(console.error);
+            // Profile doesn't exist. This could be a new registration or an error state.
+            const creationTime = new Date(authUser.metadata.creationTime!).getTime();
+            const now = new Date().getTime();
+            const isNewUser = (now - creationTime) < 10000; // 10-second window for registration
+
+            if (isNewUser) {
+              // It's a new user. We wait for the registration form to create the profile.
+              // The app remains in a loading state.
+              setUser(authUser);
+              setUserProfile(null);
+              setLoading(true);
             } else {
-                // For a regular user registering, we just wait.
-                // setLoading remains true.
-                setUserProfile(null);
+              // It's an existing user with a missing profile. This is an error.
+              // Log them out to prevent getting stuck.
+              console.error("User profile not found for an existing user. Logging out.");
+              auth.signOut();
             }
           }
+        }, (error) => {
+            console.error("Error fetching user profile:", error);
+            auth.signOut();
         });
       } else {
         // No user is signed in.
