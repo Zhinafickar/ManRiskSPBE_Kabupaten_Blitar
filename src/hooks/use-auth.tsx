@@ -8,7 +8,7 @@ import {
   ReactNode,
 } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { UserProfile } from '@/types/user';
@@ -43,17 +43,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const fetchUserProfile = async () => {
           if (db) {
             try {
-              const userDoc = await getDoc(doc(db, 'users', user.uid));
+              const userDocRef = doc(db, 'users', user.uid);
+              const userDoc = await getDoc(userDocRef);
+              
               if (userDoc.exists()) {
                 setUserProfile(userDoc.data() as UserProfile);
               } else {
-                // Special handling for hardcoded admin/superadmin accounts
+                // Profile doesn't exist, let's check if it's a special user.
+                let profileToCreate: UserProfile | null = null;
                 if (user.email === 'admin@gmail.com') {
-                    setUserProfile({ uid: user.uid, email: user.email, fullName: 'Admin', role: 'admin' });
+                  profileToCreate = { uid: user.uid, email: user.email, fullName: 'Admin', role: 'admin' };
                 } else if (user.email === 'superadmin@gmail.com') {
-                    setUserProfile({ uid: user.uid, email: user.email, fullName: 'Super Admin', role: 'superadmin' });
+                  profileToCreate = { uid: user.uid, email: user.email, fullName: 'Super Admin', role: 'superadmin' };
+                }
+                
+                if (profileToCreate) {
+                  // This is a special user, create their profile document in Firestore
+                  // to prevent this from happening again.
+                  await setDoc(userDocRef, profileToCreate);
+                  setUserProfile(profileToCreate);
                 } else {
-                    setUserProfile(null);
+                  // This is a regular user with a missing profile document.
+                  // Setting profile to null will trigger the logout in AppLayout.
+                  setUserProfile(null);
                 }
               }
             } catch (error) {
