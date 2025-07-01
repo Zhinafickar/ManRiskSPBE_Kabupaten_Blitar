@@ -36,55 +36,53 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    const unsubscribe = onAuthStateChanged(auth!, (user) => {
+    const unsubscribe = onAuthStateChanged(auth!, async (currentUser) => {
+      // Always start with a loading state during auth changes
       setLoading(true);
-      if (user) {
-        setUser(user);
-        const fetchUserProfile = async () => {
-          if (db) {
-            try {
-              const userDocRef = doc(db, 'users', user.uid);
-              const userDoc = await getDoc(userDocRef);
-              
-              if (userDoc.exists()) {
-                setUserProfile(userDoc.data() as UserProfile);
-              } else {
-                // Profile doesn't exist, let's check if it's a special user.
-                let profileToCreate: UserProfile | null = null;
-                if (user.email === 'admin@gmail.com') {
-                  profileToCreate = { uid: user.uid, email: user.email, fullName: 'Admin', role: 'admin' };
-                } else if (user.email === 'superadmin@gmail.com') {
-                  profileToCreate = { uid: user.uid, email: user.email, fullName: 'Super Admin', role: 'superadmin' };
-                }
-                
-                if (profileToCreate) {
-                  // This is a special user, create their profile document in Firestore
-                  // to prevent this from happening again.
-                  await setDoc(userDocRef, profileToCreate);
-                  setUserProfile(profileToCreate);
-                } else {
-                  // This is a regular user with a missing profile document.
-                  // Setting profile to null will trigger the logout in AppLayout.
-                  setUserProfile(null);
-                }
+
+      if (currentUser) {
+        setUser(currentUser);
+        // Try to fetch or create the user profile from Firestore
+        if (db) {
+          const userDocRef = doc(db, 'users', currentUser.uid);
+          try {
+            const userDoc = await getDoc(userDocRef);
+            if (userDoc.exists()) {
+              setUserProfile(userDoc.data() as UserProfile);
+            } else {
+              // Document doesn't exist. Check if it's a special user to create a profile.
+              let profileToCreate: UserProfile | null = null;
+              if (currentUser.email === 'admin@gmail.com') {
+                profileToCreate = { uid: currentUser.uid, email: currentUser.email, fullName: 'Admin', role: 'admin' };
+              } else if (currentUser.email === 'superadmin@gmail.com') {
+                profileToCreate = { uid: currentUser.uid, email: currentUser.email, fullName: 'Super Admin', role: 'superadmin' };
               }
-            } catch (error) {
-              console.error("Error fetching user profile:", error);
-              setUserProfile(null);
-            } finally {
-              setLoading(false);
+
+              if (profileToCreate) {
+                // Create the document for the special user
+                await setDoc(userDocRef, profileToCreate);
+                setUserProfile(profileToCreate);
+              } else {
+                // It's a regular user, but their profile doc is missing.
+                // This is an invalid state, so we'll set profile to null.
+                setUserProfile(null);
+              }
             }
-          } else {
+          } catch (error) {
+            console.error("Error fetching user profile:", error);
             setUserProfile(null);
-            setLoading(false);
           }
-        };
-        fetchUserProfile();
+        } else {
+          // Database isn't configured, can't get a profile.
+          setUserProfile(null);
+        }
       } else {
+        // User is logged out
         setUser(null);
         setUserProfile(null);
-        setLoading(false);
       }
+      // Finished all checks, set loading to false.
+      setLoading(false);
     });
 
     return () => unsubscribe();
