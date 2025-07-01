@@ -19,17 +19,54 @@ import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth, isFirebaseConfigured } from '@/lib/firebase';
 import { Icons } from '@/components/icons';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/use-auth';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
   password: z.string().min(1, { message: 'Password is required.' }),
 });
 
+function LoginPageSkeleton() {
+    return (
+        <div className="flex min-h-screen items-center justify-center bg-background p-4">
+            <div className="w-full max-w-md space-y-8">
+                <div className="flex flex-col items-center text-center space-y-4">
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <Skeleton className="h-6 w-48" />
+                    <Skeleton className="h-4 w-64" />
+                </div>
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-16" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-16" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                    <Skeleton className="h-10 w-full" />
+                </div>
+                 <Skeleton className="h-4 w-72 mx-auto" />
+            </div>
+        </div>
+    )
+}
+
 export default function LoginPage() {
   const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const { user, loading: authLoading } = useAuth();
+
+  // Redirect if user is already logged in or after successful login.
+  // This hook relies on the central auth state.
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.replace('/dashboard');
+    }
+  }, [user, authLoading, router]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -54,19 +91,32 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({
         title: 'Login Successful',
-        description: 'Welcome back!',
+        description: 'Redirecting to your dashboard...',
       });
-      router.push('/dashboard');
+      // Redirection is now handled by the useEffect hook.
     } catch (error: any) {
+      let description = 'An unknown error occurred.';
+      if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        description = 'Invalid email or password. Please try again.';
+      } else {
+        description = error.message;
+      }
       toast({
         variant: 'destructive',
         title: 'Login Failed',
-        description: error.message,
+        description: description,
       });
     } finally {
         setIsLoading(false);
     }
   }
+  
+  // While the auth state is being checked, or if the user is already
+  // logged in (and about to be redirected), show a skeleton loader.
+  if (authLoading || user) {
+    return <LoginPageSkeleton />;
+  }
+
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
