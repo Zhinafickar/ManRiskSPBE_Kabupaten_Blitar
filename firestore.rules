@@ -1,63 +1,47 @@
+
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper function to check if a user is authenticated
-    function isAuthenticated() {
-      return request.auth != null;
-    }
-    
-    // Helper function to get the user's role data safely
-    function getUserData() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
-    }
-
-    // Helper function to check if the user is an admin or superadmin
-    function isAdminOrSuperAdmin() {
-      return isAuthenticated() && getUserData().role in ['admin', 'superadmin'];
-    }
-
-    // Helper function to check if the user is a superadmin
     function isSuperAdmin() {
-      return isAuthenticated() && getUserData().role == 'superadmin';
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
     }
 
-    // Rules for the 'users' collection
+    function isAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'superadmin'];
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
     match /users/{userId} {
+      // Allow unauthenticated users to query the users collection ONLY to check for unique roles during registration.
+      // Admins and Superadmins can also list users for management purposes.
+      allow list: if request.auth == null || (request.auth != null && isAdmin());
+
+      // Allow anyone to create a user profile for themselves when they sign up.
+      allow create: if request.auth != null && isOwner(userId);
       
-      // ANYONE can perform a query (list) on the users collection.
-      // This is necessary for the "isRoleTaken" feature during registration, which
-      // runs before a user is authenticated. This rule allows checking if a role
-      // exists but does not allow reading the full contents of all documents.
-      allow list: if true;
+      // Allow users to get their own profile. Admins/Superadmins can get any profile.
+      allow get: if request.auth != null && (isOwner(userId) || isAdmin());
 
-      // An authenticated user can read their OWN profile document.
-      // A superadmin can read ANY user profile document.
-      allow get: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
-
-      // A new user can create their own profile document when registering.
-      // The document ID must match their authentication UID.
-      allow create: if isAuthenticated() && request.auth.uid == userId;
-
-      // A superadmin can update any user's profile.
-      allow update: if isSuperAdmin();
-
-      // A superadmin can delete any user.
-      allow delete: if isSuperAdmin();
+      // Users can update their own data. Superadmins can update anyone's data.
+      allow update: if request.auth != null && (isOwner(userId) || isSuperAdmin());
+      
+      // Only superadmins can delete user documents.
+      allow delete: if request.auth != null && isSuperAdmin();
     }
 
-    // Rules for the 'surveys' collection
     match /surveys/{surveyId} {
-      
-      // An authenticated user can create a survey, but they MUST set their own userId in the document.
-      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
-      
-      // An authenticated user can read surveys where their userId matches.
-      // Admins and Superadmins can read ALL surveys.
-      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdminOrSuperAdmin());
+      // Allow authenticated users to create surveys for themselves.
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
 
-      // For simplicity, updating and deleting surveys is disallowed for now.
+      // Users can read their own surveys. Admins/Superadmins can read all surveys.
+      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
+
+      // Surveys cannot be updated or deleted from the client to ensure data integrity.
       allow update, delete: if false;
     }
   }
