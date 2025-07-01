@@ -19,17 +19,14 @@ export default function UserDashboard() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Input New Survey</CardTitle>
+            <CardTitle>Input Kejadian Risiko</CardTitle>
             <CardDescription>
-              Start a new risk assessment by filling out one of the survey forms.
+              Laporkan kejadian risiko baru untuk penilaian.
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex gap-4">
+          <CardContent>
             <Button asChild>
-              <Link href="/user/survey-1">Start Survey 1</Link>
-            </Button>
-            <Button asChild variant="secondary">
-              <Link href="/user/survey-2">Start Survey 2</Link>
+              <Link href="/user/survey-1">Input Kejadian Risiko</Link>
             </Button>
           </CardContent>
         </Card>

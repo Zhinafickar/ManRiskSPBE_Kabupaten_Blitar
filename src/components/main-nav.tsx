@@ -41,15 +41,9 @@ export function MainNav() {
     },
     {
       href: '/user/survey-1',
-      label: 'Input Survey 1',
+      label: 'Input Risiko',
       icon: FilePlus,
       active: pathname === '/user/survey-1',
-    },
-    {
-      href: '/user/survey-2',
-      label: 'Input Survey 2',
-      icon: FilePlus,
-      active: pathname === '/user/survey-2',
     },
     {
       href: '/user/results',

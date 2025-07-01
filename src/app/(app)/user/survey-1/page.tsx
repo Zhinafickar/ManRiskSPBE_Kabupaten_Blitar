@@ -31,9 +31,13 @@ import {
 import { addSurvey } from '@/services/survey-service';
 import { useAuth } from '@/hooks/use-auth';
 import { useState } from 'react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
-  riskEvent: z.string({ required_error: 'Please select a risk event.' }),
+  riskEvent: z.string({ required_error: 'Please select or enter a risk event.' }).min(1, { message: 'Risk event is required.' }),
   impactArea: z.string({ required_error: 'Please select an impact area.' }),
   cause: z.string().min(10, { message: 'Cause must be at least 10 characters.' }),
   impact: z.string().min(10, { message: 'Impact must be at least 10 characters.' }),
@@ -45,10 +49,12 @@ export default function Survey1Page() {
   const { toast } = useToast();
   const { user, userProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      riskEvent: '',
       cause: '',
       impact: '',
     },
@@ -62,7 +68,7 @@ export default function Survey1Page() {
     setIsLoading(true);
     try {
         await addSurvey({ ...values, surveyType: 1, userId: user.uid, userRole: userProfile.role });
-        toast({ title: 'Success', description: 'Survey 1 submitted successfully.' });
+        toast({ title: 'Success', description: 'Survey submitted successfully.' });
         form.reset();
     } catch (error) {
         toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit survey.' });
@@ -74,8 +80,8 @@ export default function Survey1Page() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Input Survey 1</CardTitle>
-        <CardDescription>Please fill out the risk assessment form below with predefined risk events.</CardDescription>
+        <CardTitle>Input Kejadian Risiko</CardTitle>
+        <CardDescription>Isi formulir penilaian risiko di bawah ini. Anda dapat memilih dari daftar atau mengetik kejadian risiko baru.</CardDescription>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -84,12 +90,49 @@ export default function Survey1Page() {
               control={form.control}
               name="riskEvent"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col">
                   <FormLabel>Kejadian Risiko TIK</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl><SelectTrigger><SelectValue placeholder="Select a risk event" /></SelectTrigger></FormControl>
-                    <SelectContent>{RISK_EVENTS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
-                  </Select>
+                   <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn("w-full justify-between", !field.value && "text-muted-foreground")}
+                        >
+                          {field.value || "Pilih atau ketik kejadian risiko..."}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                      <Command>
+                        <CommandInput
+                          placeholder="Cari kejadian risiko..."
+                          value={field.value || ''}
+                          onValueChange={field.onChange}
+                        />
+                        <CommandEmpty>Kejadian risiko tidak ditemukan.</CommandEmpty>
+                        <CommandList>
+                          <CommandGroup>
+                            {RISK_EVENTS.map((event) => (
+                              <CommandItem
+                                key={event}
+                                value={event}
+                                onSelect={() => {
+                                  form.setValue("riskEvent", event);
+                                  setOpen(false);
+                                }}
+                              >
+                                <Check className={cn("mr-2 h-4 w-4", event === field.value ? "opacity-100" : "opacity-0")} />
+                                {event}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}
