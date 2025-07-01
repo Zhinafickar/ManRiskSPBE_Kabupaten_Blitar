@@ -2,59 +2,62 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    function isAuthed() {
+
+    // Helper function to check if a user is authenticated
+    function isAuthenticated() {
       return request.auth != null;
     }
-
-    function isOwner(userId) {
-      return isAuthed() && request.auth.uid == userId;
-    }
     
-    function getUserRole(uid) {
-      return get(/databases/$(database)/documents/users/$(uid)).data.role;
-    }
-    
-    function isAuthedUserOneOfRoles(roles) {
-        return isAuthed() && getUserRole(request.auth.uid) in roles;
+    // Helper function to get the user's role data safely
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
 
+    // Helper function to check if the user is an admin or superadmin
+    function isAdminOrSuperAdmin() {
+      return isAuthenticated() && getUserData().role in ['admin', 'superadmin'];
+    }
+
+    // Helper function to check if the user is a superadmin
+    function isSuperAdmin() {
+      return isAuthenticated() && getUserData().role == 'superadmin';
+    }
+
+    // Rules for the 'users' collection
     match /users/{userId} {
-      // ANYONE can query (`list`) the users collection to check for role availability.
-      // This is required for the "isRoleTaken" feature on the registration page.
-      // NOTE: This makes user data (name, email, role) publicly readable in queries.
-      allow list: if true; 
       
-      // Authenticated users can read (`get`) any single user profile.
-      allow get: if isAuthed();
-      
-      // A user can create their OWN user document.
-      allow create: if isOwner(userId);
+      // ANYONE can perform a query (list) on the users collection.
+      // This is necessary for the "isRoleTaken" feature during registration, which
+      // runs before a user is authenticated. This rule allows checking if a role
+      // exists but does not allow reading the full contents of all documents.
+      allow list: if true;
 
-      // A user can update their OWN document, or a superadmin can update ANY document.
-      allow update: if isOwner(userId) || isAuthedUserOneOfRoles(['superadmin']);
+      // An authenticated user can read their OWN profile document.
+      // A superadmin can read ANY user profile document.
+      allow get: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
 
-      // Only a superadmin can delete user documents.
-      allow delete: if isAuthedUserOneOfRoles(['superadmin']);
+      // A new user can create their own profile document when registering.
+      // The document ID must match their authentication UID.
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+
+      // A superadmin can update any user's profile.
+      allow update: if isSuperAdmin();
+
+      // A superadmin can delete any user.
+      allow delete: if isSuperAdmin();
     }
 
+    // Rules for the 'surveys' collection
     match /surveys/{surveyId} {
-      // An Admin/Superadmin can get ANY survey. A user can get THEIR OWN survey.
-      allow get: if isAuthed() && (isAuthedUserOneOfRoles(['admin', 'superadmin']) || resource.data.userId == request.auth.uid);
+      
+      // An authenticated user can create a survey, but they MUST set their own userId in the document.
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      
+      // An authenticated user can read surveys where their userId matches.
+      // Admins and Superadmins can read ALL surveys.
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdminOrSuperAdmin());
 
-      // An Admin/Superadmin can list ALL surveys.
-      // A user CANNOT list all surveys. They must query for their own. The client-side
-      // query `where('userId', '==', auth.uid)` is what filters the data. The security rule
-      // here just allows the query operation itself to proceed for any authenticated user.
-      // The `get` rule above provides the actual document-level security. If a user tries
-      // to list all documents, the query will fail because it would return documents
-      // they are not allowed to `get`. This is how Firestore secures queries.
-      allow list: if isAuthed();
-
-      // A user can create a survey for themselves.
-      allow create: if isOwner(request.resource.data.userId);
-
-      // Surveys cannot be changed.
+      // For simplicity, updating and deleting surveys is disallowed for now.
       allow update, delete: if false;
     }
   }
