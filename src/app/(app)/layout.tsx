@@ -64,17 +64,17 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     }
   }, [user, loading, router]);
 
-  // AuthProvider shows a global loading screen, so we don't need to check `loading` here.
+  // The AuthProvider shows a global loading screen, so we don't need a loading check here.
   // This component only renders after the initial check.
 
-  // If, after the initial load, there's no user, redirect is imminent.
-  // Return null to prevent a brief flash of the layout.
+  // If, after the initial load, there's no user, a redirect is imminent.
+  // We show the skeleton to avoid a blank screen flash before redirection.
   if (!user) {
-    return null;
+    return <AppLayoutSkeleton />;
   }
   
-  // If there's a user but the profile is still loading (e.g., during registration race condition),
-  // show a dedicated layout skeleton instead of a blank screen. This is the fix.
+  // If there's a user but the profile is still loading (e.g., during registration),
+  // show the dedicated layout skeleton.
   if (!userProfile) {
     return <AppLayoutSkeleton />;
   }

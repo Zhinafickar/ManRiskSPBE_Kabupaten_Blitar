@@ -8,7 +8,7 @@ import {
   ReactNode,
 } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, setDoc, onSnapshot, Unsubscribe } from 'firebase/firestore';
+import { doc, onSnapshot, Unsubscribe, setDoc } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { UserProfile } from '@/types/user';
@@ -40,53 +40,44 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let profileUnsubscribe: Unsubscribe | undefined;
 
     const authUnsubscribe = onAuthStateChanged(auth, (authUser) => {
-      // Clean up previous profile listener if it exists
       if (profileUnsubscribe) {
         profileUnsubscribe();
       }
 
       if (authUser) {
-        setUser(authUser); // Set the Firebase user immediately
-        setLoading(true); // Always be loading until we resolve the profile
-
+        setUser(authUser);
         const userDocRef = doc(db, 'users', authUser.uid);
+        
         profileUnsubscribe = onSnapshot(userDocRef, async (profileDoc) => {
           if (profileDoc.exists()) {
-            // Profile exists, we are good to go.
             setUserProfile(profileDoc.data() as UserProfile);
-            setLoading(false); // Stop loading, we have everything.
+            setLoading(false);
           } else {
-            // Profile doesn't exist.
-            // This could be a new registration, or a special admin user logging in for the first time.
-            let profileToCreate: UserProfile | null = null;
-            if (authUser.email === 'admin@gmail.com') {
-              profileToCreate = { uid: authUser.uid, email: authUser.email, fullName: 'Admin', role: 'admin' };
+            // Profile doesn't exist. This could be a new registration.
+            // We'll keep loading until the profile is created by the registration form.
+            // The `onSnapshot` will fire again when it's created.
+            // Special case for pre-defined admin/superadmin accounts.
+             if (authUser.email === 'admin@gmail.com') {
+              const adminProfile = { uid: authUser.uid, email: authUser.email, fullName: 'Admin', role: 'admin' };
+              await setDoc(userDocRef, adminProfile).catch(console.error);
             } else if (authUser.email === 'superadmin@gmail.com') {
-              profileToCreate = { uid: authUser.uid, email: authUser.email, fullName: 'Super Admin', role: 'superadmin' };
-            }
-
-            if (profileToCreate) {
-              // Create the profile; the onSnapshot listener will fire again and resolve the state.
-              await setDoc(userDocRef, profileToCreate).catch(console.error);
+              const superAdminProfile = { uid: authUser.uid, email: authUser.email, fullName: 'Super Admin', role: 'superadmin' };
+              await setDoc(userDocRef, superAdminProfile).catch(console.error);
             } else {
-              // This is a regular user during registration.
-              // We do nothing and keep `loading` as `true`.
-              // The `register-form.tsx` is responsible for creating the document.
-              // Once it's created, this `onSnapshot` will fire again and the `if (profileDoc.exists())` block will run.
-              // This correctly handles the race condition by simply waiting.
-              setUserProfile(null); // Ensure profile is null while we wait
+                // For a regular user registering, we just wait.
+                // setLoading remains true.
+                setUserProfile(null);
             }
           }
         });
       } else {
-        // User logged out
+        // No user is signed in.
         setUser(null);
         setUserProfile(null);
-        setLoading(false); // Stop loading, we are in a final "logged out" state.
+        setLoading(false);
       }
     });
 
-    // Cleanup on component unmount
     return () => {
       authUnsubscribe();
       if (profileUnsubscribe) {
