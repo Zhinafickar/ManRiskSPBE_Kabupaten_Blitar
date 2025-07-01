@@ -8,7 +8,7 @@ import {
   ReactNode,
 } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { UserProfile } from '@/types/user';
@@ -30,63 +30,64 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // This effect only handles auth state changes (subscribing to the user object)
   useEffect(() => {
     if (!isFirebaseConfigured) {
       setLoading(false);
       return;
     }
+    const unsubscribeAuth = onAuthStateChanged(auth!, (currentUser) => {
+      setLoading(true); // Always set loading true on auth change
+      setUser(currentUser);
+      if (!currentUser) {
+        setUserProfile(null);
+        setLoading(false);
+      }
+    });
+    return () => unsubscribeAuth();
+  }, []);
 
-    const unsubscribe = onAuthStateChanged(auth!, async (currentUser) => {
-      // Always start with a loading state during auth changes
-      setLoading(true);
+  // This effect handles profile fetching via a reactive listener
+  useEffect(() => {
+    if (!user || !db) {
+      if (!user) setLoading(false); // If there's no user, we're not loading a profile
+      return;
+    }
 
-      if (currentUser) {
-        setUser(currentUser);
-        // Try to fetch or create the user profile from Firestore
-        if (db) {
-          const userDocRef = doc(db, 'users', currentUser.uid);
-          try {
-            const userDoc = await getDoc(userDocRef);
-            if (userDoc.exists()) {
-              setUserProfile(userDoc.data() as UserProfile);
-            } else {
-              // Document doesn't exist. Check if it's a special user to create a profile.
-              let profileToCreate: UserProfile | null = null;
-              if (currentUser.email === 'admin@gmail.com') {
-                profileToCreate = { uid: currentUser.uid, email: currentUser.email, fullName: 'Admin', role: 'admin' };
-              } else if (currentUser.email === 'superadmin@gmail.com') {
-                profileToCreate = { uid: currentUser.uid, email: currentUser.email, fullName: 'Super Admin', role: 'superadmin' };
-              }
-
-              if (profileToCreate) {
-                // Create the document for the special user
-                await setDoc(userDocRef, profileToCreate);
-                setUserProfile(profileToCreate);
-              } else {
-                // It's a regular user, but their profile doc is missing.
-                // This is an invalid state, so we'll set profile to null.
-                setUserProfile(null);
-              }
-            }
-          } catch (error) {
-            console.error("Error fetching user profile:", error);
+    const userDocRef = doc(db, 'users', user.uid);
+    const unsubscribeProfile = onSnapshot(
+      userDocRef,
+      async (doc) => {
+        if (doc.exists()) {
+          setUserProfile(doc.data() as UserProfile);
+        } else {
+          // Profile doesn't exist. Check for special users to auto-create profile.
+          let profileToCreate: UserProfile | null = null;
+          if (user.email === 'admin@gmail.com') {
+            profileToCreate = { uid: user.uid, email: user.email, fullName: 'Admin', role: 'admin' };
+          } else if (user.email === 'superadmin@gmail.com') {
+            profileToCreate = { uid: user.uid, email: user.email, fullName: 'Super Admin', role: 'superadmin' };
+          }
+          
+          if (profileToCreate) {
+            // This will trigger the onSnapshot listener again with the new data
+            await setDoc(userDocRef, profileToCreate).catch(console.error);
+          } else {
+            // For regular users (during registration or error), profile is null for now
             setUserProfile(null);
           }
-        } else {
-          // Database isn't configured, can't get a profile.
-          setUserProfile(null);
         }
-      } else {
-        // User is logged out
-        setUser(null);
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Error listening to user profile:", error);
         setUserProfile(null);
+        setLoading(false);
       }
-      // Finished all checks, set loading to false.
-      setLoading(false);
-    });
+    );
 
-    return () => unsubscribe();
-  }, []);
+    return () => unsubscribeProfile();
+  }, [user]);
 
   if (loading) {
     return (
