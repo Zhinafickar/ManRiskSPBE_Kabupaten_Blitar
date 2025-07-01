@@ -4,14 +4,16 @@
  * @fileOverview This file defines a Genkit flow for analyzing risk trends from survey data.
  *
  * - analyzeRiskTrends - A function that analyzes survey data to identify emerging risk trends and their potential impacts.
- * - AnalyzeRiskTrendsInput - The input type for the analyzeRiskTrends function (currently empty).
+ * - AnalyzeRiskTrendsInput - The input type for the analyzeRiskTrends function, which includes the survey data.
  * - AnalyzeRiskTrendsOutput - The return type for the analyzeRiskTrends function, containing a summary of risk trends.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const AnalyzeRiskTrendsInputSchema = z.object({});
+const AnalyzeRiskTrendsInputSchema = z.object({
+  surveyData: z.string().describe('A JSON string of all survey data.'),
+});
 export type AnalyzeRiskTrendsInput = z.infer<typeof AnalyzeRiskTrendsInputSchema>;
 
 const AnalyzeRiskTrendsOutputSchema = z.object({
@@ -34,35 +36,14 @@ const prompt = ai.definePrompt({
   Summary: `,
 });
 
-const getSurveyData = ai.defineTool(
-    {
-      name: 'getSurveyData',
-      description: 'Retrieves all survey data from Firestore.',
-      inputSchema: z.object({}),
-      outputSchema: z.array(z.record(z.any())), // Assuming survey data is an array of objects
-    },
-    async () => {
-      // Assuming you have a service function to fetch survey data from Firestore
-      return await getAllSurveyData();
-    }
-);
-
-// Assuming you have a function to fetch survey data from Firestore
-import {getAllSurveyData} from '@/services/survey-service';
-
 const analyzeRiskTrendsFlow = ai.defineFlow(
     {
       name: 'analyzeRiskTrendsFlow',
       inputSchema: AnalyzeRiskTrendsInputSchema,
       outputSchema: AnalyzeRiskTrendsOutputSchema,
-      tools: [getSurveyData],
     },
-    async input => {
-      const surveyData = await getSurveyData({});
-      const {output} = await prompt({
-        ...input,
-        surveyData: JSON.stringify(surveyData),
-      });
+    async (input) => {
+      const {output} = await prompt(input);
       return output!;
     }
 );

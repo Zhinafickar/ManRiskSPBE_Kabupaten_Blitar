@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Users, FileText, Bot, AreaChart } from "lucide-react";
 import { analyzeRiskTrends, type AnalyzeRiskTrendsOutput } from "@/ai/flows/risk-trend-analysis";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getAllSurveyData } from "@/services/survey-service";
 
 function RiskAnalysisSkeleton() {
     return (
@@ -35,11 +36,26 @@ function RiskAnalysisCard() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    analyzeRiskTrends({})
-      .then(setAnalysis)
-      .catch(() => setError("Failed to generate AI analysis."))
-      .finally(() => setLoading(false));
+    const generateAnalysis = async () => {
+      try {
+        const surveys = await getAllSurveyData();
+        if (surveys.length === 0) {
+          setAnalysis({ summary: 'No survey data has been submitted yet. AI analysis requires data.' });
+          return;
+        }
+        const result = await analyzeRiskTrends({ surveyData: JSON.stringify(surveys) });
+        setAnalysis(result);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to generate AI analysis.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    generateAnalysis();
   }, []);
+
 
   if (loading) {
     return <RiskAnalysisSkeleton />;
