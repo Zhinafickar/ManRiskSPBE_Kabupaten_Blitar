@@ -31,36 +31,48 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isFirebaseConfigured || !auth) {
+    if (!isFirebaseConfigured) {
       setLoading(false);
       return;
     }
 
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth!, (user) => {
+      setLoading(true);
       if (user) {
         setUser(user);
-        if (db) {
-          const userDoc = await getDoc(doc(db, 'users', user.uid));
-          if (userDoc.exists()) {
-            setUserProfile(userDoc.data() as UserProfile);
-          } else {
-            // Special handling for hardcoded admin/superadmin accounts
-            if (user.email === 'admin@gmail.com') {
-                setUserProfile({ uid: user.uid, email: user.email, fullName: 'Admin', role: 'admin' });
-            } else if (user.email === 'superadmin@gmail.com') {
-                setUserProfile({ uid: user.uid, email: user.email, fullName: 'Super Admin', role: 'superadmin' });
-            } else {
-                setUserProfile(null);
+        const fetchUserProfile = async () => {
+          if (db) {
+            try {
+              const userDoc = await getDoc(doc(db, 'users', user.uid));
+              if (userDoc.exists()) {
+                setUserProfile(userDoc.data() as UserProfile);
+              } else {
+                // Special handling for hardcoded admin/superadmin accounts
+                if (user.email === 'admin@gmail.com') {
+                    setUserProfile({ uid: user.uid, email: user.email, fullName: 'Admin', role: 'admin' });
+                } else if (user.email === 'superadmin@gmail.com') {
+                    setUserProfile({ uid: user.uid, email: user.email, fullName: 'Super Admin', role: 'superadmin' });
+                } else {
+                    setUserProfile(null);
+                }
+              }
+            } catch (error) {
+              console.error("Error fetching user profile:", error);
+              setUserProfile(null);
+            } finally {
+              setLoading(false);
             }
+          } else {
+            setUserProfile(null);
+            setLoading(false);
           }
-        } else {
-            setUserProfile(null)
-        }
+        };
+        fetchUserProfile();
       } else {
         setUser(null);
         setUserProfile(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
