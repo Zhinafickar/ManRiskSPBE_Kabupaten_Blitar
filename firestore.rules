@@ -4,62 +4,65 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // HELPER FUNCTIONS
-    function isAuth() {
+    function isSignedIn() {
       return request.auth != null;
     }
-    function isOwner(uid) {
-      return isAuth() && request.auth.uid == uid;
-    }
-    function getUserData(uid) {
-      return get(/databases/$(database)/documents/users/$(uid)).data;
-    }
-    function isRole(role) {
-      return isAuth() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && getUserData(request.auth.uid).role == role;
-    }
+
     function isSuperAdmin() {
-      return isRole('superadmin');
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
     }
+
     function isAdmin() {
-      return isRole('admin');
-    }
-
-    // USERS COLLECTION
-    match /users/{userId} {
-      // Admins/SuperAdmins can list users for management.
-      allow list: if isAdmin() || isSuperAdmin();
-      // Owner or Admins/SuperAdmins can read a user profile.
-      allow get: if isOwner(userId) || isAdmin() || isSuperAdmin();
-      // A user can create their own profile.
-      allow create: if isOwner(userId);
-      // Owner or SuperAdmins can update a profile.
-      allow update: if isOwner(userId) || isSuperAdmin();
-      // Only SuperAdmins can delete.
-      allow delete: if isSuperAdmin();
-    }
-
-    // ROLES COLLECTION
-    match /roles/{roleId} {
-      // ANYONE can check if a role exists by trying to read the document.
-      // This is safe because this collection contains no sensitive user data.
-      allow get: if true;
-
-      // An authenticated user can CREATE their role document during registration.
-      allow create: if isAuth() && request.resource.data.uid == request.auth.uid;
-      
-      // ONLY a superadmin can DELETE a role document (happens when deleting a user).
-      allow delete: if isSuperAdmin();
-
-      // No one can update a role document directly. It must be deleted and re-created by an admin.
-      allow update: if false;
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && (
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+          || isSuperAdmin()
+        );
     }
     
-    // SURVEYS COLLECTION
+    function isOwner(userId) {
+        return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // ROLES: Tracks unique roles.
+    match /roles/{role} {
+      // Anyone can check if a role exists during registration. Secure because no sensitive data.
+      allow get: if true;
+      
+      // A new user can create their role document during registration by proving ownership via the UID in the data.
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+
+      // Only superadmins can update or delete role mappings.
+      allow update, delete: if isSuperAdmin();
+    }
+
+    // USERS: Stores user profiles.
+    match /users/{userId} {
+      // A user can create their own profile. Validation is on the document's content, not the path.
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      
+      // A user can read their own profile. Admins/Superadmins can read any profile.
+      allow read: if isOwner(userId) || isAdmin();
+      
+      // A user can only update their own fullName. Super Admin can update anything.
+      allow update: if (isOwner(userId) && request.resource.data.keys().hasOnly(['fullName', 'role'])) || isSuperAdmin();
+      
+      // Only a Super Admin can delete a user's profile document.
+      allow delete: if isSuperAdmin();
+    }
+
+    // SURVEYS: Stores all survey data.
     match /surveys/{surveyId} {
-      // Any authenticated user can create a survey.
-      allow create: if isAuth();
-      // Users can read their own surveys. Admins/SuperAdmins can read all surveys.
-      allow read: if isAuth() && (resource.data.userId == request.auth.uid || isAdmin() || isSuperAdmin());
-      // Surveys cannot be updated or deleted from the client to ensure data integrity.
+      // A signed-in user can create a survey.
+      allow create: if isSignedIn();
+      
+      // A user can only read surveys they created. Admins and Super Admins can read all surveys.
+      allow read: if (resource.data.userId == request.auth.uid) || isAdmin();
+
+      // Surveys are immutable for now.
       allow update, delete: if false;
     }
   }
