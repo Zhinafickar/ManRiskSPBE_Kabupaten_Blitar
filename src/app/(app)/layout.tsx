@@ -23,29 +23,16 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    if (loading) {
-      return; // Wait until authentication state is fully resolved by the hook.
-    }
-
-    if (!user) {
+    // This is now just a safeguard. If AuthProvider finishes loading and there's
+    // still no user, it means they are logged out, so we redirect.
+    if (!loading && !user) {
       router.replace('/login');
-      return;
     }
+  }, [user, loading, router]);
 
-    // This is the new error handling. If loading is done, but we have a user
-    // without a profile, it's an unrecoverable error state.
-    if (!userProfile) {
-      console.error("User is authenticated, but no profile was found. Forcing logout to prevent a broken state.");
-      if (auth) {
-        signOut(auth).finally(() => router.replace('/login'));
-      } else {
-        router.replace('/login');
-      }
-    }
-  }, [user, userProfile, loading, router]);
-
-  // The AuthProvider shows its own skeleton while loading is true.
-  // This gate prevents rendering the layout with incomplete data.
+  // AuthProvider shows its own loading skeleton. This check prevents rendering
+  // the layout with incomplete data during the brief moment before redirection
+  // or on initial hydration.
   if (loading || !user || !userProfile) {
     return null;
   }

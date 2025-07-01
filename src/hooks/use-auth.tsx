@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               // We will keep loading=true until the profile appears.
               setUser(authUser);
               setUserProfile(null);
-              setLoading(true);
+              // We intentionally DON'T set loading to false here. We wait for the profile.
             }
           }
         }, (error) => {
