@@ -35,10 +35,13 @@ export default function Home() {
       router.replace('/login');
     } else if (userProfile) {
       // If logged in and profile exists, redirect based on role
-      switch (userProfile.role) {
+      // Use userProfile.role or fallback to 'user' if not set
+      const userRole = userProfile.role || 'user';
+
+      switch (userRole) {
         case 'admin':
           router.replace('/admin/dashboard');
-          break;
+ break;
         case 'superadmin':
           router.replace('/superadmin/dashboard');
           break;

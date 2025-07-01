@@ -1,5 +1,5 @@
 import { db, isFirebaseConfigured } from '@/lib/firebase';
-import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, setDoc, deleteDoc, query, where } from 'firebase/firestore';
 import type { UserProfile } from '@/types/user';
 
 export async function getAllUsers(): Promise<UserProfile[]> {
@@ -17,6 +17,17 @@ export async function getAllUsers(): Promise<UserProfile[]> {
   });
   return userList;
 }
+
+export async function isRoleTaken(role: string): Promise<boolean> {
+  if (!isFirebaseConfigured || !db) return false; // Assume role is not taken if Firebase is not configured
+  const usersCollection = collection(db, 'users');
+  const q = query(usersCollection, where('role', '==', role));
+  const userSnapshot = await getDocs(q);
+  return !userSnapshot.empty; // If the snapshot is not empty, the role is taken
+}
+
+// Note: The actual user creation (with auth) happens in src/app/register/_components/register-form.tsx.
+// We will modify that component to use the isRoleTaken check.
 
 export async function getAssignedRoles() {
   if (!isFirebaseConfigured || !db) return [];

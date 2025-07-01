@@ -2,10 +2,44 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // This rule allows any authenticated user to read and write to any document.
-    // This is suitable for development but should be secured before production.
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+
+    function getUserRole(uid) {
+      // Caching the result of get() is important for performance if called multiple times.
+      // Rules do this automatically within a single evaluation.
+      return get(/databases/$(database)/documents/users/$(uid)).data.role;
+    }
+
+    match /users/{userId} {
+      // Allow read access for checking roles during registration and for superadmins listing users.
+      // NOTE: `allow list: if true` is insecure but required for the current app logic to allow unauthenticated role checks.
+      allow list: if true; 
+      allow get: if request.auth != null;
+
+      // Allow users to create their own profile.
+      allow create: if request.auth.uid == userId;
+      // Allow superadmins to update and delete any user.
+      allow update, delete: if request.auth != null && getUserRole(request.auth.uid) == 'superadmin';
+    }
+
+    match /surveys/{surveyId} {
+      // Allow admins/superadmins to get any document. Users can only get their own.
+      allow get: if request.auth != null && (
+        getUserRole(request.auth.uid) in ['admin', 'superadmin'] ||
+        resource.data.userId == request.auth.uid
+      );
+
+      // Allow admins/superadmins to list all documents.
+      // Users can only list documents if they query by their own userId.
+      allow list: if request.auth != null && (
+        getUserRole(request.auth.uid) in ['admin', 'superadmin'] ||
+        (request.query.where.size() == 1 && request.query.where[0].field == 'userId' && request.query.where[0].op == '==' && request.query.where[0].value == request.auth.uid)
+      );
+      
+      // Any authenticated user can create a survey as long as they set themselves as the owner.
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+
+      // Disallow updates and deletes for now.
+      allow update, delete: if false;
     }
   }
 }

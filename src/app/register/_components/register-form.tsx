@@ -27,6 +27,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { useState } from 'react';
 
+import { isRoleTaken } from '@/services/user-service';
 const formSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
   email: z.string().email({ message: 'Please enter a valid email.' }),
@@ -61,6 +62,18 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
         title: 'Firebase Not Configured',
         description: 'Please add your Firebase credentials to the .env file to enable registration.',
       });
+      return;
+    }
+
+    // Check if the role is already taken
+    const roleTaken = await isRoleTaken(values.role);
+    if (roleTaken) {
+      toast({
+        variant: 'destructive',
+        title: 'Registration Failed',
+        description: `The role '${values.role}' is already taken by another user.`,
+      });
+      setIsLoading(false);
       return;
     }
     setIsLoading(true);
