@@ -67,9 +67,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               setUserProfile(null);
               setLoading(true);
             } else {
-              // It's an existing user with a missing profile. This is an error.
-              // Log them out to prevent getting stuck.
-              console.error("User profile not found for an existing user. Logging out.");
+              // It's an existing user with a missing profile. This is an error state.
+              // Silently log them out to prevent them from getting stuck.
               auth.signOut();
             }
           }
