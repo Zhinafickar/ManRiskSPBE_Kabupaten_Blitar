@@ -15,19 +15,32 @@ import { useEffect, type ReactNode } from 'react';
 import { Icons } from '@/components/icons';
 import { MainNav } from '@/components/main-nav';
 import { UserNav } from '@/components/user-nav';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 export default function AppLayout({ children }: { children: ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, userProfile, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.replace('/login');
+    if (!loading) {
+      if (!user) {
+        router.replace('/login');
+      } else if (!userProfile) {
+        // This state can happen if a user is in Auth but their Firestore doc is missing.
+        // Log them out and redirect to login to avoid letting them into a broken state.
+        console.error("User authenticated but profile is missing. Forcing logout.");
+        if (auth) {
+          signOut(auth).finally(() => router.replace('/login'));
+        } else {
+          router.replace('/login');
+        }
+      }
     }
-  }, [user, loading, router]);
+  }, [user, userProfile, loading, router]);
 
-  if (loading || !user) {
-    // AuthProvider already shows a loading skeleton
+  if (loading || !user || !userProfile) {
+    // AuthProvider already shows a more detailed skeleton. This is a secondary gate.
     return null;
   }
 

@@ -76,6 +76,7 @@ export const RISK_EVENTS = [
 ];
 
 
+
 export const IMPACT_AREAS = [
   'Finansial',
   'Reputasi',
