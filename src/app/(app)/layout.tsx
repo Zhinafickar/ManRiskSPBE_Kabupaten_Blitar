@@ -12,44 +12,42 @@ import {
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
-import { Icons } from '@/components/icons';
 import { MainNav } from '@/components/main-nav';
 import { UserNav } from '@/components/user-nav';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { Icons } from '@/components/icons';
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const { user, userProfile, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    // Wait until loading is complete before making routing decisions.
     if (loading) {
+      return; // Wait until authentication state is fully resolved.
+    }
+
+    if (!user) {
+      router.replace('/login');
       return;
     }
 
-    // If loading is done and there's no user, redirect to login.
-    if (!user) {
-      router.replace('/login');
+    // This is the new error handling. If loading is done, but we have a user
+    // without a profile, it's an unrecoverable error state.
+    if (!userProfile) {
+      console.error("User is authenticated, but no profile was found. Forcing logout to prevent a broken state.");
+      if (auth) {
+        signOut(auth).finally(() => router.replace('/login'));
+      } else {
+        router.replace('/login');
+      }
     }
-    // The case of a user with no profile is handled by the rendering logic below.
-  }, [user, loading, router]);
+  }, [user, userProfile, loading, router]);
 
-  // The AuthProvider already shows a skeleton while its `loading` is true.
-  // This gate prevents rendering the layout until the auth state is resolved.
-  if (loading || !user) {
+  // The AuthProvider shows its own skeleton while loading is true.
+  // This gate prevents rendering the layout with incomplete data.
+  if (loading || !user || !userProfile) {
     return null;
-  }
-  
-  // If the user is authenticated but the profile is still being created (due to the race condition),
-  // show a "finalizing" screen. The onSnapshot listener in useAuth will update this state.
-  if (!userProfile) {
-     return (
-      <div className="flex h-screen w-full flex-col items-center justify-center gap-4">
-          <Icons.Logo className="size-10 animate-spin text-primary" />
-          <p className="text-muted-foreground">Finalizing profile...</p>
-      </div>
-    );
   }
 
   return (
