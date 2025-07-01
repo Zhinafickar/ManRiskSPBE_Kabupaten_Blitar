@@ -1,0 +1,55 @@
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { getAllSurveyData } from "@/services/survey-service";
+
+export const dynamic = 'force-dynamic';
+
+export default async function AdminResultsPage() {
+  const surveys = await getAllSurveyData();
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>All Survey Results</CardTitle>
+        <CardDescription>A comprehensive list of all surveys submitted by all users.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {surveys.length > 0 ? (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>User Role</TableHead>
+                <TableHead>Risk Event</TableHead>
+                <TableHead>Survey Type</TableHead>
+                <TableHead>Frequency</TableHead>
+                <TableHead>Impact</TableHead>
+                <TableHead>Date</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {surveys.map((survey) => (
+                <TableRow key={survey.id}>
+                  <TableCell className="font-medium max-w-xs truncate">{survey.userRole}</TableCell>
+                  <TableCell className="max-w-xs truncate">{survey.riskEvent}</TableCell>
+                  <TableCell>
+                    <Badge variant={survey.surveyType === 1 ? 'default' : 'secondary'}>
+                      Survey {survey.surveyType}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{survey.frequency}</TableCell>
+                  <TableCell>{survey.impactMagnitude}</TableCell>
+                  <TableCell>{new Date(survey.createdAt).toLocaleDateString()}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        ) : (
+          <div className="text-center py-10">
+            <p className="text-muted-foreground">No surveys have been submitted yet.</p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
