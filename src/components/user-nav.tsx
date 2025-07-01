@@ -56,7 +56,7 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem onSelect={() => router.push('/dashboard')}>
+          <DropdownMenuItem onSelect={() => router.push('/')}>
             Dashboard
           </DropdownMenuItem>
         </DropdownMenuGroup>

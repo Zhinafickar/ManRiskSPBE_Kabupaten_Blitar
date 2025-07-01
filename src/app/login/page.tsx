@@ -60,11 +60,10 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const { user, loading: authLoading } = useAuth();
 
-  // Redirect if user is already logged in or after successful login.
-  // This hook relies on the central auth state.
+  // Redirect if user is already logged in. The root page (/) will handle dispatching.
   useEffect(() => {
     if (!authLoading && user) {
-      router.replace('/dashboard');
+      router.replace('/');
     }
   }, [user, authLoading, router]);
 
@@ -91,7 +90,7 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({
         title: 'Login Successful',
-        description: 'Redirecting to your dashboard...',
+        description: 'Redirecting...',
       });
       // Redirection is now handled by the useEffect hook.
     } catch (error: any) {

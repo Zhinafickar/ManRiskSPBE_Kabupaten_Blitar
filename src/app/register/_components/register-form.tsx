@@ -83,7 +83,7 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
         title: 'Registration Successful',
         description: 'Your account has been created.',
       });
-      router.push('/dashboard');
+      router.push('/');
     } catch (error: any) {
       toast({
         variant: 'destructive',
