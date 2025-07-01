@@ -4,45 +4,59 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function isSuperAdmin() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
-    }
-
-    function isAdmin() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'superadmin'];
+    // == Helper Functions ==
+    function isSignedIn() {
+      return request.auth != null;
     }
 
     function isOwner(userId) {
-      return request.auth.uid == userId;
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
     }
 
+    function isSuperAdmin() {
+      return isSignedIn() && getUserRole() == 'superadmin';
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (getUserRole() == 'admin' || isSuperAdmin());
+    }
+
+    // == Collection: users ==
     match /users/{userId} {
-      // Allow unauthenticated users to query the users collection ONLY to check for unique roles during registration.
-      // Admins and Superadmins can also list users for management purposes.
-      allow list: if request.auth == null || (request.auth != null && isAdmin());
+      // FIX: Allow unauthenticated users to query the collection.
+      // This is REQUIRED for the registration page to check if a role is already taken.
+      // Without this rule, the `isRoleTaken` function will always fail with a permission error.
+      allow list: if true;
 
-      // Allow anyone to create a user profile for themselves when they sign up.
-      allow create: if request.auth != null && isOwner(userId);
+      // Allow authenticated users to get their own profile.
+      // Admins and Superadmins can get any user's profile.
+      allow get: if isOwner(userId) || isAdmin();
       
-      // Allow users to get their own profile. Admins/Superadmins can get any profile.
-      allow get: if request.auth != null && (isOwner(userId) || isAdmin());
+      // Allow a new user to create their own profile document.
+      // The document ID must match their auth UID.
+      allow create: if isOwner(userId);
 
-      // Users can update their own data. Superadmins can update anyone's data.
-      allow update: if request.auth != null && (isOwner(userId) || isSuperAdmin());
-      
-      // Only superadmins can delete user documents.
-      allow delete: if request.auth != null && isSuperAdmin();
+      // A user can update their own data. Admins/Superadmins can update any user.
+      allow update: if isOwner(userId) || isAdmin();
+
+      // Only Superadmins can delete user documents.
+      allow delete: if isSuperAdmin();
     }
 
+    // == Collection: surveys ==
     match /surveys/{surveyId} {
-      // Allow authenticated users to create surveys for themselves.
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-
       // Users can read their own surveys. Admins/Superadmins can read all surveys.
-      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
-
-      // Surveys cannot be updated or deleted from the client to ensure data integrity.
-      allow update, delete: if false;
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      
+      // Users can create surveys and must correctly set their own userId.
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      
+      // Surveys cannot be updated or deleted by anyone to ensure data integrity.
+      allow update, delete: if false; 
     }
   }
 }
