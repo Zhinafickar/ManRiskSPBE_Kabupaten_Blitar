@@ -4,20 +4,10 @@ import { ROLES } from '@/constants/data';
 import RegisterForm from './_components/register-form';
 import Link from 'next/link';
 import { Icons } from '@/components/icons';
-import { useEffect, useState } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
 
 export default function RegisterPage() {
-  const [availableRoles, setAvailableRoles] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // The previous logic tried to fetch all users to determine available roles,
-    // which is not secure for unauthenticated users and was causing permission errors.
-    // This has been simplified to show all available roles from the predefined list.
-    setAvailableRoles(ROLES);
-    setLoading(false);
-  }, []);
+  // Roles are static, so no need for state or effects.
+  const availableRoles = ROLES;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
@@ -30,29 +20,7 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        {loading ? (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-1/4" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-1/4" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-1/4" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-1/4" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-             <Skeleton className="h-10 w-full" />
-          </div>
-        ) : (
-          <RegisterForm availableRoles={availableRoles} />
-        )}
+        <RegisterForm availableRoles={availableRoles} />
         
         <p className="text-center text-sm text-muted-foreground">
           Already have an account?{' '}

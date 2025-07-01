@@ -2,11 +2,34 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow read and write access only to authenticated users.
-    // This is a good starting point for development, but you'll
-    // want more granular rules for a production application.
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+
+    function getRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    match /users/{userId} {
+      // Any authenticated user can create their own user doc (needed for signup).
+      allow create: if request.auth != null && request.auth.uid == userId;
+      
+      // Users can read their own profile. Superadmins can read any profile.
+      allow read: if request.auth != null && (request.auth.uid == userId || getRole() == 'superadmin');
+
+      // Users can update their own profile. Superadmins can update any.
+      allow update: if request.auth != null && (request.auth.uid == userId || getRole() == 'superadmin');
+      
+      // Superadmins can delete users.
+      allow delete: if request.auth != null && getRole() == 'superadmin';
+    }
+
+    match /surveys/{surveyId} {
+      // Any authenticated user can create a survey.
+      allow create: if request.auth != null;
+
+      // Users can read their own surveys. Admins and Superadmins can read all surveys.
+      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || getRole() in ['admin', 'superadmin']);
+      
+      // Surveys are immutable to preserve data integrity.
+      allow update, delete: if false;
     }
   }
 }
