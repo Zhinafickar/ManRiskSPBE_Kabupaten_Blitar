@@ -32,47 +32,57 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (!isFirebaseConfigured || !auth || !db) {
+      console.warn("Firebase is not configured. Authentication will not work.");
       setLoading(false);
       return;
     }
 
-    let profileUnsubscribe: Unsubscribe | null = null;
+    let profileUnsubscribe: Unsubscribe | undefined;
 
     const authUnsubscribe = onAuthStateChanged(auth, (authUser) => {
-      // Cleanup previous profile listener
+      // Clean up previous profile listener if it exists
       if (profileUnsubscribe) {
         profileUnsubscribe();
       }
 
       if (authUser) {
+        setUser(authUser); // Set the Firebase user immediately
+        setLoading(true); // Always be loading until we resolve the profile
+
         const userDocRef = doc(db, 'users', authUser.uid);
         profileUnsubscribe = onSnapshot(userDocRef, async (profileDoc) => {
           if (profileDoc.exists()) {
-            setUser(authUser);
+            // Profile exists, we are good to go.
             setUserProfile(profileDoc.data() as UserProfile);
-            setLoading(false);
+            setLoading(false); // Stop loading, we have everything.
           } else {
-            // Profile doesn't exist yet. Keep loading.
-            // Handle special user creation.
+            // Profile doesn't exist.
+            // This could be a new registration, or a special admin user logging in for the first time.
             let profileToCreate: UserProfile | null = null;
             if (authUser.email === 'admin@gmail.com') {
               profileToCreate = { uid: authUser.uid, email: authUser.email, fullName: 'Admin', role: 'admin' };
             } else if (authUser.email === 'superadmin@gmail.com') {
               profileToCreate = { uid: authUser.uid, email: authUser.email, fullName: 'Super Admin', role: 'superadmin' };
             }
-            
+
             if (profileToCreate) {
-                // The snapshot will fire again once this is set. We don't stop loading yet.
-                await setDoc(userDocRef, profileToCreate).catch(console.error);
+              // Create the profile; the onSnapshot listener will fire again and resolve the state.
+              await setDoc(userDocRef, profileToCreate).catch(console.error);
+            } else {
+              // This is a regular user during registration.
+              // We do nothing and keep `loading` as `true`.
+              // The `register-form.tsx` is responsible for creating the document.
+              // Once it's created, this `onSnapshot` will fire again and the `if (profileDoc.exists())` block will run.
+              // This correctly handles the race condition by simply waiting.
+              setUserProfile(null); // Ensure profile is null while we wait
             }
-            // For regular new users, we just wait. `loading` stays true.
           }
         });
       } else {
         // User logged out
         setUser(null);
         setUserProfile(null);
-        setLoading(false);
+        setLoading(false); // Stop loading, we are in a final "logged out" state.
       }
     });
 
