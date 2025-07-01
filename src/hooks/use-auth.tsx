@@ -11,13 +11,7 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
-
-export interface UserProfile {
-  uid: string;
-  email: string;
-  fullName: string;
-  role: 'user' | 'admin' | 'superadmin' | string;
-}
+import type { UserProfile } from '@/types/user';
 
 interface AuthContextType {
   user: User | null;

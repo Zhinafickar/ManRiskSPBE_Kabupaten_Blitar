@@ -1,13 +1,23 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { getAllUsers } from "@/services/user-service";
 import { ROLES } from "@/constants/data";
 import { UserTable } from "./_components/user-table";
+import type { UserProfile } from '@/types/user';
+import { Skeleton } from '@/components/ui/skeleton';
 
-export const dynamic = 'force-dynamic';
-
-export default async function UserManagementPage() {
-  const users = await getAllUsers();
+export default function UserManagementPage() {
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [loading, setLoading] = useState(true);
   const allRoles = [...ROLES, 'admin', 'superadmin']; // All possible roles
+
+  useEffect(() => {
+    getAllUsers()
+      .then(setUsers)
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <Card>
@@ -18,7 +28,21 @@ export default async function UserManagementPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <UserTable users={users as any} allRoles={allRoles} />
+        {loading ? (
+          <div className="space-y-4">
+            <div className="flex justify-end mb-4">
+              <Skeleton className="h-10 w-28" />
+            </div>
+            <div className="space-y-2">
+                <Skeleton className="h-12 w-full rounded-lg" />
+                <Skeleton className="h-12 w-full rounded-lg" />
+                <Skeleton className="h-12 w-full rounded-lg" />
+                <Skeleton className="h-12 w-full rounded-lg" />
+            </div>
+          </div>
+        ) : (
+          <UserTable users={users} allRoles={allRoles} />
+        )}
       </CardContent>
     </Card>
   );

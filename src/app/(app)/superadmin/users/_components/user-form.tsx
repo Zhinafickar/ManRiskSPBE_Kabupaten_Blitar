@@ -29,7 +29,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { UserProfile } from '@/hooks/use-auth';
+import type { UserProfile } from '@/types/user';
 import { useEffect, useState } from 'react';
 import { updateUser } from '../actions';
 

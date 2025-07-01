@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, PlusCircle, Trash2, Edit } from 'lucide-react';
-import { UserProfile } from '@/hooks/use-auth';
+import type { UserProfile } from '@/types/user';
 import { UserForm } from './user-form';
 import {
   AlertDialog,
