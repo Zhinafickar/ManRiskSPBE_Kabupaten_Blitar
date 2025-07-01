@@ -31,7 +31,8 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import type { UserProfile } from '@/types/user';
 import { useEffect, useState } from 'react';
-import { updateUser } from '../actions';
+import { updateUserData } from '@/services/user-service';
+import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
   uid: z.string(),
@@ -50,6 +51,7 @@ interface UserFormProps {
 export function UserForm({ isOpen, setIsOpen, user, allRoles }: UserFormProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -84,10 +86,11 @@ export function UserForm({ isOpen, setIsOpen, user, allRoles }: UserFormProps) {
         return;
     }
 
-    const result = await updateUser(values);
+    const result = await updateUserData(values);
 
     if (result.success) {
       toast({ title: 'Success', description: result.message });
+      router.refresh();
       setIsOpen(false);
     } else {
       toast({ variant: 'destructive', title: 'Error', description: result.message });

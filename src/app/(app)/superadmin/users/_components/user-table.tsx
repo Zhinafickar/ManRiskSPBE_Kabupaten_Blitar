@@ -30,8 +30,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { deleteUser } from '../actions';
+import { deleteUserData } from '@/services/user-service';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 interface UserTableProps {
   users: UserProfile[];
@@ -42,6 +43,7 @@ export function UserTable({ users, allRoles }: UserTableProps) {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleAddUser = () => {
     setSelectedUser(null);
@@ -54,9 +56,10 @@ export function UserTable({ users, allRoles }: UserTableProps) {
   };
   
   const handleDeleteUser = async (uid: string) => {
-    const result = await deleteUser(uid);
+    const result = await deleteUserData(uid);
     if (result.success) {
       toast({ title: 'Success', description: result.message });
+      router.refresh();
     } else {
       toast({ variant: 'destructive', title: 'Error', description: result.message });
     }
