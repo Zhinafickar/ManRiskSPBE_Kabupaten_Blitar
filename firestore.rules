@@ -2,11 +2,11 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow public read access for development, but require authentication for writes.
-    // For production, you should tighten these rules.
+    // Allow read and write access only to authenticated users.
+    // This is a good starting point for development, but you'll
+    // want more granular rules for a production application.
     match /{document=**} {
-      allow read: if true;
-      allow write: if request.auth != null;
+      allow read, write: if request.auth != null;
     }
   }
 }
