@@ -24,7 +24,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (loading) {
-      return; // Wait until authentication state is fully resolved.
+      return; // Wait until authentication state is fully resolved by the hook.
     }
 
     if (!user) {

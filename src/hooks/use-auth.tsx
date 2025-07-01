@@ -37,28 +37,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     let unsubscribeProfile: Unsubscribe | undefined;
-    let profileTimeout: NodeJS.Timeout | undefined;
 
     const unsubscribeAuth = onAuthStateChanged(auth, (authUser) => {
-      // Clean up previous listeners and timeouts
       if (unsubscribeProfile) unsubscribeProfile();
-      if (profileTimeout) clearTimeout(profileTimeout);
 
       if (authUser) {
-        setLoading(true); // Always start in loading state for an authenticated user
         const userDocRef = doc(db, 'users', authUser.uid);
-
+        
         unsubscribeProfile = onSnapshot(userDocRef, async (profileDoc) => {
-          if (profileTimeout) clearTimeout(profileTimeout);
-
           if (profileDoc.exists()) {
+            // Profile exists, we are good to go.
             setUser(authUser);
             setUserProfile(profileDoc.data() as UserProfile);
             setLoading(false);
           } else {
-            setUser(authUser);
-            setUserProfile(null);
-            
+            // Profile does not exist. This could be a new user, or a special user on first login.
+            // For special users, we create the profile here.
             let profileToCreate: UserProfile | null = null;
             if (authUser.email === 'admin@gmail.com') {
               profileToCreate = { uid: authUser.uid, email: authUser.email, fullName: 'Admin', role: 'admin' };
@@ -68,14 +62,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
             if (profileToCreate) {
               await setDoc(userDocRef, profileToCreate).catch(console.error);
-              return; // The listener will fire again with the created profile.
+              // The onSnapshot listener will fire again with the new data, and loading will be set to false then.
+            } else {
+              // For a regular new user, the registration form is responsible for creation.
+              // We will keep loading=true until the profile appears.
+              setUser(authUser);
+              setUserProfile(null);
+              setLoading(true);
             }
-
-            // For regular new users, set a timeout. If the profile doesn't appear, it's an error.
-            profileTimeout = setTimeout(() => {
-                console.error("Profile not found after a delay. This could indicate an error during registration or a missing database record.");
-                setLoading(false); // End loading, will trigger error handling in layout
-            }, 7000); // 7-second timeout
           }
         }, (error) => {
             console.error("Error listening to user profile:", error);
@@ -94,7 +88,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       unsubscribeAuth();
       if (unsubscribeProfile) unsubscribeProfile();
-      if (profileTimeout) clearTimeout(profileTimeout);
     };
   }, []);
 
