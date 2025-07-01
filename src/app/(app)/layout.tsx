@@ -23,25 +23,50 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading) {
-      if (!user) {
-        router.replace('/login');
-      } else if (!userProfile) {
-        // This state can happen if a user is in Auth but their Firestore doc is missing.
-        // Log them out and redirect to login to avoid letting them into a broken state.
+    // Don't do anything while the auth state is initially loading.
+    if (loading) {
+      return;
+    }
+
+    // If loading is done and there's no user, redirect to login.
+    if (!user) {
+      router.replace('/login');
+      return;
+    }
+
+    // If there is a user but no profile, this could be a race condition
+    // during registration or a genuine error. We'll wait a few seconds.
+    if (user && !userProfile) {
+      const timer = setTimeout(() => {
+        // If the profile is still missing after a delay, it's an error. Force logout.
         console.error("User authenticated but profile is missing. Forcing logout.");
         if (auth) {
           signOut(auth).finally(() => router.replace('/login'));
         } else {
           router.replace('/login');
         }
-      }
+      }, 5000); // 5-second timeout
+
+      // Clean up the timer if the component unmounts or if the profile loads.
+      return () => clearTimeout(timer);
     }
   }, [user, userProfile, loading, router]);
 
-  if (loading || !user || !userProfile) {
-    // AuthProvider already shows a more detailed skeleton. This is a secondary gate.
+  // The AuthProvider already shows a skeleton while its `loading` is true.
+  // This gate prevents rendering the layout until the user is confirmed.
+  if (loading || !user) {
     return null;
+  }
+  
+  // If the user is authenticated but the profile is still being created (due to the race condition),
+  // show a simple "finalizing" screen instead of the full layout.
+  if (!userProfile) {
+     return (
+      <div className="flex h-screen w-full flex-col items-center justify-center gap-4">
+          <Icons.Logo className="size-10 animate-spin text-primary" />
+          <p className="text-muted-foreground">Finalizing profile...</p>
+      </div>
+    );
   }
 
   return (
