@@ -11,17 +11,26 @@ import {
   FileText,
   FilePlus,
   Book,
-  LineChart,
+  AreaChart,
   Users,
-  Shield,
-  AreaChart
+  LogOut,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 export function MainNav() {
   const { userProfile } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    if (auth) {
+      await signOut(auth);
+      router.push('/login');
+    }
+  };
 
   const userMenu = [
     {
@@ -85,16 +94,16 @@ export function MainNav() {
       active: pathname === '/superadmin/dashboard',
     },
     {
-        href: '/superadmin/results',
-        label: 'Hasil Survey',
-        icon: FileText,
-        active: pathname === '/superadmin/results',
+      href: '/superadmin/results',
+      label: 'Hasil Survey',
+      icon: FileText,
+      active: pathname === '/superadmin/results',
     },
     {
-        href: '/superadmin/visualization',
-        label: 'Visualisasi',
-        icon: AreaChart,
-        active: pathname === '/superadmin/visualization',
+      href: '/superadmin/visualization',
+      label: 'Visualisasi',
+      icon: AreaChart,
+      active: pathname === '/superadmin/visualization',
     },
     {
       href: '/superadmin/users',
@@ -117,20 +126,41 @@ export function MainNav() {
 
   const menuItems = getMenuItems();
 
+  const allItems = [
+    ...menuItems,
+    {
+      label: 'Logout',
+      icon: LogOut,
+      onClick: handleLogout,
+      active: false,
+    },
+  ];
+
   return (
     <SidebarMenu>
-      {menuItems.map((item) => (
-        <SidebarMenuItem key={item.href}>
-          <SidebarMenuButton
-            asChild
-            isActive={item.active}
-            tooltip={item.label}
-          >
-            <Link href={item.href}>
+      {allItems.map((item: any) => (
+        <SidebarMenuItem key={item.label}>
+          {item.href ? (
+            <SidebarMenuButton
+              asChild
+              isActive={item.active}
+              tooltip={item.label}
+            >
+              <Link href={item.href}>
+                <item.icon />
+                <span>{item.label}</span>
+              </Link>
+            </SidebarMenuButton>
+          ) : (
+            <SidebarMenuButton
+              onClick={item.onClick}
+              isActive={item.active}
+              tooltip={item.label}
+            >
               <item.icon />
               <span>{item.label}</span>
-            </Link>
-          </SidebarMenuButton>
+            </SidebarMenuButton>
+          )}
         </SidebarMenuItem>
       ))}
     </SidebarMenu>
