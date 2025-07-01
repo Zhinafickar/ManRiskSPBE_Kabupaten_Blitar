@@ -14,8 +14,6 @@ import { useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
 import { MainNav } from '@/components/main-nav';
 import { UserNav } from '@/components/user-nav';
-import { signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 import { Icons } from '@/components/icons';
 
 export default function AppLayout({ children }: { children: ReactNode }) {
@@ -23,17 +21,18 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // This is now just a safeguard. If AuthProvider finishes loading and there's
-    // still no user, it means they are logged out, so we redirect.
+    // The AuthProvider won't stop loading until auth is resolved.
+    // So, if loading is false and there's no user, they are logged out.
     if (!loading && !user) {
       router.replace('/login');
     }
   }, [user, loading, router]);
 
-  // AuthProvider shows its own loading skeleton. This check prevents rendering
-  // the layout with incomplete data during the brief moment before redirection
-  // or on initial hydration.
+  // AuthProvider shows a global loading screen. If `loading` is true here,
+  // this component isn't even rendered. We just need to handle the case
+  // where loading is false but we still don't have a user, before useEffect redirects.
   if (loading || !user || !userProfile) {
+    // This will be briefly null while the redirect to /login happens.
     return null;
   }
 

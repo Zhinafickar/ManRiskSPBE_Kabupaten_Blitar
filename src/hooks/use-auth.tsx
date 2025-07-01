@@ -36,58 +36,52 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    let unsubscribeProfile: Unsubscribe | undefined;
+    let profileUnsubscribe: Unsubscribe | null = null;
 
-    const unsubscribeAuth = onAuthStateChanged(auth, (authUser) => {
-      if (unsubscribeProfile) unsubscribeProfile();
+    const authUnsubscribe = onAuthStateChanged(auth, (authUser) => {
+      // Cleanup previous profile listener
+      if (profileUnsubscribe) {
+        profileUnsubscribe();
+      }
 
       if (authUser) {
         const userDocRef = doc(db, 'users', authUser.uid);
-        
-        unsubscribeProfile = onSnapshot(userDocRef, async (profileDoc) => {
+        profileUnsubscribe = onSnapshot(userDocRef, async (profileDoc) => {
           if (profileDoc.exists()) {
-            // Profile exists, we are good to go.
             setUser(authUser);
             setUserProfile(profileDoc.data() as UserProfile);
             setLoading(false);
           } else {
-            // Profile does not exist. This could be a new user, or a special user on first login.
-            // For special users, we create the profile here.
+            // Profile doesn't exist yet. Keep loading.
+            // Handle special user creation.
             let profileToCreate: UserProfile | null = null;
             if (authUser.email === 'admin@gmail.com') {
               profileToCreate = { uid: authUser.uid, email: authUser.email, fullName: 'Admin', role: 'admin' };
             } else if (authUser.email === 'superadmin@gmail.com') {
               profileToCreate = { uid: authUser.uid, email: authUser.email, fullName: 'Super Admin', role: 'superadmin' };
             }
-
+            
             if (profileToCreate) {
-              await setDoc(userDocRef, profileToCreate).catch(console.error);
-              // The onSnapshot listener will fire again with the new data, and loading will be set to false then.
-            } else {
-              // For a regular new user, the registration form is responsible for creation.
-              // We will keep loading=true until the profile appears.
-              setUser(authUser);
-              setUserProfile(null);
-              // We intentionally DON'T set loading to false here. We wait for the profile.
+                // The snapshot will fire again once this is set. We don't stop loading yet.
+                await setDoc(userDocRef, profileToCreate).catch(console.error);
             }
+            // For regular new users, we just wait. `loading` stays true.
           }
-        }, (error) => {
-            console.error("Error listening to user profile:", error);
-            setUser(null);
-            setUserProfile(null);
-            setLoading(false);
         });
       } else {
-        // User is signed out
+        // User logged out
         setUser(null);
         setUserProfile(null);
         setLoading(false);
       }
     });
 
+    // Cleanup on component unmount
     return () => {
-      unsubscribeAuth();
-      if (unsubscribeProfile) unsubscribeProfile();
+      authUnsubscribe();
+      if (profileUnsubscribe) {
+        profileUnsubscribe();
+      }
     };
   }, []);
 
