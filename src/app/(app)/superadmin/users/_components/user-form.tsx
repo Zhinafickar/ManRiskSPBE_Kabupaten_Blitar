@@ -1,11 +1,10 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -107,7 +106,7 @@ export function UserForm({ isOpen, setIsOpen, user, allRoles }: UserFormProps) {
             {user ? 'Update the user details below.' : 'To add a new user, they must first register through the public registration page. You can then edit their role and details here.'}
           </DialogDescription>
         </DialogHeader>
-        <Form {...form}>
+        <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
@@ -156,7 +155,7 @@ export function UserForm({ isOpen, setIsOpen, user, allRoles }: UserFormProps) {
               </Button>
             </DialogFooter>
           </form>
-        </Form>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   );

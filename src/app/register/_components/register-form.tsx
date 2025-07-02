@@ -1,11 +1,10 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -68,9 +67,7 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
         return;
       }
 
-      const existingUsers = await getAllUsers();
-      const isFirstUser = existingUsers.length === 0;
-      
+      const isFirstUser = (await getAllUsers()).length === 0;
       const finalRole = isFirstUser ? 'superadmin' : values.role;
 
       if (!isFirstUser) {
@@ -132,7 +129,7 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
   }
 
   return (
-    <Form {...form}>
+    <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
@@ -207,6 +204,6 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
           {isLoading ? 'Creating account...' : 'Create Account'}
         </Button>
       </form>
-    </Form>
+    </FormProvider>
   );
 }

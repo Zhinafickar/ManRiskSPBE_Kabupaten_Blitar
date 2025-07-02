@@ -1,11 +1,10 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -124,7 +123,7 @@ export default function LoginPage() {
             <h1 className="text-2xl font-bold mt-4">Risk Navigator</h1>
             <p className="text-muted-foreground">Welcome back! Please enter your details.</p>
         </div>
-        <Form {...form}>
+        <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
@@ -156,7 +155,7 @@ export default function LoginPage() {
               {isLoading ? 'Logging in...' : 'Login'}
             </Button>
           </form>
-        </Form>
+        </FormProvider>
         <p className="text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{' '}
           <Link href="/register" className="font-medium text-primary hover:underline">

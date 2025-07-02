@@ -1,11 +1,10 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -83,7 +82,7 @@ export default function Survey1Page() {
         <CardTitle>Input Kejadian Risiko</CardTitle>
         <CardDescription>Isi formulir penilaian risiko di bawah ini. Anda dapat memilih dari daftar atau mengetik kejadian risiko baru.</CardDescription>
       </CardHeader>
-      <Form {...form}>
+      <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="space-y-6">
             <FormField
@@ -208,7 +207,7 @@ export default function Survey1Page() {
             <Button type="submit" disabled={isLoading}>{isLoading ? 'Submitting...' : 'Submit Survey'}</Button>
           </CardFooter>
         </form>
-      </Form>
+      </FormProvider>
     </Card>
   );
 }
