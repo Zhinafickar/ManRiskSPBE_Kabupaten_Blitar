@@ -13,13 +13,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -29,6 +22,10 @@ import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { useState } from 'react';
 import { isRoleTaken } from '@/services/user-service';
 import { ROLES } from '@/constants/data';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
@@ -45,6 +42,7 @@ export default function RegisterPage() {
   const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -177,34 +175,53 @@ export default function RegisterPage() {
                 )}
                 />
                 <FormField
-                control={form.control}
-                name="role"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Role</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select your role/department" />
-                        </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                        {availableRoles.length > 0 ? (
-                            availableRoles.map((role) => (
-                            <SelectItem key={role} value={role}>
-                                {role}
-                            </SelectItem>
-                            ))
-                        ) : (
-                            <SelectItem value="no-roles" disabled>
-                            No available roles
-                            </SelectItem>
-                        )}
-                        </SelectContent>
-                    </Select>
-                    <FormMessage />
+                  control={form.control}
+                  name="role"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Role</FormLabel>
+                      <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn("w-full justify-between", !field.value && "text-muted-foreground")}
+                            >
+                              {field.value
+                                ? availableRoles.find(role => role === field.value)
+                                : "Select your role/department"}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                          <Command>
+                            <CommandInput placeholder="Search role..." />
+                            <CommandEmpty>No role found.</CommandEmpty>
+                            <CommandList>
+                              <CommandGroup>
+                                {availableRoles.map((role) => (
+                                  <CommandItem
+                                    key={role}
+                                    value={role}
+                                    onSelect={() => {
+                                      form.setValue("role", role);
+                                      setOpen(false);
+                                    }}
+                                  >
+                                    <Check className={cn("mr-2 h-4 w-4", role === field.value ? "opacity-100" : "opacity-0")} />
+                                    {role}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
                     </FormItem>
-                )}
+                  )}
                 />
                 <Button type="submit" className="w-full" disabled={isLoading || availableRoles.length === 0}>
                 {isLoading ? 'Creating account...' : 'Create Account'}
