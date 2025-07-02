@@ -1,5 +1,5 @@
 import { db, isFirebaseConfigured } from '@/lib/firebase';
-import { collection, getDocs, addDoc, query, where } from 'firebase/firestore';
+import { collection, getDocs, addDoc, query, where, doc, deleteDoc } from 'firebase/firestore';
 import { Survey } from '@/types/survey';
 
 export async function getAllSurveyData() {
@@ -44,4 +44,18 @@ export async function getUserSurveys(userId: string) {
         } as Survey;
     });
     return surveyList;
+}
+
+export async function deleteSurvey(surveyId: string): Promise<{ success: boolean, message: string }> {
+    if (!isFirebaseConfigured || !db) {
+        return { success: false, message: 'Firebase is not configured.' };
+    }
+    try {
+        const surveyRef = doc(db, 'surveys', surveyId);
+        await deleteDoc(surveyRef);
+        return { success: true, message: 'Survey deleted successfully.' };
+    } catch (error) {
+        console.error("Error deleting survey: ", error);
+        return { success: false, message: 'Failed to delete survey.' };
+    }
 }

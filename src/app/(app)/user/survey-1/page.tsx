@@ -121,7 +121,7 @@ export default function Survey1Page() {
               name="riskEvent"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Kejadian Risiko TIK</FormLabel>
+                  <FormLabel>Kejadian Risiko</FormLabel>
                    <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -170,7 +170,7 @@ export default function Survey1Page() {
               name="impactArea"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Area Dampak</FormLabel>
+                  <FormLabel>Area Dampak Risiko</FormLabel>
                   <Select 
                     onValueChange={field.onChange} 
                     value={field.value}
@@ -238,14 +238,14 @@ export default function Survey1Page() {
                 />
             </div>
             <div className="space-y-2 rounded-lg border p-4">
-                <FormLabel>Indikator Risiko</FormLabel>
+                <FormLabel>Analisis Risiko</FormLabel>
                 <div className='pt-2'>
                 {riskIndicator.level ? (
                     <Badge className={cn("text-base", riskIndicator.color)}>
                     {riskIndicator.level}
                     </Badge>
                 ) : (
-                    <p className="text-sm text-muted-foreground">Pilih frekuensi dan besaran dampak untuk melihat indikator.</p>
+                    <p className="text-sm text-muted-foreground">Indikator Risiko Anda Akan Keluar Disini</p>
                 )}
                 </div>
             </div>
