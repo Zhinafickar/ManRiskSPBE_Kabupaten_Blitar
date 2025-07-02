@@ -78,7 +78,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2">
-            <Image src="https://1.bp.blogspot.com/-FWtnaDcD23s/UWTmDrZwOtI/AAAAAAAAAhA/1DpC7OLHLFw/s1600/logo%20kabupaten%20blitar.jpg" alt="Logo" width={32} height={36} />
+            <Image src="https://berita.blitarkab.go.id/wp-content/uploads/2020/09/logo-kab-blitar.png" alt="Logo" width={38} height={36} />
             <h1 className="text-lg font-semibold">Manajement Resiko</h1>
           </div>
         </SidebarHeader>

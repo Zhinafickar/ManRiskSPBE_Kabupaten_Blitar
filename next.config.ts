@@ -27,7 +27,13 @@ const nextConfig: NextConfig = {
         hostname: '1.bp.blogspot.com',
         port: '',
         pathname: '/**',
-      }
+      },
+      {
+        protocol: 'https',
+        hostname: 'berita.blitarkab.go.id',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };

@@ -133,7 +133,7 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center text-center">
-          <Image src="https://1.bp.blogspot.com/-FWtnaDcD23s/UWTmDrZwOtI/AAAAAAAAAhA/1DpC7OLHLFw/s1600/logo%20kabupaten%20blitar.jpg" alt="Logo" width={60} height={66} />
+          <Image src="https://berita.blitarkab.go.id/wp-content/uploads/2020/09/logo-kab-blitar.png" alt="Logo" width={74} height={70} />
           <h1 className="text-2xl font-bold mt-4">Create an Account</h1>
           <p className="text-muted-foreground">
             Fill in the details below to join Manajement Resiko.
