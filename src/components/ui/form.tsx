@@ -9,14 +9,10 @@ import {
   type ControllerProps,
   type FieldPath,
   type FieldValues,
-  FormProvider,
 } from "react-hook-form"
 
 import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
-
-// The FormProvider component is now imported directly from react-hook-form
-// in the files that need it, and this alias has been removed to fix the build error.
 
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
@@ -175,6 +171,4 @@ export {
   FormDescription,
   FormMessage,
   FormField,
-  // The 'Form' alias is removed. Use FormProvider from 'react-hook-form' directly.
-  FormProvider,
 }
