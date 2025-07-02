@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { Icons } from '@/components/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, FormProvider } from 'react-hook-form';
 import * as z from 'zod';
@@ -26,6 +25,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 const formSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
@@ -133,7 +133,7 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center text-center">
-          <Icons.Logo className="h-10 w-10" />
+          <Image src="https://1.bp.blogspot.com/-FWtnaDcD23s/UWTmDrZwOtI/AAAAAAAAAhA/1DpC7OLHLFw/s1600/logo%20kabupaten%20blitar.jpg" alt="Logo" width={40} height={44} />
           <h1 className="text-2xl font-bold mt-4">Create an Account</h1>
           <p className="text-muted-foreground">
             Fill in the details below to join Manajement Resiko.

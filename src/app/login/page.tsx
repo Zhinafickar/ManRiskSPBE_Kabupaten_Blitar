@@ -17,10 +17,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth, isFirebaseConfigured } from '@/lib/firebase';
-import { Icons } from '@/components/icons';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { Skeleton } from '@/components/ui/skeleton';
+import Image from 'next/image';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
@@ -119,7 +119,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center text-center">
-            <Icons.Logo className="h-10 w-10" />
+            <Image src="https://1.bp.blogspot.com/-FWtnaDcD23s/UWTmDrZwOtI/AAAAAAAAAhA/1DpC7OLHLFw/s1600/logo%20kabupaten%20blitar.jpg" alt="Logo" width={40} height={44} />
             <h1 className="text-2xl font-bold mt-4">Manajement Resiko</h1>
             <p className="text-muted-foreground">Sistem ini dirancang untuk membantu instansi pemerintah dalam mengidentifikasi, menganalisis, dan memitigasi berbagai potensi risiko operasional, strategis, dan kepatuhan guna mendukung tata kelola yang efektif dan transparan.</p>
         </div>

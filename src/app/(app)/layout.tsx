@@ -14,8 +14,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
 import { MainNav } from '@/components/main-nav';
 import { UserNav } from '@/components/user-nav';
-import { Icons } from '@/components/icons';
 import { Skeleton } from '@/components/ui/skeleton';
+import Image from 'next/image';
 
 function AppLayoutSkeleton() {
   return (
@@ -78,7 +78,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2">
-            <Icons.Logo className="size-6" />
+            <Image src="https://1.bp.blogspot.com/-FWtnaDcD23s/UWTmDrZwOtI/AAAAAAAAAhA/1DpC7OLHLFw/s1600/logo%20kabupaten%20blitar.jpg" alt="Logo" width={24} height={27} />
             <h1 className="text-lg font-semibold">Manajement Resiko</h1>
           </div>
         </SidebarHeader>
