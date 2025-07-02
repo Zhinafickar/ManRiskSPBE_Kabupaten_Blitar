@@ -23,7 +23,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, writeBatch } from 'firebase/firestore';
+import { doc, writeBatch } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { useState } from 'react';
 import { isRoleTaken, getAllUsers } from '@/services/user-service';
@@ -58,39 +58,34 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    if (!isFirebaseConfigured || !auth || !db) {
-      toast({
-        variant: 'destructive',
-        title: 'Firebase Not Configured',
-        description: 'Please add your Firebase credentials to the .env file to enable registration.',
-      });
-      setIsLoading(false);
-      return;
-    }
-
-    // New logic: Check if this is the first user
-    const existingUsers = await getAllUsers();
-    const isFirstUser = existingUsers.length === 0;
-    
-    // Determine the final role
-    const finalRole = isFirstUser ? 'superadmin' : values.role;
-
-    // Check if the role is taken, unless it's the first user becoming a superadmin
-    if (!isFirstUser) {
-        const roleTaken = await isRoleTaken(finalRole);
-        if (roleTaken) {
-            toast({
-                variant: 'destructive',
-                title: 'Peran Tidak Tersedia',
-                description: `Peran '${finalRole}' sudah dipilih orang lain. Silakan pilih peran yang berbeda.`,
-            });
-            form.setValue('role', '', { shouldValidate: true });
-            setIsLoading(false);
-            return;
-        }
-    }
-    
     try {
+      if (!isFirebaseConfigured || !auth || !db) {
+        toast({
+          variant: 'destructive',
+          title: 'Firebase Not Configured',
+          description: 'Please add your Firebase credentials to the .env file to enable registration.',
+        });
+        return;
+      }
+
+      const existingUsers = await getAllUsers();
+      const isFirstUser = existingUsers.length === 0;
+      
+      const finalRole = isFirstUser ? 'superadmin' : values.role;
+
+      if (!isFirstUser) {
+          const roleTaken = await isRoleTaken(finalRole);
+          if (roleTaken) {
+              toast({
+                  variant: 'destructive',
+                  title: 'Peran Tidak Tersedia',
+                  description: `Peran '${finalRole}' sudah dipilih orang lain. Silakan pilih peran yang berbeda.`,
+              });
+              form.setValue('role', '', { shouldValidate: true });
+              return;
+          }
+      }
+      
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         values.email,
@@ -119,7 +114,6 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
       });
       
       router.push('/');
-
     } catch (error: any) {
       let description = 'An unknown error occurred.';
       if (error.code === 'auth/email-already-in-use') {
@@ -132,7 +126,8 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
         title: 'Registration Failed',
         description: description,
       });
-      setIsLoading(false);
+    } finally {
+        setIsLoading(false);
     }
   }
 
