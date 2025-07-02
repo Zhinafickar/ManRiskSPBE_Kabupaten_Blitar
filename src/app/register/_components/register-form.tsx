@@ -25,7 +25,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, writeBatch } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { useState } from 'react';
-import { isRoleTaken, getAllUsers } from '@/services/user-service';
+import { isRoleTaken } from '@/services/user-service';
 
 const formSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
@@ -66,21 +66,16 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
         });
         return;
       }
-
-      const isFirstUser = (await getAllUsers()).length === 0;
-      const finalRole = isFirstUser ? 'superadmin' : values.role;
-
-      if (!isFirstUser) {
-          const roleTaken = await isRoleTaken(finalRole);
-          if (roleTaken) {
-              toast({
-                  variant: 'destructive',
-                  title: 'Peran Tidak Tersedia',
-                  description: `Peran '${finalRole}' sudah dipilih orang lain. Silakan pilih peran yang berbeda.`,
-              });
-              form.setValue('role', '', { shouldValidate: true });
-              return;
-          }
+      
+      const roleTaken = await isRoleTaken(values.role);
+      if (roleTaken) {
+          toast({
+              variant: 'destructive',
+              title: 'Peran Tidak Tersedia',
+              description: `Peran '${values.role}' sudah dipilih orang lain. Silakan pilih peran yang berbeda.`,
+          });
+          form.setValue('role', '', { shouldValidate: true });
+          return;
       }
       
       const userCredential = await createUserWithEmailAndPassword(
@@ -97,17 +92,17 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
         uid: user.uid,
         fullName: values.fullName,
         email: values.email,
-        role: finalRole,
+        role: values.role,
       });
 
-      const roleRef = doc(db, 'roles', finalRole);
+      const roleRef = doc(db, 'roles', values.role);
       batch.set(roleRef, { uid: user.uid });
 
       await batch.commit();
 
       toast({
         title: 'Registration Successful',
-        description: isFirstUser ? 'Congratulations! You are the Superadmin.' : 'Redirecting to your dashboard...',
+        description: 'Redirecting to your dashboard...',
       });
       
       router.push('/');

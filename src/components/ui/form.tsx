@@ -5,7 +5,6 @@ import * as LabelPrimitive from "@radix-ui/react-label"
 import { Slot } from "@radix-ui/react-slot"
 import {
   Controller,
-  // FormProvider is now imported directly in components that use it.
   useFormContext,
   type ControllerProps,
   type FieldPath,
@@ -15,8 +14,8 @@ import {
 import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
 
-// FormProvider is now imported directly where needed, so this re-export is removed.
-// We keep the other Form... exports as they are part of shadcn.
+// The FormProvider component is now imported directly in the files that need it.
+// The problematic alias and its export have been removed to fix the build error.
 
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
@@ -31,7 +30,7 @@ const FormFieldContext = React.createContext<FormFieldContextValue>(
 
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = Path<TFieldValues>
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
 >({
   ...props
 }: ControllerProps<TFieldValues, TName>) => {
