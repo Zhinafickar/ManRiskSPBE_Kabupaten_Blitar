@@ -67,8 +67,8 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
         return;
       }
       
-      const roleTaken = await isRoleTaken(values.role);
-      if (roleTaken) {
+      const roleIsAlreadyTaken = await isRoleTaken(values.role);
+      if (roleIsAlreadyTaken) {
           toast({
               variant: 'destructive',
               title: 'Peran Tidak Tersedia',
