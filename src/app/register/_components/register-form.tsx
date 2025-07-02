@@ -26,7 +26,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc, writeBatch } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { useState } from 'react';
-import { isRoleTaken } from '@/services/user-service';
+import { isRoleTaken, getAllUsers } from '@/services/user-service';
 
 const formSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
@@ -68,16 +68,26 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
       return;
     }
 
-    const roleTaken = await isRoleTaken(values.role);
-    if (roleTaken) {
-      toast({
-        variant: 'destructive',
-        title: 'Peran Tidak Tersedia',
-        description: `Peran '${values.role}' sudah dipilih orang lain. Silakan pilih peran yang berbeda.`,
-      });
-      form.setValue('role', '', { shouldValidate: true });
-      setIsLoading(false);
-      return;
+    // New logic: Check if this is the first user
+    const existingUsers = await getAllUsers();
+    const isFirstUser = existingUsers.length === 0;
+    
+    // Determine the final role
+    const finalRole = isFirstUser ? 'superadmin' : values.role;
+
+    // Check if the role is taken, unless it's the first user becoming a superadmin
+    if (!isFirstUser) {
+        const roleTaken = await isRoleTaken(finalRole);
+        if (roleTaken) {
+            toast({
+                variant: 'destructive',
+                title: 'Peran Tidak Tersedia',
+                description: `Peran '${finalRole}' sudah dipilih orang lain. Silakan pilih peran yang berbeda.`,
+            });
+            form.setValue('role', '', { shouldValidate: true });
+            setIsLoading(false);
+            return;
+        }
     }
     
     try {
@@ -95,17 +105,17 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
         uid: user.uid,
         fullName: values.fullName,
         email: values.email,
-        role: values.role,
+        role: finalRole,
       });
 
-      const roleRef = doc(db, 'roles', values.role);
+      const roleRef = doc(db, 'roles', finalRole);
       batch.set(roleRef, { uid: user.uid });
 
       await batch.commit();
 
       toast({
         title: 'Registration Successful',
-        description: 'Redirecting to your dashboard...',
+        description: isFirstUser ? 'Congratulations! You are the Superadmin.' : 'Redirecting to your dashboard...',
       });
       
       router.push('/');
@@ -178,7 +188,7 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select your role/department" />
-                  </SelectTrigger>
+                  </Trigger>
                 </FormControl>
                 <SelectContent>
                   {availableRoles.length > 0 ? (
