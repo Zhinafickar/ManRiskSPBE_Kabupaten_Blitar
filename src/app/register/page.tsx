@@ -136,7 +136,7 @@ export default function RegisterPage() {
           <Icons.Logo className="h-10 w-10" />
           <h1 className="text-2xl font-bold mt-4">Create an Account</h1>
           <p className="text-muted-foreground">
-            Fill in the details below to join Risk Navigator.
+            Fill in the details below to join Manajement Resiko.
           </p>
         </div>
 

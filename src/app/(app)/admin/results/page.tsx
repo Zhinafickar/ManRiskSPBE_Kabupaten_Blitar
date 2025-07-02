@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from '@/components/ui/skeleton';
 import { getAllSurveyData } from "@/services/survey-service";
 import type { Survey } from '@/types/survey';
+import { cn } from '@/lib/utils';
 
 function ResultsTableSkeleton() {
   return (
@@ -17,6 +18,32 @@ function ResultsTableSkeleton() {
       <Skeleton className="h-12 w-full" />
     </div>
   );
+}
+
+function RiskIndicatorBadge({ level }: { level?: string }) {
+    if (!level) return <Badge variant="outline">N/A</Badge>;
+
+    let colorClass = 'bg-gray-400 text-white hover:bg-gray-500';
+    switch (level) {
+        case 'Bahaya':
+            colorClass = 'bg-red-600 text-white hover:bg-red-700';
+            break;
+        case 'Sedang':
+            colorClass = 'bg-yellow-500 text-white hover:bg-yellow-600';
+            break;
+        case 'Rendah':
+            colorClass = 'bg-green-600 text-white hover:bg-green-700';
+            break;
+        case 'Minor':
+            colorClass = 'bg-blue-600 text-white hover:bg-blue-700';
+            break;
+    }
+
+    return (
+        <Badge className={cn(colorClass)}>
+            {level}
+        </Badge>
+    );
 }
 
 export default function AdminResultsPage() {
@@ -47,6 +74,7 @@ export default function AdminResultsPage() {
                 <TableHead>Survey Type</TableHead>
                 <TableHead>Frequency</TableHead>
                 <TableHead>Impact</TableHead>
+                <TableHead>Risk Level</TableHead>
                 <TableHead>Date</TableHead>
               </TableRow>
             </TableHeader>
@@ -62,6 +90,7 @@ export default function AdminResultsPage() {
                   </TableCell>
                   <TableCell>{survey.frequency}</TableCell>
                   <TableCell>{survey.impactMagnitude}</TableCell>
+                  <TableCell><RiskIndicatorBadge level={survey.riskLevel} /></TableCell>
                   <TableCell>{new Date(survey.createdAt).toLocaleDateString()}</TableCell>
                 </TableRow>
               ))}

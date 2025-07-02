@@ -8,6 +8,33 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
+
+function RiskIndicatorBadge({ level }: { level?: string }) {
+    if (!level) return <Badge variant="outline">N/A</Badge>;
+
+    let colorClass = 'bg-gray-400 text-white hover:bg-gray-500';
+    switch (level) {
+        case 'Bahaya':
+            colorClass = 'bg-red-600 text-white hover:bg-red-700';
+            break;
+        case 'Sedang':
+            colorClass = 'bg-yellow-500 text-white hover:bg-yellow-600';
+            break;
+        case 'Rendah':
+            colorClass = 'bg-green-600 text-white hover:bg-green-700';
+            break;
+        case 'Minor':
+            colorClass = 'bg-blue-600 text-white hover:bg-blue-700';
+            break;
+    }
+
+    return (
+        <Badge className={cn(colorClass)}>
+            {level}
+        </Badge>
+    );
+}
 
 export default function UserResultsPage() {
   const { user } = useAuth();
@@ -43,6 +70,7 @@ export default function UserResultsPage() {
                 <TableHead>Survey Type</TableHead>
                 <TableHead>Frequency</TableHead>
                 <TableHead>Impact</TableHead>
+                <TableHead>Risk Level</TableHead>
                 <TableHead>Date</TableHead>
               </TableRow>
             </TableHeader>
@@ -57,6 +85,7 @@ export default function UserResultsPage() {
                   </TableCell>
                   <TableCell>{survey.frequency}</TableCell>
                   <TableCell>{survey.impactMagnitude}</TableCell>
+                  <TableCell><RiskIndicatorBadge level={survey.riskLevel} /></TableCell>
                   <TableCell>{new Date(survey.createdAt).toLocaleDateString()}</TableCell>
                 </TableRow>
               ))}

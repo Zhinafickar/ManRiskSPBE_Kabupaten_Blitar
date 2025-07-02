@@ -29,7 +29,10 @@ import {
 } from '@/constants/data';
 import { addSurvey } from '@/services/survey-service';
 import { useAuth } from '@/hooks/use-auth';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getRiskLevel, type RiskIndicator } from '@/lib/risk-matrix';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
   riskEvent: z.string().min(5, { message: 'Risk event must be at least 5 characters.' }),
@@ -44,6 +47,7 @@ export default function Survey2Page() {
   const { toast } = useToast();
   const { user, userProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [riskIndicator, setRiskIndicator] = useState<RiskIndicator>({ level: null, color: '' });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -54,14 +58,27 @@ export default function Survey2Page() {
     },
   });
 
+  const frequency = form.watch('frequency');
+  const impactMagnitude = form.watch('impactMagnitude');
+
+  useEffect(() => {
+    if (frequency && impactMagnitude) {
+        const indicator = getRiskLevel(frequency, impactMagnitude);
+        setRiskIndicator(indicator);
+    } else {
+        setRiskIndicator({ level: null, color: '' });
+    }
+  }, [frequency, impactMagnitude]);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!user || !userProfile) {
         toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to submit a survey.' });
         return;
     }
     setIsLoading(true);
+    const indicator = getRiskLevel(values.frequency, values.impactMagnitude);
     try {
-        await addSurvey({ ...values, surveyType: 2, userId: user.uid, userRole: userProfile.role });
+        await addSurvey({ ...values, surveyType: 2, userId: user.uid, userRole: userProfile.role, riskLevel: indicator.level ?? undefined });
         toast({ title: 'Success', description: 'Survey 2 submitted successfully.' });
         form.reset();
     } catch (error) {
@@ -156,6 +173,18 @@ export default function Survey2Page() {
                     </FormItem>
                 )}
                 />
+            </div>
+             <div className="space-y-2 rounded-lg border p-4">
+                <FormLabel>Indikator Risiko</FormLabel>
+                <div className='pt-2'>
+                {riskIndicator.level ? (
+                    <Badge className={cn("text-base", riskIndicator.color)}>
+                    {riskIndicator.level}
+                    </Badge>
+                ) : (
+                    <p className="text-sm text-muted-foreground">Pilih frekuensi dan besaran dampak untuk melihat indikator.</p>
+                )}
+                </div>
             </div>
           </CardContent>
           <CardFooter>

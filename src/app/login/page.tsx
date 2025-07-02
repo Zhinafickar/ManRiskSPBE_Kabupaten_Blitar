@@ -120,8 +120,8 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center text-center">
             <Icons.Logo className="h-10 w-10" />
-            <h1 className="text-2xl font-bold mt-4">Risk Navigator</h1>
-            <p className="text-muted-foreground">Welcome back! Please enter your details.</p>
+            <h1 className="text-2xl font-bold mt-4">Manajement Resiko</h1>
+            <p className="text-muted-foreground">Sistem ini dirancang untuk membantu instansi pemerintah dalam mengidentifikasi, menganalisis, dan memitigasi berbagai potensi risiko operasional, strategis, dan kepatuhan guna mendukung tata kelola yang efektif dan transparan.</p>
         </div>
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
