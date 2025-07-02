@@ -18,19 +18,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: '1.bp.blogspot.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'http',
-        hostname: '1.bp.blogspot.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'berita.blitarkab.go.id',
+        hostname: 'cdn.kibrispdr.org',
         port: '',
         pathname: '/**',
       },

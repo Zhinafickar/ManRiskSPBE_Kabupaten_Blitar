@@ -119,7 +119,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center text-center">
-            <Image src="https://berita.blitarkab.go.id/wp-content/uploads/2020/09/logo-kab-blitar.png" alt="Logo" width={74} height={70} />
+            <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={74} height={70} />
             <h1 className="text-2xl font-bold mt-4">Manajement Resiko</h1>
             <p className="text-muted-foreground">Sistem ini dirancang untuk membantu instansi pemerintah dalam mengidentifikasi, menganalisis, dan memitigasi berbagai potensi risiko operasional, strategis, dan kepatuhan guna mendukung tata kelola yang efektif dan transparan.</p>
         </div>
