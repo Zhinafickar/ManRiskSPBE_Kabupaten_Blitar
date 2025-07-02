@@ -25,7 +25,6 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    console.log('Attempting to refresh dev server state...');
     // Wait until the authentication status is fully resolved
     if (loading) {
       return; // Do nothing while loading, AuthProvider shows a global skeleton
