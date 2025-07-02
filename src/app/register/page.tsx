@@ -70,8 +70,8 @@ export default function RegisterPage() {
       if (roleIsAlreadyTaken) {
           toast({
               variant: 'destructive',
-              title: 'Peran Tidak Tersedia',
-              description: `Peran '${values.role}' sudah dipilih orang lain. Silakan pilih peran yang berbeda.`,
+              title: 'Role Unavailable',
+              description: `The role '${values.role}' has already been taken. Please select a different role.`,
           });
           form.setValue('role', '', { shouldValidate: true });
           return;
@@ -108,7 +108,7 @@ export default function RegisterPage() {
 
       toast({
         title: 'Registration Successful',
-        description: isFirstUser ? 'Akun superadmin pertama berhasil dibuat! Mengarahkan...' : 'Redirecting to your dashboard...',
+        description: isFirstUser ? 'First superadmin account created! Redirecting...' : 'Redirecting to your dashboard...',
       });
       
       router.push('/');
@@ -134,9 +134,9 @@ export default function RegisterPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center text-center">
           <Icons.Logo className="h-10 w-10" />
-          <h1 className="text-2xl font-bold mt-4">Buat Akun</h1>
+          <h1 className="text-2xl font-bold mt-4">Create an Account</h1>
           <p className="text-muted-foreground">
-            Isi detail di bawah ini untuk bergabung dengan Manajemen Resiko.
+            Fill in the details below to join Risk Navigator.
           </p>
         </div>
 

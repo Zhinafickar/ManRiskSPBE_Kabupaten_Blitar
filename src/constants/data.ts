@@ -175,17 +175,17 @@ export const RISK_EVENTS = [
 
 
 export const FREQUENCY_LEVELS = [
-  'Hampir Tidak Terjadi',
-  'Jarang Terjadi',
-  'Kadang Terjadi',
-  'Sering Terjadi',
-  'Sangat Sering Terjadi',
+  'Almost Never',
+  'Rarely',
+  'Sometimes',
+  'Often',
+  'Very Often',
 ];
 
 export const IMPACT_MAGNITUDES = [
-  'Tidak Signifikan',
-  'Kurang Signifikan',
-  'Cukup Signifikan',
-  'Signifikan',
-  'Sangat Signifikan',
+  'Insignificant',
+  'Minor',
+  'Moderate',
+  'Significant',
+  'Very Significant',
 ];
