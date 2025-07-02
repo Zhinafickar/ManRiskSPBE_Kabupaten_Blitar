@@ -57,7 +57,7 @@ export default function LoginPage() {
   const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading }_ = useAuth();
 
   // Redirect if user is already logged in. The root page (/) will handle dispatching.
   useEffect(() => {
