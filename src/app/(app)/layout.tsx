@@ -78,8 +78,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2">
-            <Icons.Logo className="size-6 text-primary" />
-            <h1 className="text-lg font-semibold">Risk Navigator</h1>
+            <Icons.Logo className="size-6" />
+            <h1 className="text-lg font-semibold">Manajemen Resiko</h1>
           </div>
         </SidebarHeader>
         <SidebarContent>

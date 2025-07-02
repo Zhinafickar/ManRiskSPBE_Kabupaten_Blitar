@@ -6,12 +6,12 @@ export default function TutorialPage() {
       <CardHeader>
         <CardTitle>Tutorial</CardTitle>
         <CardDescription>
-          How to use the Risk Navigator application.
+          Cara menggunakan aplikasi Manajemen Resiko.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex items-center justify-center h-64 border-2 border-dashed rounded-lg">
-          <p className="text-muted-foreground">Tutorial content will be available here soon.</p>
+          <p className="text-muted-foreground">Konten tutorial akan segera tersedia di sini.</p>
         </div>
       </CardContent>
     </Card>

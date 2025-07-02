@@ -7,8 +7,8 @@ import { Toaster } from '@/components/ui/toaster';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: 'Risk Navigator',
-  description: 'A web application for risk assessment surveys.',
+  title: 'Manajemen Resiko',
+  description: 'Aplikasi web untuk survei penilaian risiko.',
 };
 
 export default function RootLayout({

@@ -119,9 +119,9 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center text-center">
-            <Icons.Logo className="h-10 w-10 text-primary" />
-            <h1 className="text-2xl font-bold mt-4">Risk Navigator</h1>
-            <p className="text-muted-foreground">Welcome back! Please enter your details.</p>
+            <Icons.Logo className="h-10 w-10" />
+            <h1 className="text-2xl font-bold mt-4">Manajemen Resiko</h1>
+            <p className="text-muted-foreground">Selamat datang kembali! Silakan masukkan detail Anda.</p>
         </div>
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

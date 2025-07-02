@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, writeBatch } from 'firebase/firestore';
+import { doc, writeBatch, getDocs, collection } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { useState } from 'react';
 import { isRoleTaken } from '@/services/user-service';
@@ -76,6 +76,11 @@ export default function RegisterPage() {
           form.setValue('role', '', { shouldValidate: true });
           return;
       }
+
+      // Check if this is the first user
+      const usersCollection = collection(db, 'users');
+      const usersSnapshot = await getDocs(usersCollection);
+      const isFirstUser = usersSnapshot.empty;
       
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -85,23 +90,25 @@ export default function RegisterPage() {
       const user = userCredential.user;
 
       const batch = writeBatch(db);
+      
+      const userRole = isFirstUser ? 'superadmin' : values.role;
 
       const userRef = doc(db, 'users', user.uid);
       batch.set(userRef, {
         uid: user.uid,
         fullName: values.fullName,
         email: values.email,
-        role: values.role,
+        role: userRole,
       });
 
-      const roleRef = doc(db, 'roles', values.role);
+      const roleRef = doc(db, 'roles', userRole);
       batch.set(roleRef, { uid: user.uid });
 
       await batch.commit();
 
       toast({
         title: 'Registration Successful',
-        description: 'Redirecting to your dashboard...',
+        description: isFirstUser ? 'Akun superadmin pertama berhasil dibuat! Mengarahkan...' : 'Redirecting to your dashboard...',
       });
       
       router.push('/');
@@ -126,10 +133,10 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center text-center">
-          <Icons.Logo className="h-10 w-10 text-primary" />
-          <h1 className="text-2xl font-bold mt-4">Create an Account</h1>
+          <Icons.Logo className="h-10 w-10" />
+          <h1 className="text-2xl font-bold mt-4">Buat Akun</h1>
           <p className="text-muted-foreground">
-            Fill in the details below to join Risk Navigator.
+            Isi detail di bawah ini untuk bergabung dengan Manajemen Resiko.
           </p>
         </div>
 
