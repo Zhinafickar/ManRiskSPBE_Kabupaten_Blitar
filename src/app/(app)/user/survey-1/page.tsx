@@ -22,26 +22,25 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import {
-    IMPACT_AREAS,
     RISK_EVENTS,
     FREQUENCY_LEVELS,
     IMPACT_MAGNITUDES
 } from '@/constants/data';
 import { addSurvey } from '@/services/survey-service';
 import { useAuth } from '@/hooks/use-auth';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
-  riskEvent: z.string({ required_error: 'Please select or enter a risk event.' }).min(1, { message: 'Risk event is required.' }),
-  impactArea: z.string({ required_error: 'Please select an impact area.' }),
-  cause: z.string().min(10, { message: 'Cause must be at least 10 characters.' }),
-  impact: z.string().min(10, { message: 'Impact must be at least 10 characters.' }),
-  frequency: z.string({ required_error: 'Please select a frequency level.' }),
-  impactMagnitude: z.string({ required_error: 'Please select an impact magnitude.' }),
+  riskEvent: z.string({ required_error: 'Silakan pilih kejadian risiko.' }).min(1, { message: 'Kejadian risiko harus diisi.' }),
+  impactArea: z.string({ required_error: 'Silakan pilih area dampak.' }).min(1, { message: 'Area dampak harus diisi.' }),
+  cause: z.string().min(10, { message: 'Penyebab harus diisi minimal 10 karakter.' }),
+  impact: z.string().min(10, { message: 'Dampak harus diisi minimal 10 karakter.' }),
+  frequency: z.string({ required_error: 'Silakan pilih frekuensi.' }),
+  impactMagnitude: z.string({ required_error: 'Silakan pilih besaran dampak.' }),
 });
 
 export default function Survey1Page() {
@@ -49,28 +48,45 @@ export default function Survey1Page() {
   const { user, userProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [availableImpactAreas, setAvailableImpactAreas] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       riskEvent: '',
+      impactArea: '',
       cause: '',
       impact: '',
+      frequency: '',
+      impactMagnitude: '',
     },
   });
 
+  const selectedRiskEvent = form.watch('riskEvent');
+
+  useEffect(() => {
+    const riskEventObject = RISK_EVENTS.find(event => event.name === selectedRiskEvent);
+    if (riskEventObject) {
+      setAvailableImpactAreas(riskEventObject.impactAreas);
+    } else {
+      setAvailableImpactAreas([]);
+    }
+    form.setValue('impactArea', '');
+  }, [selectedRiskEvent, form]);
+
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!user || !userProfile) {
-        toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to submit a survey.' });
+        toast({ variant: 'destructive', title: 'Error', description: 'Anda harus masuk untuk mengirimkan survei.' });
         return;
     }
     setIsLoading(true);
     try {
         await addSurvey({ ...values, surveyType: 1, userId: user.uid, userRole: userProfile.role });
-        toast({ title: 'Success', description: 'Survey submitted successfully.' });
+        toast({ title: 'Sukses', description: 'Survei berhasil dikirim.' });
         form.reset();
     } catch (error) {
-        toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit survey.' });
+        toast({ variant: 'destructive', title: 'Error', description: 'Gagal mengirim survei.' });
     } finally {
         setIsLoading(false);
     }
@@ -80,7 +96,7 @@ export default function Survey1Page() {
     <Card>
       <CardHeader>
         <CardTitle>Input Kejadian Risiko</CardTitle>
-        <CardDescription>Isi formulir penilaian risiko di bawah ini. Anda dapat memilih dari daftar atau mengetik kejadian risiko baru.</CardDescription>
+        <CardDescription>Isi formulir penilaian risiko di bawah ini. Pilih kejadian risiko untuk melihat area dampak yang relevan.</CardDescription>
       </CardHeader>
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -99,32 +115,30 @@ export default function Survey1Page() {
                           role="combobox"
                           className={cn("w-full justify-between", !field.value && "text-muted-foreground")}
                         >
-                          {field.value || "Pilih atau ketik kejadian risiko..."}
+                          {field.value
+                            ? RISK_EVENTS.find(event => event.name === field.value)?.name
+                            : "Pilih kejadian risiko..."}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
                     <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                       <Command>
-                        <CommandInput
-                          placeholder="Cari kejadian risiko..."
-                          value={field.value || ''}
-                          onValueChange={field.onChange}
-                        />
+                        <CommandInput placeholder="Cari kejadian risiko..." />
                         <CommandEmpty>Kejadian risiko tidak ditemukan.</CommandEmpty>
                         <CommandList>
                           <CommandGroup>
                             {RISK_EVENTS.map((event) => (
                               <CommandItem
-                                key={event}
-                                value={event}
+                                key={event.name}
+                                value={event.name}
                                 onSelect={() => {
-                                  form.setValue("riskEvent", event);
+                                  form.setValue("riskEvent", event.name);
                                   setOpen(false);
                                 }}
                               >
-                                <Check className={cn("mr-2 h-4 w-4", event === field.value ? "opacity-100" : "opacity-0")} />
-                                {event}
+                                <Check className={cn("mr-2 h-4 w-4", event.name === field.value ? "opacity-100" : "opacity-0")} />
+                                {event.name}
                               </CommandItem>
                             ))}
                           </CommandGroup>
@@ -142,9 +156,15 @@ export default function Survey1Page() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Area Dampak</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl><SelectTrigger><SelectValue placeholder="Select an impact area" /></SelectTrigger></FormControl>
-                    <SelectContent>{IMPACT_AREAS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
+                  <Select 
+                    onValueChange={field.onChange} 
+                    value={field.value}
+                    disabled={!selectedRiskEvent || availableImpactAreas.length === 0}
+                  >
+                    <FormControl><SelectTrigger><SelectValue placeholder="Pilih area dampak" /></SelectTrigger></FormControl>
+                    <SelectContent>
+                      {availableImpactAreas.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}
+                    </SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
@@ -156,7 +176,7 @@ export default function Survey1Page() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Penyebab</FormLabel>
-                  <FormControl><Textarea placeholder="Describe the cause of the risk event..." {...field} /></FormControl>
+                  <FormControl><Textarea placeholder="Jelaskan penyebab kejadian risiko..." {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -167,7 +187,7 @@ export default function Survey1Page() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Dampak</FormLabel>
-                  <FormControl><Textarea placeholder="Describe the potential impact..." {...field} /></FormControl>
+                  <FormControl><Textarea placeholder="Jelaskan potensi dampaknya..." {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -179,8 +199,8 @@ export default function Survey1Page() {
                 render={({ field }) => (
                     <FormItem>
                     <FormLabel>Frekuensi Kejadian</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl><SelectTrigger><SelectValue placeholder="Select frequency" /></SelectTrigger></FormControl>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl><SelectTrigger><SelectValue placeholder="Pilih frekuensi" /></SelectTrigger></FormControl>
                         <SelectContent>{FREQUENCY_LEVELS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
                     </Select>
                     <FormMessage />
@@ -193,8 +213,8 @@ export default function Survey1Page() {
                 render={({ field }) => (
                     <FormItem>
                     <FormLabel>Besaran Dampak</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl><SelectTrigger><SelectValue placeholder="Select impact magnitude" /></SelectTrigger></FormControl>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl><SelectTrigger><SelectValue placeholder="Pilih besaran dampak" /></SelectTrigger></FormControl>
                         <SelectContent>{IMPACT_MAGNITUDES.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
                     </Select>
                     <FormMessage />
@@ -204,7 +224,7 @@ export default function Survey1Page() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isLoading}>{isLoading ? 'Submitting...' : 'Submit Survey'}</Button>
+            <Button type="submit" disabled={isLoading}>{isLoading ? 'Mengirim...' : 'Kirim Survei'}</Button>
           </CardFooter>
         </form>
       </FormProvider>
