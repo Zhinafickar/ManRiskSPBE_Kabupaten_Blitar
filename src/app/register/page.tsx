@@ -73,9 +73,10 @@ export default function RegisterPage() {
           toast({
               variant: 'destructive',
               title: 'Role Unavailable',
-              description: `The role '${values.role}' has already been taken. Please select a different role.`,
+              description: `The role '${values.role}' has already been taken. Please select a different role or try again shortly.`,
           });
           form.setValue('role', '', { shouldValidate: true });
+          setIsLoading(false);
           return;
       }
 
@@ -107,7 +108,7 @@ export default function RegisterPage() {
       });
 
       const roleRef = doc(db, 'roles', userRole);
-      batch.set(roleRef, { uid: user.uid });
+      batch.set(roleRef, { uid: user.uid, createdAt: new Date() });
 
       await batch.commit();
 
@@ -130,7 +131,10 @@ export default function RegisterPage() {
         description: description,
       });
     } finally {
-        setIsLoading(false);
+        // Don't set isLoading to false on success because of redirect
+        if (!router.asPath.includes('/login')) {
+            setIsLoading(false);
+        }
     }
   }
 

@@ -23,7 +23,29 @@ export async function isRoleTaken(role: string): Promise<boolean> {
   if (!isFirebaseConfigured || !db) return false;
   const roleDocRef = doc(db, 'roles', role);
   const roleDoc = await getDoc(roleDocRef);
-  return roleDoc.exists();
+
+  if (!roleDoc.exists()) {
+    return false; // Role is not taken
+  }
+
+  const roleData = roleDoc.data();
+  const existingUid = roleData.uid;
+  const creationTime = roleData.createdAt?.toDate(); // Firestore timestamp
+
+  // Cleanup threshold: 1 minute (60 * 1000 ms)
+  const STALE_THRESHOLD_MS = 60 * 1000;
+
+  if (creationTime && (new Date().getTime() - creationTime.getTime() > STALE_THRESHOLD_MS)) {
+      // The role reservation is older than the threshold.
+      // We assume the user is unverified and clean up their data.
+      // This does NOT delete their Firebase Auth account, only their user data and role reservation.
+      console.warn(`Stale role reservation '${role}' for UID ${existingUid} is being cleared.`);
+      await deleteUserData(existingUid);
+      return false; // The role is now considered available.
+  }
+
+  // If not stale, the role is considered taken.
+  return true;
 }
 
 export async function getAssignedRoles() {
@@ -65,7 +87,7 @@ export async function updateUserData(user: Pick<UserProfile, 'uid' | 'fullName' 
                 const oldRoleRef = doc(db, 'roles', oldRole);
                 batch.delete(oldRoleRef);
             }
-            batch.set(newRoleRef, { uid: user.uid });
+            batch.set(newRoleRef, { uid: user.uid, createdAt: new Date() });
         }
 
         await batch.commit();
@@ -92,7 +114,13 @@ export async function deleteUserData(uid: string) {
 
         const batch = writeBatch(db);
         batch.delete(userRef);
-        batch.delete(roleRef);
+        
+        // Check if the role document actually exists before trying to delete it
+        const roleDocSnapshot = await getDoc(roleRef);
+        if (roleDocSnapshot.exists() && roleDocSnapshot.data().uid === uid) {
+             batch.delete(roleRef);
+        }
+
         await batch.commit();
 
         return { success: true, message: 'User data and role deleted successfully.' };
