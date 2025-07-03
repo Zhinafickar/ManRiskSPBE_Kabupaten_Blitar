@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth, isFirebaseConfigured } from '@/lib/firebase';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
@@ -86,7 +86,19 @@ export default function LoginPage() {
     }
     setIsLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, values.email, values.password);
+      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
+      
+      if (!userCredential.user.emailVerified) {
+        await signOut(auth);
+        toast({
+            variant: 'destructive',
+            title: 'Email Not Verified',
+            description: 'Please check your inbox and verify your email address before logging in.',
+        });
+        setIsLoading(false);
+        return;
+      }
+
       // On successful login, useAuth hook will detect the change.
       // We proactively redirect to the root page to avoid getting stuck.
       // The root page will then handle the final redirection to the correct dashboard.

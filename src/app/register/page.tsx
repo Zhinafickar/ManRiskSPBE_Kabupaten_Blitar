@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { doc, writeBatch, getDocs, collection } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { useState } from 'react';
@@ -91,6 +91,8 @@ export default function RegisterPage() {
       );
       const user = userCredential.user;
 
+      await sendEmailVerification(user);
+
       const batch = writeBatch(db);
       
       const userRole = isFirstUser ? 'superadmin' : values.role;
@@ -111,10 +113,10 @@ export default function RegisterPage() {
 
       toast({
         title: 'Registration Successful',
-        description: isFirstUser ? 'First superadmin account created! Redirecting...' : 'Redirecting to your dashboard...',
+        description: 'Please check your email to verify your account before logging in.',
       });
       
-      router.push('/');
+      router.push('/login');
     } catch (error: any) {
       let description = 'An unknown error occurred.';
       if (error.code === 'auth/email-already-in-use') {
