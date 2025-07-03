@@ -38,7 +38,7 @@ const formSchema = z.object({
 });
 
 
-export default function RegisterPage() {
+export default function RegisterPage({ params, searchParams }: { params: any, searchParams: any}) {
   const availableRoles = ROLES;
   const { toast } = useToast();
   const router = useRouter();
@@ -74,15 +74,12 @@ export default function RegisterPage() {
           toast({
               variant: 'destructive',
               title: 'Role Unavailable',
-              description: `The role '${values.role}' has already been taken. Please select a different role or try again shortly.`,
+              description: `The role '${values.role}' has already been taken. Please select a different role.`,
           });
           form.setValue('role', '', { shouldValidate: true });
           setIsLoading(false);
           return;
       }
-
-      // The "first user is superadmin" logic is removed as it violates security rules.
-      // The first user should be promoted to superadmin manually via the Firebase Console.
       
       const userCredential = await createUserWithEmailAndPassword(
         auth,

@@ -64,6 +64,7 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
           title: 'Firebase Not Configured',
           description: 'Please add your Firebase credentials to the .env file to enable registration.',
         });
+        setIsLoading(false);
         return;
       }
       
@@ -71,10 +72,11 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
       if (roleIsAlreadyTaken) {
           toast({
               variant: 'destructive',
-              title: 'Peran Tidak Tersedia',
-              description: `Peran '${values.role}' sudah dipilih orang lain. Silakan pilih peran yang berbeda.`,
+              title: 'Role Unavailable',
+              description: `The role '${values.role}' has already been taken. Please select a different role.`,
           });
           form.setValue('role', '', { shouldValidate: true });
+          setIsLoading(false);
           return;
       }
       
@@ -96,7 +98,7 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
       });
 
       const roleRef = doc(db, 'roles', values.role);
-      batch.set(roleRef, { uid: user.uid });
+      batch.set(roleRef, { uid: user.uid, createdAt: new Date() });
 
       await batch.commit();
 
@@ -118,8 +120,7 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
         title: 'Registration Failed',
         description: description,
       });
-    } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   }
 
