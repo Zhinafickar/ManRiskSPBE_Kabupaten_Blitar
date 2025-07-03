@@ -12,4 +12,8 @@ export interface Survey {
     createdAt: string;
     eventDate: any;
     riskLevel?: string;
+    kontrolOrganisasi?: string;
+    kontrolOrang?: string;
+    kontrolFisik?: string;
+    kontrolTeknologi?: string;
 }

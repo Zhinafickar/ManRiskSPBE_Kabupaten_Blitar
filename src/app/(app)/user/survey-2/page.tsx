@@ -46,6 +46,10 @@ const formSchema = z.object({
   impact: z.string().min(10, { message: 'Impact must be at least 10 characters.' }),
   frequency: z.string({ required_error: 'Please select a frequency level.' }),
   impactMagnitude: z.string({ required_error: 'Please select an impact magnitude.' }),
+  kontrolOrganisasi: z.string().optional(),
+  kontrolOrang: z.string().optional(),
+  kontrolFisik: z.string().optional(),
+  kontrolTeknologi: z.string().optional(),
 });
 
 export default function Survey2Page() {
@@ -61,6 +65,10 @@ export default function Survey2Page() {
       eventDate: undefined,
       cause: '',
       impact: '',
+      kontrolOrganisasi: '',
+      kontrolOrang: '',
+      kontrolFisik: '',
+      kontrolTeknologi: '',
     },
   });
 
@@ -232,6 +240,55 @@ export default function Survey2Page() {
                     <p className="text-sm text-muted-foreground">Pilih frekuensi dan besaran dampak untuk melihat indikator.</p>
                 )}
                 </div>
+            </div>
+            <div className="space-y-2 rounded-lg border p-4">
+              <FormLabel>Kontrol yang Sudah Ada</FormLabel>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                 <FormField
+                  control={form.control}
+                  name="kontrolOrganisasi"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Kontrol Organisasi</FormLabel>
+                      <FormControl><Textarea placeholder="Jelaskan kontrol organisasi yang ada..." {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="kontrolOrang"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Kontrol Orang</FormLabel>
+                      <FormControl><Textarea placeholder="Jelaskan kontrol orang yang ada..." {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="kontrolFisik"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Kontrol Fisik</FormLabel>
+                      <FormControl><Textarea placeholder="Jelaskan kontrol fisik yang ada..." {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="kontrolTeknologi"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Kontrol Teknologi</FormLabel>
+                      <FormControl><Textarea placeholder="Jelaskan kontrol teknologi yang ada..." {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
           </CardContent>
           <CardFooter>
