@@ -350,6 +350,23 @@ export const PEOPLE_CONTROLS = [
   "6.8 Pelaporan peristiwa keamanan informasi"
 ];
 
+export const PHYSICAL_CONTROLS = [
+  "7.1 Batas keamanan fisik",
+  "7.2 Masuk fisik",
+  "7.3 Mengamankan kantor, ruangan dan fasilitas",
+  "7.4 Pemantauan keamanan fisik",
+  "7.5 Melindungi dari ancaman fisik dan lingkungan",
+  "7.6 Bekerja di area aman",
+  "7.7 Mengosongkan meja dan mengosongkan layar",
+  "7.8 Penempatan dan perlindungan peralatan",
+  "7.9 Keamanan aset di luar lokasi",
+  "7.10 Media penyimpanan",
+  "7.11 Utilitas pendukung",
+  "7.12 Keamanan kabel",
+  "7.13 Pemeliharaan peralatan",
+  "7.14 Pembuangan atau penggunaan kembali peralatan secara aman"
+];
+
 export const MITIGATION_OPTIONS = [
   "Eskalasi Risiko",
   "Eksploitasi Risiko",

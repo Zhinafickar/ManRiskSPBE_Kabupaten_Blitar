@@ -27,6 +27,7 @@ import {
     IMPACT_MAGNITUDES,
     ORGANIZATIONAL_CONTROLS,
     PEOPLE_CONTROLS,
+    PHYSICAL_CONTROLS,
     MITIGATION_OPTIONS
 } from '@/constants/data';
 import { addSurvey } from '@/services/survey-service';
@@ -64,6 +65,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
   const [impactAreaOpen, setImpactAreaOpen] = useState(false);
   const [kontrolOrganisasiOpen, setKontrolOrganisasiOpen] = useState(false);
   const [kontrolOrangOpen, setKontrolOrangOpen] = useState(false);
+  const [kontrolFisikOpen, setKontrolFisikOpen] = useState(false);
   const [availableImpactAreas, setAvailableImpactAreas] = useState<string[]>([]);
   const [riskIndicator, setRiskIndicator] = useState<RiskIndicator>({ level: null, color: '' });
 
@@ -457,9 +459,47 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                   control={form.control}
                   name="kontrolFisik"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Kontrol Fisik</FormLabel>
-                      <FormControl><Textarea placeholder="Jelaskan kontrol fisik yang ada..." {...field} /></FormControl>
+                      <Popover open={kontrolFisikOpen} onOpenChange={setKontrolFisikOpen}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn("w-full justify-between", !field.value && "text-muted-foreground")}
+                            >
+                              {field.value
+                                ? PHYSICAL_CONTROLS.find(item => item === field.value)
+                                : "Pilih kontrol fisik..."}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                          <Command>
+                            <CommandInput placeholder="Cari kontrol..." />
+                            <CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty>
+                            <CommandList>
+                              <CommandGroup>
+                                {PHYSICAL_CONTROLS.map((item) => (
+                                  <CommandItem
+                                    key={item}
+                                    value={item}
+                                    onSelect={() => {
+                                      form.setValue("kontrolFisik", item);
+                                      setKontrolFisikOpen(false);
+                                    }}
+                                  >
+                                    <Check className={cn("mr-2 h-4 w-4", item === field.value ? "opacity-100" : "opacity-0")} />
+                                    {item}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                       <FormMessage />
                     </FormItem>
                   )}
