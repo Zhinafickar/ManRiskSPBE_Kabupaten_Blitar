@@ -49,13 +49,13 @@ const formSchema = z.object({
   eventDate: z.date({ required_error: 'Waktu kejadian harus diisi.' }),
   cause: z.string().min(10, { message: 'Penyebab harus diisi minimal 10 karakter.' }),
   impact: z.string().min(10, { message: 'Dampak harus diisi minimal 10 karakter.' }),
-  frequency: z.string({ required_error: 'Silakan pilih frekuensi.' }),
-  impactMagnitude: z.string({ required_error: 'Silakan pilih besaran dampak.' }),
+  frequency: z.string().min(1, { message: "Frekuensi kejadian harus dipilih." }),
+  impactMagnitude: z.string().min(1, { message: "Besaran dampak harus dipilih." }),
   kontrolOrganisasi: z.array(z.string()).optional(),
   kontrolOrang: z.array(z.string()).optional(),
   kontrolFisik: z.array(z.string()).optional(),
   kontrolTeknologi: z.array(z.string()).optional(),
-  mitigasi: z.string({ required_error: 'Silakan pilih mitigasi.' }),
+  mitigasi: z.string().min(1, { message: "Mitigasi harus dipilih." }),
 });
 
 export default function Survey1Page({ params, searchParams }: { params: any, searchParams: any}) {
@@ -145,7 +145,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
               name="riskEvent"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Kejadian Risiko</FormLabel>
+                  <FormLabel>Kejadian Risiko (ISO 31000 dan Cobit 5 for risk)</FormLabel>
                    <Popover open={riskEventOpen} onOpenChange={setRiskEventOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -194,7 +194,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
               name="impactArea"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Area Dampak Risiko</FormLabel>
+                  <FormLabel>Area Dampak (ISO 31000 dan Cobit 5 for risk)</FormLabel>
                   <Popover open={impactAreaOpen} onOpenChange={setImpactAreaOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -357,7 +357,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                 </div>
             </div>
             <div className="space-y-2 rounded-lg border p-4">
-              <FormLabel>Kontrol yang Sudah Ada</FormLabel>
+              <FormLabel>Kendali Sesuai ISO 27001</FormLabel>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                  <FormField
                   control={form.control}
