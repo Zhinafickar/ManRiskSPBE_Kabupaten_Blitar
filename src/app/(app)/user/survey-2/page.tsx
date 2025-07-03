@@ -37,7 +37,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon, Check, ChevronsUpDown } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, ChevronsUpDown, RotateCcw } from 'lucide-react';
 import { format } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
@@ -147,6 +147,20 @@ export default function Survey2Page() {
         return newStates;
     });
   };
+  
+  const handleClearRow = (index: number) => {
+    form.setValue(`surveys.${index}.impactArea`, '');
+    form.setValue(`surveys.${index}.eventDate`, undefined);
+    form.setValue(`surveys.${index}.cause`, '');
+    form.setValue(`surveys.${index}.impact`, '');
+    form.setValue(`surveys.${index}.frequency`, '');
+    form.setValue(`surveys.${index}.impactMagnitude`, '');
+    form.setValue(`surveys.${index}.kontrolOrganisasi`, []);
+    form.setValue(`surveys.${index}.kontrolOrang`, []);
+    form.setValue(`surveys.${index}.kontrolFisik`, []);
+    form.setValue(`surveys.${index}.kontrolTeknologi`, []);
+    form.setValue(`surveys.${index}.mitigasi`, '');
+  };
 
   const renderMultiSelect = (
     index: number,
@@ -232,6 +246,7 @@ export default function Survey2Page() {
                     <TableHead className="min-w-[200px] font-semibold">Kontrol Fisik</TableHead>
                     <TableHead className="min-w-[200px] font-semibold">Kontrol Teknologi</TableHead>
                     <TableHead className="min-w-[200px] font-semibold">Mitigasi</TableHead>
+                    <TableHead className="min-w-[80px] font-semibold text-center">Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -405,6 +420,18 @@ export default function Survey2Page() {
                                         </FormItem>
                                     )}
                                 />
+                            </TableCell>
+                            <TableCell className="text-center align-middle">
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleClearRow(index)}
+                                    title="Bersihkan baris"
+                                >
+                                    <RotateCcw className="h-4 w-4" />
+                                    <span className="sr-only">Bersihkan baris</span>
+                                </Button>
                             </TableCell>
                         </TableRow>
                     )
