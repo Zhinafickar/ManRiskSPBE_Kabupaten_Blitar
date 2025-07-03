@@ -174,12 +174,12 @@ export function MainNav() {
             <SidebarMenuSub>
               <SidebarMenuSubItem>
                 <SidebarMenuSubButton asChild isActive={pathname === '/user/survey-1'}>
-                  <Link href="/user/survey-1">isi survey-1</Link>
+                  <Link href="/user/survey-1">Input Form (Single)</Link>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
               <SidebarMenuSubItem>
                 <SidebarMenuSubButton asChild isActive={pathname === '/user/survey-2'}>
-                  <Link href="/user/survey-2">isi survey 2</Link>
+                  <Link href="/user/survey-2">input Tabel (Multi)</Link>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
               <SidebarMenuSubItem>

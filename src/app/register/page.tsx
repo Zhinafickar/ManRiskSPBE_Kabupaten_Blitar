@@ -30,6 +30,7 @@ import Image from 'next/image';
 const formSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
   email: z.string().email({ message: 'Please enter a valid email.' }),
+  phoneNumber: z.string().min(10, { message: 'Phone number must be at least 10 digits.' }),
   password: z
     .string()
     .min(6, { message: 'Password must be at least 6 characters.' }),
@@ -49,6 +50,7 @@ export default function RegisterPage() {
     defaultValues: {
       fullName: '',
       email: '',
+      phoneNumber: '',
       password: '',
       role: '',
     },
@@ -98,6 +100,7 @@ export default function RegisterPage() {
         uid: user.uid,
         fullName: values.fullName,
         email: values.email,
+        phoneNumber: values.phoneNumber,
         role: userRole,
       });
 
@@ -133,7 +136,7 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center text-center">
-          <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={90} height={85} />
+          <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={180} height={170} />
           <h1 className="text-2xl font-bold mt-4">Create an Account</h1>
           <p className="text-muted-foreground">
             Fill in the details below to join Manajement Resiko.
@@ -167,6 +170,19 @@ export default function RegisterPage() {
                     <FormMessage />
                     </FormItem>
                 )}
+                />
+                <FormField
+                  control={form.control}
+                  name="phoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g. 081234567890" {...field} type="tel" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
                 <FormField
                 control={form.control}

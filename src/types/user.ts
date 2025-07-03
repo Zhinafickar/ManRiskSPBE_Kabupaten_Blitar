@@ -3,4 +3,5 @@ export interface UserProfile {
   email: string;
   fullName: string;
   role: 'user' | 'admin' | 'superadmin' | string;
+  phoneNumber?: string;
 }

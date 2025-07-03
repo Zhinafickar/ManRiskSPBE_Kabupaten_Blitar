@@ -84,6 +84,7 @@ export function UserTable({ users, allRoles }: UserTableProps) {
           <TableRow>
             <TableHead>Full Name</TableHead>
             <TableHead>Email</TableHead>
+            <TableHead>Phone Number</TableHead>
             <TableHead>Role</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -93,6 +94,7 @@ export function UserTable({ users, allRoles }: UserTableProps) {
             <TableRow key={user.uid}>
               <TableCell className="font-medium">{user.fullName}</TableCell>
               <TableCell>{user.email}</TableCell>
+              <TableCell>{user.phoneNumber || 'N/A'}</TableCell>
               <TableCell>{user.role}</TableCell>
               <TableCell className="text-right">
                 <AlertDialog>
@@ -108,12 +110,13 @@ export function UserTable({ users, allRoles }: UserTableProps) {
                         <Edit className="mr-2 h-4 w-4" />
                         Edit
                       </DropdownMenuItem>
-                      <AlertDialogTrigger asChild>
-                        <DropdownMenuItem className="text-red-600">
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </AlertDialogTrigger>
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        onSelect={() => handleDeleteUser(user.uid)}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                   <AlertDialogContent>

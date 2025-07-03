@@ -13,6 +13,7 @@ export async function getAllUsers(): Promise<UserProfile[]> {
       email: data.email,
       fullName: data.fullName,
       role: data.role,
+      phoneNumber: data.phoneNumber,
     };
   });
   return userList;
@@ -32,7 +33,7 @@ export async function getAssignedRoles() {
     return rolesSnapshot.docs.map(doc => doc.id);
 }
 
-export async function updateUserData(user: Pick<UserProfile, 'uid' | 'fullName' | 'role' >) {
+export async function updateUserData(user: Pick<UserProfile, 'uid' | 'fullName' | 'role'> & { phoneNumber?: string }) {
     if (!isFirebaseConfigured || !db) return { success: false, message: 'Firebase is not configured.' };
     try {
         const userRef = doc(db, 'users', user.uid);
@@ -47,17 +48,23 @@ export async function updateUserData(user: Pick<UserProfile, 'uid' | 'fullName' 
 
         const batch = writeBatch(db);
 
-        batch.set(userRef, { fullName: user.fullName, role: newRole }, { merge: true });
+        batch.set(userRef, { 
+            fullName: user.fullName, 
+            role: newRole, 
+            phoneNumber: user.phoneNumber || null 
+        }, { merge: true });
 
         if (oldRole !== newRole) {
             const newRoleRef = doc(db, 'roles', newRole);
             const newRoleDoc = await getDoc(newRoleRef);
-            if (newRoleDoc.exists()) {
+            if (newRoleDoc.exists() && newRoleDoc.data().uid !== user.uid) {
                 return { success: false, message: `Role '${newRole}' is already taken.` };
             }
             
-            const oldRoleRef = doc(db, 'roles', oldRole);
-            batch.delete(oldRoleRef);
+            if (oldRole) {
+                const oldRoleRef = doc(db, 'roles', oldRole);
+                batch.delete(oldRoleRef);
+            }
             batch.set(newRoleRef, { uid: user.uid });
         }
 

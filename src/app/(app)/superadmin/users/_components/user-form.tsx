@@ -37,6 +37,7 @@ const formSchema = z.object({
   uid: z.string(),
   fullName: z.string().min(1, { message: 'Full name is required.' }),
   email: z.string().email({ message: 'Please enter a valid email.' }),
+  phoneNumber: z.string().optional(),
   role: z.string({ required_error: 'Please select a role.' }),
 });
 
@@ -58,18 +59,23 @@ export function UserForm({ isOpen, setIsOpen, user, allRoles }: UserFormProps) {
       uid: '',
       fullName: '',
       email: '',
+      phoneNumber: '',
       role: '',
     },
   });
 
   useEffect(() => {
     if (user) {
-      form.reset(user);
+      form.reset({
+        ...user,
+        phoneNumber: user.phoneNumber || '',
+      });
     } else {
       form.reset({
         uid: '',
         fullName: '',
         email: '',
+        phoneNumber: '',
         role: '',
       });
     }
@@ -126,6 +132,17 @@ export function UserForm({ isOpen, setIsOpen, user, allRoles }: UserFormProps) {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl><Input placeholder="name@example.com" {...field} disabled={!!user} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phoneNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone Number</FormLabel>
+                  <FormControl><Input placeholder="e.g. 081234567890" {...field} type="tel" /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}
