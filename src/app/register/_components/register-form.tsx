@@ -25,7 +25,6 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, writeBatch } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { useState } from 'react';
-import { isRoleTaken } from '@/services/user-service';
 
 const formSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
@@ -66,18 +65,6 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
         });
         setIsLoading(false);
         return;
-      }
-      
-      const roleIsAlreadyTaken = await isRoleTaken(values.role);
-      if (roleIsAlreadyTaken) {
-          toast({
-              variant: 'destructive',
-              title: 'Role Unavailable',
-              description: `The role '${values.role}' has already been taken. Please select a different role.`,
-          });
-          form.setValue('role', '', { shouldValidate: true });
-          setIsLoading(false);
-          return;
       }
       
       const userCredential = await createUserWithEmailAndPassword(

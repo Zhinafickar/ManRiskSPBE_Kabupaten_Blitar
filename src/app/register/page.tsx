@@ -19,7 +19,6 @@ import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/
 import { doc, writeBatch } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { useState } from 'react';
-import { isRoleTaken } from '@/services/user-service';
 import { ROLES } from '@/constants/data';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Check, ChevronsUpDown } from 'lucide-react';
@@ -67,18 +66,6 @@ export default function RegisterPage({ params, searchParams }: { params: any, se
         });
         setIsLoading(false);
         return;
-      }
-      
-      const roleIsAlreadyTaken = await isRoleTaken(values.role);
-      if (roleIsAlreadyTaken) {
-          toast({
-              variant: 'destructive',
-              title: 'Role Unavailable',
-              description: `The role '${values.role}' has already been taken. Please select a different role.`,
-          });
-          form.setValue('role', '', { shouldValidate: true });
-          setIsLoading(false);
-          return;
       }
       
       const userCredential = await createUserWithEmailAndPassword(
