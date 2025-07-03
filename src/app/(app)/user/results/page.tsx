@@ -48,7 +48,7 @@ function RiskIndicatorBadge({ level }: { level?: string }) {
 }
 
 export default function UserResultsPage() {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const [surveys, setSurveys] = useState<Survey[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -73,7 +73,9 @@ export default function UserResultsPage() {
   };
 
   const handleExport = () => {
-    exportToExcel(surveys, "My_Survey_Results");
+    if (!userProfile) return;
+    const fileName = `${userProfile.role}_Hasil_Management_Risiko`;
+    exportToExcel(surveys, fileName);
   };
 
   return (

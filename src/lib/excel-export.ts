@@ -17,13 +17,9 @@ export const exportToExcel = (surveys: Survey[], fileName: string) => {
         return;
     }
 
-    // Prepare data with all fields for the worksheet
+    // Prepare data with selected fields for the worksheet
     const dataForSheet = surveys.map(survey => ({
-        'ID Survei': survey.id,
-        'ID Pengguna': survey.userId,
         'Peran Pengguna': survey.userRole,
-        'Tipe Survei': survey.surveyType,
-        'Tanggal Dibuat': survey.createdAt ? new Date(survey.createdAt).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }) : 'N/A',
         'Kejadian Risiko': survey.riskEvent,
         'Area Dampak': survey.impactArea,
         'Waktu Kejadian': survey.eventDate ? new Date(survey.eventDate).toLocaleDateString('id-ID') : 'N/A',
@@ -43,7 +39,7 @@ export const exportToExcel = (surveys: Survey[], fileName: string) => {
     const ws = XLSX.utils.json_to_sheet(dataForSheet);
 
     // Apply styles to the 'Tingkat Risiko' column
-    const riskLevelColIndex = 'M'; // Corresponds to 'Tingkat Risiko'
+    const riskLevelColIndex = 'I'; // Corresponds to 'Tingkat Risiko'
     dataForSheet.forEach((row, index) => {
         const riskLevel = row['Tingkat Risiko'];
         if (riskLevel && riskLevelColors[riskLevel]) {

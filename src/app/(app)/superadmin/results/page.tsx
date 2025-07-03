@@ -19,6 +19,7 @@ import { MoreHorizontal, Trash2, FileDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { exportToExcel } from '@/lib/excel-export';
+import { useAuth } from '@/hooks/use-auth';
 
 function ResultsTableSkeleton() {
   return (
@@ -62,6 +63,7 @@ export default function SuperAdminResultsPage() {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const router = useRouter();
+  const { userProfile } = useAuth();
 
   useEffect(() => {
     getAllSurveyData()
@@ -80,7 +82,9 @@ export default function SuperAdminResultsPage() {
   };
   
   const handleExport = () => {
-    exportToExcel(surveys, "All_Survey_Results_SuperAdmin");
+    const roleName = userProfile?.role || 'SuperAdmin';
+    const fileName = `${roleName}_Hasil_Management_Risiko`;
+    exportToExcel(surveys, fileName);
   };
 
   return (
