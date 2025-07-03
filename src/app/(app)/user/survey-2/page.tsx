@@ -256,10 +256,10 @@ export default function Survey2Page() {
                     
                     return (
                         <TableRow key={riskEvent.name}>
-                            <TableCell className="font-medium align-top sticky left-0 bg-background z-10 truncate">
+                            <TableCell className="font-medium align-top sticky left-0 bg-background z-10 whitespace-normal break-words">
                                 {riskEvent.name}
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="align-top">
                                 <FormField
                                     control={form.control}
                                     name={`surveys.${index}.impactArea`}
@@ -268,9 +268,9 @@ export default function Survey2Page() {
                                             <Popover open={openImpactAreaPopovers[index]} onOpenChange={() => togglePopover(index, setOpenImpactAreaPopovers)}>
                                                 <PopoverTrigger asChild>
                                                     <FormControl>
-                                                        <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value && "text-muted-foreground")}>
-                                                            <span className="truncate">{field.value ? field.value : "Pilih area..."}</span>
-                                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                        <Button variant="outline" role="combobox" className={cn("w-full justify-between text-left h-auto min-h-10", !field.value && "text-muted-foreground")}>
+                                                          <span className="whitespace-normal break-words flex-1 pr-2">{field.value ? field.value : "Pilih area..."}</span>
+                                                          <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
                                                         </Button>
                                                     </FormControl>
                                                 </PopoverTrigger>
@@ -290,7 +290,7 @@ export default function Survey2Page() {
                                                                         }}
                                                                     >
                                                                         <Check className={cn("mr-2 h-4 w-4", area === field.value ? "opacity-100" : "opacity-0")} />
-                                                                        <span className="flex-1 truncate">{area}</span>
+                                                                        <span className="flex-1 whitespace-normal break-words">{area}</span>
                                                                     </CommandItem>
                                                                 ))}
                                                             </CommandGroup>
@@ -303,7 +303,7 @@ export default function Survey2Page() {
                                     )}
                                 />
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="align-top">
                                 <FormField
                                     control={form.control}
                                     name={`surveys.${index}.eventDate`}
@@ -327,7 +327,7 @@ export default function Survey2Page() {
                                     )}
                                 />
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="align-top">
                                 <FormField
                                     control={form.control}
                                     name={`surveys.${index}.cause`}
@@ -339,7 +339,7 @@ export default function Survey2Page() {
                                     )}
                                 />
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="align-top">
                                 <FormField
                                     control={form.control}
                                     name={`surveys.${index}.impact`}
@@ -351,7 +351,7 @@ export default function Survey2Page() {
                                     )}
                                 />
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="align-top">
                                 <FormField
                                     control={form.control}
                                     name={`surveys.${index}.frequency`}
@@ -366,7 +366,7 @@ export default function Survey2Page() {
                                     )}
                                 />
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="align-top">
                                 <FormField
                                     control={form.control}
                                     name={`surveys.${index}.impactMagnitude`}
@@ -384,19 +384,19 @@ export default function Survey2Page() {
                             <TableCell className="text-center align-middle">
                                 {level ? <Badge className={cn("text-base", color)}>{level}</Badge> : <span className="text-xs text-muted-foreground">-</span>}
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="align-top">
                                 {renderMultiSelect(index, 'kontrolOrganisasi', ORGANIZATIONAL_CONTROLS, "Pilih kontrol...", openKontrolOrganisasiPopovers, setOpenKontrolOrganisasiPopovers)}
                             </TableCell>
-                             <TableCell>
+                             <TableCell className="align-top">
                                 {renderMultiSelect(index, 'kontrolOrang', PEOPLE_CONTROLS, "Pilih kontrol...", openKontrolOrangPopovers, setOpenKontrolOrangPopovers)}
                             </TableCell>
-                             <TableCell>
+                             <TableCell className="align-top">
                                 {renderMultiSelect(index, 'kontrolFisik', PHYSICAL_CONTROLS, "Pilih kontrol...", openKontrolFisikPopovers, setOpenKontrolFisikPopovers)}
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="align-top">
                                 {renderMultiSelect(index, 'kontrolTeknologi', TECHNOLOGICAL_CONTROLS, "Pilih kontrol...", openKontrolTeknologiPopovers, setOpenKontrolTeknologiPopovers)}
                             </TableCell>
-                             <TableCell>
+                             <TableCell className="align-top">
                                 <FormField
                                     control={form.control}
                                     name={`surveys.${index}.mitigasi`}
