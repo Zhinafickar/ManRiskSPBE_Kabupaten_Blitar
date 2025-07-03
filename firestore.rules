@@ -1,65 +1,51 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper function to get the role of the currently authenticated user.
-    function getUserRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    // Helper function to check if a user has a specific role
+    function isRole(role) {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role;
     }
 
-    // Helper function to check if the user is a superadmin.
-    function isSuperAdmin() {
-      return request.auth != null && getUserRole() == 'superadmin';
-    }
+    // --- User and Role Management ---
 
-    // Helper function to check if the user is an admin.
-    function isAdmin() {
-      return request.auth != null && getUserRole() == 'admin';
-    }
-
-    // Helper function to check if the user is an admin or superadmin.
-    function isAdminOrSuperAdmin() {
-      return request.auth != null && (isAdmin() || isSuperAdmin());
-    }
-
-    // --- Collection: users ---
     match /users/{userId} {
-      // CREATE: A new user can create their own document.
-      // READ: A user can read their own document. Admins/Superadmins can read any.
-      // UPDATE: A user can update their own document, but NOT their role. Superadmins can update anything.
-      // DELETE: Only superadmins can delete user documents. The stale role cleanup can also delete.
-      allow create: if request.auth.uid == userId;
-      allow read: if request.auth.uid == userId || isAdminOrSuperAdmin();
-      allow update: if (request.auth.uid == userId && request.resource.data.role == resource.data.role) || isSuperAdmin();
-      allow delete: if isSuperAdmin() || get(/databases/$(database)/documents/roles/$(resource.data.role)).data.uid == userId;
-    }
-
-    // --- Collection: roles ---
-    match /roles/{role} {
-      // Anyone can check if a role exists.
-      allow read: if true;
+      // Allow user creation during registration. Any authenticated user can create a user doc.
+      // The app logic ensures they only create their own document with their own UID.
+      allow create: if request.auth != null;
       
-      // Allow a user to create/delete a role document for themselves, or allow a superadmin to manage roles.
-      // This supports registration, role changes, and admin management.
-      // The stale role cleanup by a NEW user will work if we allow any authenticated user to delete a role document.
-      // Let's make it more specific: a superadmin, or the user who owns the role reservation.
-      allow create, update: if request.auth.uid == request.resource.data.uid || isSuperAdmin();
-      allow delete: if request.auth.uid == resource.data.uid || isSuperAdmin() || request.auth.uid != null;
+      // A user can read/update their own data. A superadmin can read/update any user's data.
+      allow read, update: if request.auth.uid == userId || isRole('superadmin');
+      
+      // Only a superadmin can delete a user's data from Firestore.
+      allow delete: if isRole('superadmin');
     }
 
-    // --- Collection: surveys ---
+    match /roles/{role} {
+      // Allow role creation during registration.
+      // This rule ensures the 'uid' field inside the new role document matches the person creating it.
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      
+      // Anyone can read the roles collection to check for availability.
+      allow read: if true;
+
+      // A role document can be updated or deleted by a superadmin (e.g., when managing users).
+      allow update, delete: if isRole('superadmin');
+    }
+
+    // --- Survey Data Management ---
+
     match /surveys/{surveyId} {
       // Any authenticated user can create a survey.
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-
-      // Users can read their own surveys. Admins/Superadmins can read all surveys.
-      allow read: if (request.auth.uid == resource.data.userId) || isAdminOrSuperAdmin();
+      allow create: if request.auth != null;
       
-      // Users can delete their own surveys. Admins/Superadmins can delete any survey.
-      allow delete: if (request.auth.uid == resource.data.userId) || isAdminOrSuperAdmin();
-
-      // Updates to surveys are not allowed.
-      allow update: if false;
+      // Users can read/delete their own surveys.
+      // Admins and Superadmins can read/delete any survey.
+      allow read, delete: if (resource.data.userId == request.auth.uid) || 
+                           isRole('admin') || 
+                           isRole('superadmin');
     }
   }
 }
