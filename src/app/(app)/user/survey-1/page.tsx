@@ -30,15 +30,18 @@ import { addSurvey } from '@/services/survey-service';
 import { useAuth } from '@/hooks/use-auth';
 import { useEffect, useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, ChevronsUpDown } from 'lucide-react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import { getRiskLevel, type RiskIndicator } from '@/lib/risk-matrix';
 import { Badge } from '@/components/ui/badge';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
 
 const formSchema = z.object({
   riskEvent: z.string({ required_error: 'Silakan pilih kejadian risiko.' }).min(1, { message: 'Kejadian risiko harus diisi.' }),
   impactArea: z.string({ required_error: 'Silakan pilih area dampak.' }).min(1, { message: 'Area dampak harus diisi.' }),
+  eventDate: z.date({ required_error: 'Waktu kejadian harus diisi.' }),
   cause: z.string().min(10, { message: 'Penyebab harus diisi minimal 10 karakter.' }),
   impact: z.string().min(10, { message: 'Dampak harus diisi minimal 10 karakter.' }),
   frequency: z.string({ required_error: 'Silakan pilih frekuensi.' }),
@@ -58,6 +61,7 @@ export default function Survey1Page() {
     defaultValues: {
       riskEvent: '',
       impactArea: '',
+      eventDate: undefined,
       cause: '',
       impact: '',
       frequency: '',
@@ -181,6 +185,47 @@ export default function Survey1Page() {
                       {availableImpactAreas.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="eventDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Waktu Kejadian</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "dd/MM/yyyy")
+                          ) : (
+                            <span>Pilih tanggal</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}

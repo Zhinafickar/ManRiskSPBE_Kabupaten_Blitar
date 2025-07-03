@@ -33,10 +33,15 @@ import { useEffect, useState } from 'react';
 import { getRiskLevel, type RiskIndicator } from '@/lib/risk-matrix';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
 
 const formSchema = z.object({
   riskEvent: z.string().min(5, { message: 'Risk event must be at least 5 characters.' }),
   impactArea: z.string({ required_error: 'Please select an impact area.' }),
+  eventDate: z.date({ required_error: 'Waktu kejadian harus diisi.' }),
   cause: z.string().min(10, { message: 'Cause must be at least 10 characters.' }),
   impact: z.string().min(10, { message: 'Impact must be at least 10 characters.' }),
   frequency: z.string({ required_error: 'Please select a frequency level.' }),
@@ -53,6 +58,7 @@ export default function Survey2Page() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       riskEvent: '',
+      eventDate: undefined,
       cause: '',
       impact: '',
     },
@@ -118,6 +124,47 @@ export default function Survey2Page() {
                     <FormControl><SelectTrigger><SelectValue placeholder="Select an impact area" /></SelectTrigger></FormControl>
                     <SelectContent>{IMPACT_AREAS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="eventDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Waktu Kejadian</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "dd/MM/yyyy")
+                          ) : (
+                            <span>Pilih tanggal</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}

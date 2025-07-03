@@ -11,8 +11,9 @@ export async function getAllSurveyData() {
     return { 
       id: doc.id, 
       ...data,
-      // Ensure createdAt is serializable
-      createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : null
+      // Ensure timestamps are serializable
+      createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : null,
+      eventDate: data.eventDate?.toDate ? data.eventDate.toDate().toISOString() : null
     };
   });
   return surveyList;
@@ -40,7 +41,8 @@ export async function getUserSurveys(userId: string) {
         return { 
             id: doc.id, 
             ...data,
-            createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : null
+            createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : null,
+            eventDate: data.eventDate?.toDate ? data.eventDate.toDate().toISOString() : null
         } as Survey;
     });
     return surveyList;

@@ -108,7 +108,8 @@ export default function AdminResultsPage() {
                 <TableHead>Frequency</TableHead>
                 <TableHead>Impact</TableHead>
                 <TableHead>Risk Level</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead>Waktu Kejadian</TableHead>
+                <TableHead>Tanggal Lapor</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -125,7 +126,8 @@ export default function AdminResultsPage() {
                   <TableCell>{survey.frequency}</TableCell>
                   <TableCell>{survey.impactMagnitude}</TableCell>
                   <TableCell><RiskIndicatorBadge level={survey.riskLevel} /></TableCell>
-                  <TableCell>{new Date(survey.createdAt).toLocaleDateString()}</TableCell>
+                  <TableCell>{survey.eventDate ? new Date(survey.eventDate).toLocaleDateString('id-ID') : 'N/A'}</TableCell>
+                  <TableCell>{new Date(survey.createdAt).toLocaleDateString('id-ID')}</TableCell>
                   <TableCell className="text-right">
                     <AlertDialog>
                       <DropdownMenu>

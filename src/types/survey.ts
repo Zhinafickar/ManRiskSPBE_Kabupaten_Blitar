@@ -10,5 +10,6 @@ export interface Survey {
     impactMagnitude: string;
     surveyType: 1 | 2;
     createdAt: string;
+    eventDate: any;
     riskLevel?: string;
 }
