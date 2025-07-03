@@ -16,9 +16,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Trash2, FileDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { exportToExcel } from '@/lib/excel-export';
 
 function RiskIndicatorBadge({ level }: { level?: string }) {
     if (!level) return <Badge variant="outline">N/A</Badge>;
@@ -29,7 +30,7 @@ function RiskIndicatorBadge({ level }: { level?: string }) {
             colorClass = 'bg-red-600 text-white hover:bg-red-700';
             break;
         case 'Sedang':
-            colorClass = 'bg-yellow-500 text-white hover:bg-yellow-600';
+            colorClass = 'bg-yellow-500 text-black hover:bg-yellow-600';
             break;
         case 'Rendah':
             colorClass = 'bg-green-600 text-white hover:bg-green-700';
@@ -71,11 +72,21 @@ export default function UserResultsPage() {
     }
   };
 
+  const handleExport = () => {
+    exportToExcel(surveys, "My_Survey_Results");
+  };
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>My Survey Results</CardTitle>
-        <CardDescription>Here are all the surveys you have submitted.</CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+            <CardTitle>My Survey Results</CardTitle>
+            <CardDescription>Here are all the surveys you have submitted.</CardDescription>
+        </div>
+        <Button onClick={handleExport} disabled={surveys.length === 0}>
+            <FileDown className="mr-2 h-4 w-4" />
+            Download Excel
+        </Button>
       </CardHeader>
       <CardContent>
         {loading ? (
