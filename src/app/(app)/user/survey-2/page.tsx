@@ -4,44 +4,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, FormProvider } from 'react-hook-form';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@/components/ui/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import {
-    RISK_EVENTS,
-    FREQUENCY_LEVELS,
-    IMPACT_MAGNITUDES,
-    ORGANIZATIONAL_CONTROLS,
-    PEOPLE_CONTROLS,
-    PHYSICAL_CONTROLS,
-    TECHNOLOGICAL_CONTROLS,
-    MITIGATION_OPTIONS
-} from '@/constants/data';
+import { RISK_EVENTS } from '@/constants/data';
 import { addSurvey } from '@/services/survey-service';
 import { useAuth } from '@/hooks/use-auth';
 import { useState } from 'react';
 import { getRiskLevel } from '@/lib/risk-matrix';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon, Check, ChevronsUpDown, RotateCcw } from 'lucide-react';
-import { format } from 'date-fns';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Textarea } from '@/components/ui/textarea';
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { SurveyTableRow } from './_components/survey-table-row';
 
 const singleSurveySchema = z.object({
   riskEvent: z.string(),
@@ -67,12 +39,6 @@ export default function Survey2Page() {
   const { user, userProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   
-  const [openImpactAreaPopovers, setOpenImpactAreaPopovers] = useState<boolean[]>(Array(RISK_EVENTS.length).fill(false));
-  const [openKontrolOrganisasiPopovers, setOpenKontrolOrganisasiPopovers] = useState<boolean[]>(Array(RISK_EVENTS.length).fill(false));
-  const [openKontrolOrangPopovers, setOpenKontrolOrangPopovers] = useState<boolean[]>(Array(RISK_EVENTS.length).fill(false));
-  const [openKontrolFisikPopovers, setOpenKontrolFisikPopovers] = useState<boolean[]>(Array(RISK_EVENTS.length).fill(false));
-  const [openKontrolTeknologiPopovers, setOpenKontrolTeknologiPopovers] = useState<boolean[]>(Array(RISK_EVENTS.length).fill(false));
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -92,8 +58,6 @@ export default function Survey2Page() {
       })),
     },
   });
-
-  const watchedSurveys = form.watch('surveys');
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!user || !userProfile) {
@@ -140,14 +104,6 @@ export default function Survey2Page() {
     }
   }
   
-  const togglePopover = (index: number, setPopoverState: React.Dispatch<React.SetStateAction<boolean[]>>) => {
-    setPopoverState(prev => {
-        const newStates = [...prev];
-        newStates[index] = !newStates[index];
-        return newStates;
-    });
-  };
-  
   const handleClearRow = (index: number) => {
     form.setValue(`surveys.${index}.impactArea`, '');
     form.setValue(`surveys.${index}.eventDate`, undefined);
@@ -162,64 +118,6 @@ export default function Survey2Page() {
     form.setValue(`surveys.${index}.mitigasi`, '');
   };
 
-  const renderMultiSelect = (
-    index: number,
-    fieldName: keyof z.infer<typeof singleSurveySchema>,
-    options: readonly string[],
-    placeholder: string,
-    popoverOpenState: boolean[],
-    setPopoverOpenState: React.Dispatch<React.SetStateAction<boolean[]>>
-  ) => {
-    const fieldNameStr = `surveys.${index}.${fieldName}` as const;
-    
-    return (
-      <FormField
-        control={form.control}
-        name={fieldNameStr}
-        render={({ field }) => (
-          <FormItem>
-            <Popover open={popoverOpenState[index]} onOpenChange={() => togglePopover(index, setPopoverOpenState)}>
-              <PopoverTrigger asChild>
-                <FormControl>
-                  <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}>
-                    <span className="truncate">{field.value && field.value.length > 0 ? `${field.value.length} terpilih` : placeholder}</span>
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </FormControl>
-              </PopoverTrigger>
-              <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
-                <Command>
-                  <CommandInput placeholder="Cari..." />
-                  <CommandEmpty>Tidak ditemukan.</CommandEmpty>
-                  <CommandList>
-                    <CommandGroup>
-                      {options.map((item) => (
-                        <CommandItem
-                          key={item}
-                          value={item}
-                          onSelect={() => {
-                            const value = (field.value as string[] | undefined) || [];
-                            const newValue = value.includes(item)
-                              ? value.filter((i) => i !== item)
-                              : [...value, item];
-                            form.setValue(fieldNameStr, newValue);
-                          }}
-                        >
-                          <Check className={cn("mr-2 h-4 w-4", (field.value as string[] | undefined)?.includes(item) ? "opacity-100" : "opacity-0")} />
-                          <span className="flex-1 truncate">{item}</span>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          </FormItem>
-        )}
-      />
-    );
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -230,7 +128,7 @@ export default function Survey2Page() {
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent>
             <div className="overflow-x-auto border rounded-lg">
-              <Table className="table-fixed">
+              <Table className="min-w-max">
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[300px] font-semibold sticky left-0 bg-background z-10">Kejadian Risiko TIK</TableHead>
@@ -250,192 +148,14 @@ export default function Survey2Page() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {RISK_EVENTS.map((riskEvent, index) => {
-                    const { level, color } = getRiskLevel(watchedSurveys[index]?.frequency, watchedSurveys[index]?.impactMagnitude);
-                    const availableImpactAreas = riskEvent.impactAreas || [];
-                    
-                    return (
-                        <TableRow key={riskEvent.name}>
-                            <TableCell className="font-medium align-top sticky left-0 bg-background z-10 whitespace-normal break-words">
-                                {riskEvent.name}
-                            </TableCell>
-                            <TableCell className="align-top">
-                                <FormField
-                                    control={form.control}
-                                    name={`surveys.${index}.impactArea`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <Popover open={openImpactAreaPopovers[index]} onOpenChange={() => togglePopover(index, setOpenImpactAreaPopovers)}>
-                                                <PopoverTrigger asChild>
-                                                    <FormControl>
-                                                        <Button variant="outline" role="combobox" className={cn("w-full justify-between text-left h-auto min-h-10", !field.value && "text-muted-foreground")}>
-                                                          <span className="whitespace-normal break-words flex-1 pr-2">{field.value ? field.value : "Pilih area..."}</span>
-                                                          <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
-                                                        </Button>
-                                                    </FormControl>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
-                                                    <Command>
-                                                        <CommandInput placeholder="Cari area dampak..." />
-                                                        <CommandEmpty>Area dampak tidak ditemukan.</CommandEmpty>
-                                                        <CommandList>
-                                                            <CommandGroup>
-                                                                {availableImpactAreas.map((area) => (
-                                                                    <CommandItem
-                                                                        key={area}
-                                                                        value={area}
-                                                                        onSelect={() => {
-                                                                            form.setValue(`surveys.${index}.impactArea`, area);
-                                                                            togglePopover(index, setOpenImpactAreaPopovers);
-                                                                        }}
-                                                                    >
-                                                                        <Check className={cn("mr-2 h-4 w-4", area === field.value ? "opacity-100" : "opacity-0")} />
-                                                                        <span className="flex-1 whitespace-normal break-words">{area}</span>
-                                                                    </CommandItem>
-                                                                ))}
-                                                            </CommandGroup>
-                                                        </CommandList>
-                                                    </Command>
-                                                </PopoverContent>
-                                            </Popover>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </TableCell>
-                            <TableCell className="align-top">
-                                <FormField
-                                    control={form.control}
-                                    name={`surveys.${index}.eventDate`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                    <FormControl>
-                                                        <Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
-                                                            {field.value ? format(field.value, "dd/MM/yyyy") : <span>Pilih tanggal</span>}
-                                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                        </Button>
-                                                    </FormControl>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-auto p-0" align="start">
-                                                    <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} initialFocus />
-                                                </PopoverContent>
-                                            </Popover>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </TableCell>
-                            <TableCell className="align-top">
-                                <FormField
-                                    control={form.control}
-                                    name={`surveys.${index}.cause`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                        <FormControl><Textarea placeholder="Jelaskan penyebab..." {...field} /></FormControl>
-                                        <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </TableCell>
-                            <TableCell className="align-top">
-                                <FormField
-                                    control={form.control}
-                                    name={`surveys.${index}.impact`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                        <FormControl><Textarea placeholder="Jelaskan dampak..." {...field} /></FormControl>
-                                        <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </TableCell>
-                            <TableCell className="align-top">
-                                <FormField
-                                    control={form.control}
-                                    name={`surveys.${index}.frequency`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <Select onValueChange={field.onChange} value={field.value || ''}>
-                                                <FormControl><SelectTrigger><SelectValue placeholder="Pilih frekuensi" /></SelectTrigger></FormControl>
-                                                <SelectContent>{FREQUENCY_LEVELS.map(level => <SelectItem key={level} value={level}>{level}</SelectItem>)}</SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </TableCell>
-                            <TableCell className="align-top">
-                                <FormField
-                                    control={form.control}
-                                    name={`surveys.${index}.impactMagnitude`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <Select onValueChange={field.onChange} value={field.value || ''}>
-                                                <FormControl><SelectTrigger><SelectValue placeholder="Pilih besaran" /></SelectTrigger></FormControl>
-                                                <SelectContent>{IMPACT_MAGNITUDES.map(level => <SelectItem key={level} value={level}>{level}</SelectItem>)}</SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </TableCell>
-                            <TableCell className="text-center align-middle">
-                                {level ? <Badge className={cn("text-base", color)}>{level}</Badge> : <span className="text-xs text-muted-foreground">-</span>}
-                            </TableCell>
-                            <TableCell className="align-top">
-                                {renderMultiSelect(index, 'kontrolOrganisasi', ORGANIZATIONAL_CONTROLS, "Pilih kontrol...", openKontrolOrganisasiPopovers, setOpenKontrolOrganisasiPopovers)}
-                            </TableCell>
-                             <TableCell className="align-top">
-                                {renderMultiSelect(index, 'kontrolOrang', PEOPLE_CONTROLS, "Pilih kontrol...", openKontrolOrangPopovers, setOpenKontrolOrangPopovers)}
-                            </TableCell>
-                             <TableCell className="align-top">
-                                {renderMultiSelect(index, 'kontrolFisik', PHYSICAL_CONTROLS, "Pilih kontrol...", openKontrolFisikPopovers, setOpenKontrolFisikPopovers)}
-                            </TableCell>
-                            <TableCell className="align-top">
-                                {renderMultiSelect(index, 'kontrolTeknologi', TECHNOLOGICAL_CONTROLS, "Pilih kontrol...", openKontrolTeknologiPopovers, setOpenKontrolTeknologiPopovers)}
-                            </TableCell>
-                             <TableCell className="align-top">
-                                <FormField
-                                    control={form.control}
-                                    name={`surveys.${index}.mitigasi`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                        <Select onValueChange={field.onChange} value={field.value || ''}>
-                                            <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Pilih mitigasi" />
-                                            </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                            {MITIGATION_OPTIONS.map((option) => (
-                                                <SelectItem key={option} value={option}>
-                                                {option}
-                                                </SelectItem>
-                                            ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </TableCell>
-                            <TableCell className="text-center align-middle">
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => handleClearRow(index)}
-                                    title="Bersihkan baris"
-                                >
-                                    <RotateCcw className="h-4 w-4" />
-                                    <span className="sr-only">Bersihkan baris</span>
-                                </Button>
-                            </TableCell>
-                        </TableRow>
-                    )
-                  })}
+                  {RISK_EVENTS.map((riskEvent, index) => (
+                    <SurveyTableRow
+                      key={riskEvent.name}
+                      index={index}
+                      riskEvent={riskEvent}
+                      handleClearRow={handleClearRow}
+                    />
+                  ))}
                 </TableBody>
               </Table>
             </div>
