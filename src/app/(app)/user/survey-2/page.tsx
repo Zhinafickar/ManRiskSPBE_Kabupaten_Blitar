@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,6 +9,7 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from '@/components/ui/form';
 import {
@@ -22,7 +24,12 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import {
     RISK_EVENTS,
     FREQUENCY_LEVELS,
-    IMPACT_MAGNITUDES
+    IMPACT_MAGNITUDES,
+    ORGANIZATIONAL_CONTROLS,
+    PEOPLE_CONTROLS,
+    PHYSICAL_CONTROLS,
+    TECHNOLOGICAL_CONTROLS,
+    MITIGATION_OPTIONS
 } from '@/constants/data';
 import { addSurvey } from '@/services/survey-service';
 import { useAuth } from '@/hooks/use-auth';
@@ -32,14 +39,15 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon, Check, ChevronsUpDown } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, ChevronsUpDown, ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Textarea } from '@/components/ui/textarea';
 
-// Make fields optional to allow submitting only filled rows.
 const singleSurveySchema = z.object({
-  riskEvent: z.string(), // This is pre-filled, so it will always be there.
+  riskEvent: z.string(),
   impactArea: z.string().optional(),
   eventDate: z.date().optional(),
   frequency: z.string().optional(),
@@ -50,6 +58,7 @@ const singleSurveySchema = z.object({
   kontrolOrang: z.array(z.string()).optional(),
   kontrolFisik: z.array(z.string()).optional(),
   kontrolTeknologi: z.array(z.string()).optional(),
+  mitigasi: z.string().optional(),
 });
 
 const formSchema = z.object({
@@ -61,17 +70,27 @@ export default function Survey2Page() {
   const { user, userProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [openImpactAreaPopovers, setOpenImpactAreaPopovers] = useState<boolean[]>(Array(RISK_EVENTS.length).fill(false));
+  const [openKontrolOrganisasiPopovers, setOpenKontrolOrganisasiPopovers] = useState<boolean[]>(Array(RISK_EVENTS.length).fill(false));
+  const [openKontrolOrangPopovers, setOpenKontrolOrangPopovers] = useState<boolean[]>(Array(RISK_EVENTS.length).fill(false));
+  const [openKontrolFisikPopovers, setOpenKontrolFisikPopovers] = useState<boolean[]>(Array(RISK_EVENTS.length).fill(false));
+  const [openKontrolTeknologiPopovers, setOpenKontrolTeknologiPopovers] = useState<boolean[]>(Array(RISK_EVENTS.length).fill(false));
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    // Initialize the form with all risk events.
     defaultValues: {
       surveys: RISK_EVENTS.map(event => ({
         riskEvent: event.name,
         impactArea: '',
         eventDate: undefined,
         frequency: '',
-        impactMagnitude: ''
+        impactMagnitude: '',
+        cause: '',
+        impact: '',
+        kontrolOrganisasi: [],
+        kontrolOrang: [],
+        kontrolFisik: [],
+        kontrolTeknologi: [],
+        mitigasi: '',
       })),
     },
   });
@@ -114,6 +133,7 @@ export default function Survey2Page() {
                 kontrolOrang: surveyRow.kontrolOrang || [],
                 kontrolFisik: surveyRow.kontrolFisik || [],
                 kontrolTeknologi: surveyRow.kontrolTeknologi || [],
+                mitigasi: surveyRow.mitigasi || '',
             });
         });
 
@@ -129,8 +149,8 @@ export default function Survey2Page() {
     }
   }
   
-  const toggleImpactAreaPopover = (index: number) => {
-    setOpenImpactAreaPopovers(prev => {
+  const togglePopover = (index: number, setPopoverState: React.Dispatch<React.SetStateAction<boolean[]>>) => {
+    setPopoverState(prev => {
         const newStates = [...prev];
         newStates[index] = !newStates[index];
         return newStates;
@@ -150,6 +170,7 @@ export default function Survey2Page() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-12"></TableHead>
                     <TableHead className="min-w-[300px] font-semibold">Kejadian Risiko TIK</TableHead>
                     <TableHead className="min-w-[300px] font-semibold">Area Dampak</TableHead>
                     <TableHead className="min-w-[170px] font-semibold">Waktu Kejadian</TableHead>
@@ -164,7 +185,17 @@ export default function Survey2Page() {
                     const availableImpactAreas = riskEvent.impactAreas || [];
                     
                     return (
-                        <TableRow key={riskEvent.name}>
+                      <Collapsible asChild key={riskEvent.name}>
+                        <>
+                          <TableRow>
+                            <TableCell>
+                              <CollapsibleTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <ChevronDown className="h-4 w-4" />
+                                  <span className="sr-only">Toggle details</span>
+                                </Button>
+                              </CollapsibleTrigger>
+                            </TableCell>
                             <TableCell className="font-medium align-top pt-5">
                                 {riskEvent.name}
                             </TableCell>
@@ -174,7 +205,7 @@ export default function Survey2Page() {
                                     name={`surveys.${index}.impactArea`}
                                     render={({ field }) => (
                                         <FormItem>
-                                            <Popover open={openImpactAreaPopovers[index]} onOpenChange={() => toggleImpactAreaPopover(index)}>
+                                            <Popover open={openImpactAreaPopovers[index]} onOpenChange={() => togglePopover(index, setOpenImpactAreaPopovers)}>
                                                 <PopoverTrigger asChild>
                                                     <FormControl>
                                                         <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value && "text-muted-foreground")}>
@@ -195,7 +226,7 @@ export default function Survey2Page() {
                                                                         value={area}
                                                                         onSelect={() => {
                                                                             form.setValue(`surveys.${index}.impactArea`, area);
-                                                                            toggleImpactAreaPopover(index);
+                                                                            togglePopover(index, setOpenImpactAreaPopovers);
                                                                         }}
                                                                     >
                                                                         <Check className={cn("mr-2 h-4 w-4", area === field.value ? "opacity-100" : "opacity-0")} />
@@ -269,7 +300,244 @@ export default function Survey2Page() {
                             <TableCell className="text-center align-middle">
                                 {level ? <Badge className={cn("text-base", color)}>{level}</Badge> : <span className="text-xs text-muted-foreground">-</span>}
                             </TableCell>
-                        </TableRow>
+                          </TableRow>
+                          <CollapsibleContent asChild>
+                             <TableRow>
+                                <TableCell colSpan={7} className="p-0">
+                                    <div className="p-4 space-y-4 bg-muted/50">
+                                         <FormField
+                                            control={form.control}
+                                            name={`surveys.${index}.cause`}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                <FormLabel>Penyebab</FormLabel>
+                                                <FormControl><Textarea placeholder="Jelaskan penyebab kejadian risiko..." {...field} /></FormControl>
+                                                <FormMessage />
+                                                </FormItem>
+                                            )}
+                                            />
+                                            <FormField
+                                            control={form.control}
+                                            name={`surveys.${index}.impact`}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                <FormLabel>Dampak</FormLabel>
+                                                <FormControl><Textarea placeholder="Jelaskan potensi dampaknya..." {...field} /></FormControl>
+                                                <FormMessage />
+                                                </FormItem>
+                                            )}
+                                            />
+                                        <div className="space-y-2 rounded-lg border p-4 bg-background">
+                                            <FormLabel>Kontrol yang Sudah Ada</FormLabel>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`surveys.${index}.kontrolOrganisasi`}
+                                                    render={({ field }) => (
+                                                        <FormItem className="flex flex-col">
+                                                        <FormLabel>Kontrol Organisasi</FormLabel>
+                                                        <Popover open={openKontrolOrganisasiPopovers[index]} onOpenChange={() => togglePopover(index, setOpenKontrolOrganisasiPopovers)}>
+                                                            <PopoverTrigger asChild>
+                                                            <FormControl>
+                                                                <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}>
+                                                                {field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol..."}
+                                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                                </Button>
+                                                            </FormControl>
+                                                            </PopoverTrigger>
+                                                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                                                            <Command>
+                                                                <CommandInput placeholder="Cari kontrol..." />
+                                                                <CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty>
+                                                                <CommandList>
+                                                                <CommandGroup>
+                                                                    {ORGANIZATIONAL_CONTROLS.map((item) => (
+                                                                    <CommandItem
+                                                                        key={item}
+                                                                        value={item}
+                                                                        onSelect={() => {
+                                                                        const value = field.value || [];
+                                                                        const newValue = value.includes(item) ? value.filter((i) => i !== item) : [...value, item];
+                                                                        form.setValue(`surveys.${index}.kontrolOrganisasi`, newValue);
+                                                                        }}
+                                                                    >
+                                                                        <Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />
+                                                                        {item}
+                                                                    </CommandItem>
+                                                                    ))}
+                                                                </CommandGroup>
+                                                                </CommandList>
+                                                            </Command>
+                                                            </PopoverContent>
+                                                        </Popover>
+                                                        <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`surveys.${index}.kontrolOrang`}
+                                                    render={({ field }) => (
+                                                        <FormItem className="flex flex-col">
+                                                        <FormLabel>Kontrol Orang</FormLabel>
+                                                        <Popover open={openKontrolOrangPopovers[index]} onOpenChange={() => togglePopover(index, setOpenKontrolOrangPopovers)}>
+                                                            <PopoverTrigger asChild>
+                                                            <FormControl>
+                                                                <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}>
+                                                                {field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol..."}
+                                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                                </Button>
+                                                            </FormControl>
+                                                            </PopoverTrigger>
+                                                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                                                            <Command>
+                                                                <CommandInput placeholder="Cari kontrol..." />
+                                                                <CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty>
+                                                                <CommandList>
+                                                                <CommandGroup>
+                                                                    {PEOPLE_CONTROLS.map((item) => (
+                                                                    <CommandItem
+                                                                        key={item}
+                                                                        value={item}
+                                                                        onSelect={() => {
+                                                                        const value = field.value || [];
+                                                                        const newValue = value.includes(item) ? value.filter((i) => i !== item) : [...value, item];
+                                                                        form.setValue(`surveys.${index}.kontrolOrang`, newValue);
+                                                                        }}
+                                                                    >
+                                                                        <Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />
+                                                                        {item}
+                                                                    </CommandItem>
+                                                                    ))}
+                                                                </CommandGroup>
+                                                                </CommandList>
+                                                            </Command>
+                                                            </PopoverContent>
+                                                        </Popover>
+                                                        <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`surveys.${index}.kontrolFisik`}
+                                                    render={({ field }) => (
+                                                        <FormItem className="flex flex-col">
+                                                        <FormLabel>Kontrol Fisik</FormLabel>
+                                                        <Popover open={openKontrolFisikPopovers[index]} onOpenChange={() => togglePopover(index, setOpenKontrolFisikPopovers)}>
+                                                            <PopoverTrigger asChild>
+                                                            <FormControl>
+                                                                <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}>
+                                                                {field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol..."}
+                                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                                </Button>
+                                                            </FormControl>
+                                                            </PopoverTrigger>
+                                                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                                                            <Command>
+                                                                <CommandInput placeholder="Cari kontrol..." />
+                                                                <CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty>
+                                                                <CommandList>
+                                                                <CommandGroup>
+                                                                    {PHYSICAL_CONTROLS.map((item) => (
+                                                                    <CommandItem
+                                                                        key={item}
+                                                                        value={item}
+                                                                        onSelect={() => {
+                                                                        const value = field.value || [];
+                                                                        const newValue = value.includes(item) ? value.filter((i) => i !== item) : [...value, item];
+                                                                        form.setValue(`surveys.${index}.kontrolFisik`, newValue);
+                                                                        }}
+                                                                    >
+                                                                        <Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />
+                                                                        {item}
+                                                                    </CommandItem>
+                                                                    ))}
+                                                                </CommandGroup>
+                                                                </CommandList>
+                                                            </Command>
+                                                            </PopoverContent>
+                                                        </Popover>
+                                                        <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`surveys.${index}.kontrolTeknologi`}
+                                                    render={({ field }) => (
+                                                        <FormItem className="flex flex-col">
+                                                        <FormLabel>Kontrol Teknologi</FormLabel>
+                                                        <Popover open={openKontrolTeknologiPopovers[index]} onOpenChange={() => togglePopover(index, setOpenKontrolTeknologiPopovers)}>
+                                                            <PopoverTrigger asChild>
+                                                            <FormControl>
+                                                                <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}>
+                                                                {field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol..."}
+                                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                                </Button>
+                                                            </FormControl>
+                                                            </PopoverTrigger>
+                                                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                                                            <Command>
+                                                                <CommandInput placeholder="Cari kontrol..." />
+                                                                <CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty>
+                                                                <CommandList>
+                                                                <CommandGroup>
+                                                                    {TECHNOLOGICAL_CONTROLS.map((item) => (
+                                                                    <CommandItem
+                                                                        key={item}
+                                                                        value={item}
+                                                                        onSelect={() => {
+                                                                        const value = field.value || [];
+                                                                        const newValue = value.includes(item) ? value.filter((i) => i !== item) : [...value, item];
+                                                                        form.setValue(`surveys.${index}.kontrolTeknologi`, newValue);
+                                                                        }}
+                                                                    >
+                                                                        <Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />
+                                                                        {item}
+                                                                    </CommandItem>
+                                                                    ))}
+                                                                </CommandGroup>
+                                                                </CommandList>
+                                                            </Command>
+                                                            </PopoverContent>
+                                                        </Popover>
+                                                        <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                        </div>
+                                        <FormField
+                                            control={form.control}
+                                            name={`surveys.${index}.mitigasi`}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                <FormLabel>Mitigasi</FormLabel>
+                                                <Select onValueChange={field.onChange} value={field.value || ''}>
+                                                    <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Pilih mitigasi" />
+                                                    </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                    {MITIGATION_OPTIONS.map((option) => (
+                                                        <SelectItem key={option} value={option}>
+                                                        {option}
+                                                        </SelectItem>
+                                                    ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                </TableCell>
+                             </TableRow>
+                          </CollapsibleContent>
+                        </>
+                      </Collapsible>
                     )
                   })}
                 </TableBody>
