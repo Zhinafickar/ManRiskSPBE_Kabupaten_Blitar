@@ -16,4 +16,5 @@ export interface Survey {
     kontrolOrang?: string;
     kontrolFisik?: string;
     kontrolTeknologi?: string;
+    mitigasi?: string;
 }

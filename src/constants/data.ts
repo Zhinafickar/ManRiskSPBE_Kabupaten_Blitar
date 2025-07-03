@@ -349,3 +349,11 @@ export const PEOPLE_CONTROLS = [
   "6.7 Kerja jarak jauh",
   "6.8 Pelaporan peristiwa keamanan informasi"
 ];
+
+export const MITIGATION_OPTIONS = [
+  "Eskalasi Risiko",
+  "Eksploitasi Risiko",
+  "Peningkatan Risiko",
+  "Pembagian Risiko",
+  "Penerimaan Risiko"
+];

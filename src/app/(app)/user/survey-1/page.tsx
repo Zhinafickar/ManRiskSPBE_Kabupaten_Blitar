@@ -26,7 +26,8 @@ import {
     FREQUENCY_LEVELS,
     IMPACT_MAGNITUDES,
     ORGANIZATIONAL_CONTROLS,
-    PEOPLE_CONTROLS
+    PEOPLE_CONTROLS,
+    MITIGATION_OPTIONS
 } from '@/constants/data';
 import { addSurvey } from '@/services/survey-service';
 import { useAuth } from '@/hooks/use-auth';
@@ -52,6 +53,7 @@ const formSchema = z.object({
   kontrolOrang: z.string().optional(),
   kontrolFisik: z.string().optional(),
   kontrolTeknologi: z.string().optional(),
+  mitigasi: z.string({ required_error: 'Silakan pilih mitigasi.' }),
 });
 
 export default function Survey1Page({ params, searchParams }: { params: any, searchParams: any}) {
@@ -79,6 +81,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
       kontrolOrang: '',
       kontrolFisik: '',
       kontrolTeknologi: '',
+      mitigasi: '',
     },
   });
 
@@ -474,6 +477,30 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                 />
               </div>
             </div>
+             <FormField
+              control={form.control}
+              name="mitigasi"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Mitigasi</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih mitigasi" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {MITIGATION_OPTIONS.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </CardContent>
           <CardFooter>
             <Button type="submit" disabled={isLoading}>{isLoading ? 'Mengirim...' : 'Kirim Survei'}</Button>

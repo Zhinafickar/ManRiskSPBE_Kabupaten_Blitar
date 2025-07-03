@@ -98,6 +98,7 @@ export default function SuperAdminResultsPage() {
                 <TableHead>Impact</TableHead>
                 <TableHead>Risk Level</TableHead>
                 <TableHead>Waktu Kejadian</TableHead>
+                <TableHead>Mitigasi</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -111,6 +112,7 @@ export default function SuperAdminResultsPage() {
                   <TableCell>{survey.impactMagnitude}</TableCell>
                    <TableCell><RiskIndicatorBadge level={survey.riskLevel} /></TableCell>
                    <TableCell>{survey.eventDate ? new Date(survey.eventDate).toLocaleDateString('id-ID') : 'N/A'}</TableCell>
+                  <TableCell className="max-w-xs truncate">{survey.mitigasi || 'N/A'}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
