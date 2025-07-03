@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, useFieldArray, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,11 +17,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import {
-    IMPACT_AREAS,
+    RISK_EVENTS,
     FREQUENCY_LEVELS,
     IMPACT_MAGNITUDES
 } from '@/constants/data';
@@ -33,17 +32,18 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon, PlusCircle, Trash2 } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, ChevronsUpDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 
+// Make fields optional to allow submitting only filled rows.
 const singleSurveySchema = z.object({
-  riskEvent: z.string().min(5, { message: 'Minimal 5 karakter.' }),
-  impactArea: z.string({ required_error: 'Pilih area dampak.' }),
-  eventDate: z.date({ required_error: 'Pilih tanggal.' }),
-  frequency: z.string({ required_error: 'Pilih frekuensi.' }),
-  impactMagnitude: z.string({ required_error: 'Pilih besaran.' }),
-  // These fields are not in the new UI, so they are made optional.
+  riskEvent: z.string(), // This is pre-filled, so it will always be there.
+  impactArea: z.string().optional(),
+  eventDate: z.date().optional(),
+  frequency: z.string().optional(),
+  impactMagnitude: z.string().optional(),
   cause: z.string().optional(),
   impact: z.string().optional(),
   kontrolOrganisasi: z.string().optional(),
@@ -53,34 +53,29 @@ const singleSurveySchema = z.object({
 });
 
 const formSchema = z.object({
-  surveys: z.array(singleSurveySchema).min(1, 'Harus ada setidaknya satu baris untuk dikirim.'),
+  surveys: z.array(singleSurveySchema),
 });
-
-const defaultRowValue = {
-    riskEvent: '',
-    impactArea: '',
-    eventDate: undefined as Date | undefined,
-    frequency: '',
-    impactMagnitude: ''
-};
 
 export default function Survey2Page() {
   const { toast } = useToast();
   const { user, userProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [openImpactAreaPopovers, setOpenImpactAreaPopovers] = useState<boolean[]>(Array(RISK_EVENTS.length).fill(false));
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    // Initialize the form with all risk events.
     defaultValues: {
-      surveys: [defaultRowValue],
+      surveys: RISK_EVENTS.map(event => ({
+        riskEvent: event.name,
+        impactArea: '',
+        eventDate: undefined,
+        frequency: '',
+        impactMagnitude: ''
+      })),
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "surveys",
-  });
-  
   const watchedSurveys = form.watch('surveys');
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -88,26 +83,44 @@ export default function Survey2Page() {
         toast({ variant: 'destructive', title: 'Error', description: 'Anda harus masuk untuk mengirimkan survei.' });
         return;
     }
+
+    const surveysToSubmit = values.surveys.filter(
+        s => s.impactArea && s.eventDate && s.frequency && s.impactMagnitude
+    );
+
+    if (surveysToSubmit.length === 0) {
+        toast({ variant: 'destructive', title: 'Tidak Ada Data', description: 'Silakan isi setidaknya satu baris yang lengkap untuk dikirim.' });
+        return;
+    }
+
     setIsLoading(true);
 
     try {
-        const submissionPromises = values.surveys.map(surveyRow => {
-            const indicator = getRiskLevel(surveyRow.frequency, surveyRow.impactMagnitude);
+        const submissionPromises = surveysToSubmit.map(surveyRow => {
+            const indicator = getRiskLevel(surveyRow.frequency!, surveyRow.impactMagnitude!);
             return addSurvey({ 
-                ...surveyRow, 
+                riskEvent: surveyRow.riskEvent,
+                impactArea: surveyRow.impactArea!,
+                eventDate: surveyRow.eventDate!,
+                frequency: surveyRow.frequency!,
+                impactMagnitude: surveyRow.impactMagnitude!,
                 surveyType: 2, 
                 userId: user.uid, 
                 userRole: userProfile.role, 
                 riskLevel: indicator.level ?? undefined,
                 cause: surveyRow.cause || '',
                 impact: surveyRow.impact || '',
+                kontrolOrganisasi: surveyRow.kontrolOrganisasi || '',
+                kontrolOrang: surveyRow.kontrolOrang || '',
+                kontrolFisik: surveyRow.kontrolFisik || '',
+                kontrolTeknologi: surveyRow.kontrolTeknologi || '',
             });
         });
 
         await Promise.all(submissionPromises);
 
-        toast({ title: 'Sukses', description: `${values.surveys.length} kejadian risiko berhasil dikirim.` });
-        form.reset({ surveys: [defaultRowValue] });
+        toast({ title: 'Sukses', description: `${surveysToSubmit.length} kejadian risiko berhasil dikirim.` });
+        form.reset();
 
     } catch (error) {
         toast({ variant: 'destructive', title: 'Error', description: 'Gagal mengirim survei.' });
@@ -115,12 +128,20 @@ export default function Survey2Page() {
         setIsLoading(false);
     }
   }
+  
+  const toggleImpactAreaPopover = (index: number) => {
+    setOpenImpactAreaPopovers(prev => {
+        const newStates = [...prev];
+        newStates[index] = !newStates[index];
+        return newStates;
+    });
+  };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Input Survey (Tampilan Tabel)</CardTitle>
-        <CardDescription>Isi satu atau lebih kejadian risiko dalam format seperti Excel. Klik "Tambah Baris" untuk menambah data baru.</CardDescription>
+        <CardDescription>Isi data untuk setiap kejadian risiko yang telah ditentukan. Hanya baris yang terisi lengkap yang akan dikirim.</CardDescription>
       </CardHeader>
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -129,28 +150,23 @@ export default function Survey2Page() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="min-w-[250px]">Kejadian Risiko TIK</TableHead>
-                    <TableHead className="min-w-[200px]">Area Dampak</TableHead>
-                    <TableHead className="min-w-[170px]">Waktu Kejadian</TableHead>
-                    <TableHead className="min-w-[180px]">Frekuensi</TableHead>
-                    <TableHead className="min-w-[180px]">Besaran Dampak</TableHead>
-                    <TableHead className="text-center">Tingkat Risiko</TableHead>
-                    <TableHead>Aksi</TableHead>
+                    <TableHead className="min-w-[300px] font-semibold">Kejadian Risiko TIK</TableHead>
+                    <TableHead className="min-w-[300px] font-semibold">Area Dampak</TableHead>
+                    <TableHead className="min-w-[170px] font-semibold">Waktu Kejadian</TableHead>
+                    <TableHead className="min-w-[180px] font-semibold">Frekuensi</TableHead>
+                    <TableHead className="min-w-[180px] font-semibold">Besaran Dampak</TableHead>
+                    <TableHead className="text-center font-semibold">Tingkat Risiko</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {fields.map((field, index) => {
+                  {RISK_EVENTS.map((riskEvent, index) => {
                     const { level, color } = getRiskLevel(watchedSurveys[index]?.frequency, watchedSurveys[index]?.impactMagnitude);
+                    const availableImpactAreas = riskEvent.impactAreas || [];
+                    
                     return (
-                        <TableRow key={field.id}>
-                            <TableCell>
-                                <FormField
-                                    control={form.control}
-                                    name={`surveys.${index}.riskEvent`}
-                                    render={({ field }) => (
-                                        <FormItem><FormControl><Input placeholder="Jelaskan kejadian..." {...field} /></FormControl><FormMessage /></FormItem>
-                                    )}
-                                />
+                        <TableRow key={riskEvent.name}>
+                            <TableCell className="font-medium align-top pt-5">
+                                {riskEvent.name}
                             </TableCell>
                             <TableCell>
                                 <FormField
@@ -158,16 +174,45 @@ export default function Survey2Page() {
                                     name={`surveys.${index}.impactArea`}
                                     render={({ field }) => (
                                         <FormItem>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                <FormControl><SelectTrigger><SelectValue placeholder="Pilih area..." /></SelectTrigger></FormControl>
-                                                <SelectContent>{IMPACT_AREAS.map(area => <SelectItem key={area} value={area}>{area}</SelectItem>)}</SelectContent>
-                                            </Select>
+                                            <Popover open={openImpactAreaPopovers[index]} onOpenChange={() => toggleImpactAreaPopover(index)}>
+                                                <PopoverTrigger asChild>
+                                                    <FormControl>
+                                                        <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value && "text-muted-foreground")}>
+                                                            <span className="truncate">{field.value ? field.value : "Pilih area..."}</span>
+                                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                        </Button>
+                                                    </FormControl>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                                                    <Command>
+                                                        <CommandInput placeholder="Cari area dampak..." />
+                                                        <CommandEmpty>Area dampak tidak ditemukan.</CommandEmpty>
+                                                        <CommandList>
+                                                            <CommandGroup>
+                                                                {availableImpactAreas.map((area) => (
+                                                                    <CommandItem
+                                                                        key={area}
+                                                                        value={area}
+                                                                        onSelect={() => {
+                                                                            form.setValue(`surveys.${index}.impactArea`, area);
+                                                                            toggleImpactAreaPopover(index);
+                                                                        }}
+                                                                    >
+                                                                        <Check className={cn("mr-2 h-4 w-4", area === field.value ? "opacity-100" : "opacity-0")} />
+                                                                        <span className="flex-1">{area}</span>
+                                                                    </CommandItem>
+                                                                ))}
+                                                            </CommandGroup>
+                                                        </CommandList>
+                                                    </Command>
+                                                </PopoverContent>
+                                            </Popover>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
                             </TableCell>
-                            <TableCell>
+                             <TableCell>
                                 <FormField
                                     control={form.control}
                                     name={`surveys.${index}.eventDate`}
@@ -197,7 +242,7 @@ export default function Survey2Page() {
                                     name={`surveys.${index}.frequency`}
                                     render={({ field }) => (
                                         <FormItem>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <Select onValueChange={field.onChange} value={field.value || ''}>
                                                 <FormControl><SelectTrigger><SelectValue placeholder="Pilih frekuensi" /></SelectTrigger></FormControl>
                                                 <SelectContent>{FREQUENCY_LEVELS.map(level => <SelectItem key={level} value={level}>{level}</SelectItem>)}</SelectContent>
                                             </Select>
@@ -212,7 +257,7 @@ export default function Survey2Page() {
                                     name={`surveys.${index}.impactMagnitude`}
                                     render={({ field }) => (
                                         <FormItem>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <Select onValueChange={field.onChange} value={field.value || ''}>
                                                 <FormControl><SelectTrigger><SelectValue placeholder="Pilih besaran" /></SelectTrigger></FormControl>
                                                 <SelectContent>{IMPACT_MAGNITUDES.map(level => <SelectItem key={level} value={level}>{level}</SelectItem>)}</SelectContent>
                                             </Select>
@@ -221,13 +266,8 @@ export default function Survey2Page() {
                                     )}
                                 />
                             </TableCell>
-                            <TableCell className="text-center">
+                            <TableCell className="text-center align-middle">
                                 {level ? <Badge className={cn("text-base", color)}>{level}</Badge> : <span className="text-xs text-muted-foreground">-</span>}
-                            </TableCell>
-                            <TableCell>
-                                <Button type="button" variant="ghost" size="icon" onClick={() => fields.length > 1 && remove(index)} disabled={fields.length <= 1}>
-                                    <Trash2 className="h-4 w-4 text-destructive" />
-                                </Button>
                             </TableCell>
                         </TableRow>
                     )
@@ -235,10 +275,6 @@ export default function Survey2Page() {
                 </TableBody>
               </Table>
             </div>
-             <Button type="button" variant="outline" size="sm" className="mt-4" onClick={() => append(defaultRowValue)}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Tambah Baris
-            </Button>
             <FormMessage>{form.formState.errors.surveys?.root?.message}</FormMessage>
           </CardContent>
           <CardFooter className="flex justify-end">
