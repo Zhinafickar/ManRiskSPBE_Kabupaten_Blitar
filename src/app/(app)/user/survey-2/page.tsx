@@ -1,4 +1,3 @@
-
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,7 +8,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/form';
 import {
@@ -39,11 +37,10 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon, Check, ChevronsUpDown, ChevronDown } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, ChevronsUpDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Textarea } from '@/components/ui/textarea';
 
 const singleSurveySchema = z.object({
@@ -69,6 +66,7 @@ export default function Survey2Page() {
   const { toast } = useToast();
   const { user, userProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  
   const [openImpactAreaPopovers, setOpenImpactAreaPopovers] = useState<boolean[]>(Array(RISK_EVENTS.length).fill(false));
   const [openKontrolOrganisasiPopovers, setOpenKontrolOrganisasiPopovers] = useState<boolean[]>(Array(RISK_EVENTS.length).fill(false));
   const [openKontrolOrangPopovers, setOpenKontrolOrangPopovers] = useState<boolean[]>(Array(RISK_EVENTS.length).fill(false));
@@ -118,7 +116,7 @@ export default function Survey2Page() {
         const submissionPromises = surveysToSubmit.map(surveyRow => {
             const indicator = getRiskLevel(surveyRow.frequency!, surveyRow.impactMagnitude!);
             return addSurvey({ 
-                riskEvent: surveyRow.riskEvent,
+                ...surveyRow,
                 impactArea: surveyRow.impactArea!,
                 eventDate: surveyRow.eventDate!,
                 frequency: surveyRow.frequency!,
@@ -127,13 +125,6 @@ export default function Survey2Page() {
                 userId: user.uid, 
                 userRole: userProfile.role, 
                 riskLevel: indicator.level ?? undefined,
-                cause: surveyRow.cause || '',
-                impact: surveyRow.impact || '',
-                kontrolOrganisasi: surveyRow.kontrolOrganisasi || [],
-                kontrolOrang: surveyRow.kontrolOrang || [],
-                kontrolFisik: surveyRow.kontrolFisik || [],
-                kontrolTeknologi: surveyRow.kontrolTeknologi || [],
-                mitigasi: surveyRow.mitigasi || '',
             });
         });
 
@@ -157,6 +148,64 @@ export default function Survey2Page() {
     });
   };
 
+  const renderMultiSelect = (
+    index: number,
+    fieldName: keyof z.infer<typeof singleSurveySchema>,
+    options: readonly string[],
+    placeholder: string,
+    popoverOpenState: boolean[],
+    setPopoverOpenState: React.Dispatch<React.SetStateAction<boolean[]>>
+  ) => {
+    const fieldNameStr = `surveys.${index}.${fieldName}` as const;
+    
+    return (
+      <FormField
+        control={form.control}
+        name={fieldNameStr}
+        render={({ field }) => (
+          <FormItem>
+            <Popover open={popoverOpenState[index]} onOpenChange={() => togglePopover(index, setPopoverOpenState)}>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}>
+                    <span className="truncate">{field.value && field.value.length > 0 ? `${field.value.length} terpilih` : placeholder}</span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                <Command>
+                  <CommandInput placeholder="Cari..." />
+                  <CommandEmpty>Tidak ditemukan.</CommandEmpty>
+                  <CommandList>
+                    <CommandGroup>
+                      {options.map((item) => (
+                        <CommandItem
+                          key={item}
+                          value={item}
+                          onSelect={() => {
+                            const value = (field.value as string[] | undefined) || [];
+                            const newValue = value.includes(item)
+                              ? value.filter((i) => i !== item)
+                              : [...value, item];
+                            form.setValue(fieldNameStr, newValue);
+                          }}
+                        >
+                          <Check className={cn("mr-2 h-4 w-4", (field.value as string[] | undefined)?.includes(item) ? "opacity-100" : "opacity-0")} />
+                          <span className="flex-1">{item}</span>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </FormItem>
+        )}
+      />
+    );
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -166,17 +215,23 @@ export default function Survey2Page() {
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto border rounded-lg">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-12"></TableHead>
-                    <TableHead className="min-w-[300px] font-semibold">Kejadian Risiko TIK</TableHead>
+                    <TableHead className="min-w-[300px] font-semibold sticky left-0 bg-background z-10">Kejadian Risiko TIK</TableHead>
                     <TableHead className="min-w-[300px] font-semibold">Area Dampak</TableHead>
                     <TableHead className="min-w-[170px] font-semibold">Waktu Kejadian</TableHead>
+                    <TableHead className="min-w-[250px] font-semibold">Penyebab</TableHead>
+                    <TableHead className="min-w-[250px] font-semibold">Dampak</TableHead>
                     <TableHead className="min-w-[180px] font-semibold">Frekuensi</TableHead>
                     <TableHead className="min-w-[180px] font-semibold">Besaran Dampak</TableHead>
-                    <TableHead className="text-center font-semibold">Tingkat Risiko</TableHead>
+                    <TableHead className="min-w-[120px] text-center font-semibold">Tingkat Risiko</TableHead>
+                    <TableHead className="min-w-[200px] font-semibold">Kontrol Organisasi</TableHead>
+                    <TableHead className="min-w-[200px] font-semibold">Kontrol Orang</TableHead>
+                    <TableHead className="min-w-[200px] font-semibold">Kontrol Fisik</TableHead>
+                    <TableHead className="min-w-[200px] font-semibold">Kontrol Teknologi</TableHead>
+                    <TableHead className="min-w-[200px] font-semibold">Mitigasi</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -185,18 +240,8 @@ export default function Survey2Page() {
                     const availableImpactAreas = riskEvent.impactAreas || [];
                     
                     return (
-                      <Collapsible asChild key={riskEvent.name}>
-                        <>
-                          <TableRow>
-                            <TableCell>
-                              <CollapsibleTrigger asChild>
-                                <Button variant="ghost" size="sm">
-                                  <ChevronDown className="h-4 w-4" />
-                                  <span className="sr-only">Toggle details</span>
-                                </Button>
-                              </CollapsibleTrigger>
-                            </TableCell>
-                            <TableCell className="font-medium align-top pt-5">
+                        <TableRow key={riskEvent.name}>
+                            <TableCell className="font-medium align-top sticky left-0 bg-background z-10">
                                 {riskEvent.name}
                             </TableCell>
                             <TableCell>
@@ -243,7 +288,7 @@ export default function Survey2Page() {
                                     )}
                                 />
                             </TableCell>
-                             <TableCell>
+                            <TableCell>
                                 <FormField
                                     control={form.control}
                                     name={`surveys.${index}.eventDate`}
@@ -263,6 +308,30 @@ export default function Survey2Page() {
                                                 </PopoverContent>
                                             </Popover>
                                             <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </TableCell>
+                            <TableCell>
+                                <FormField
+                                    control={form.control}
+                                    name={`surveys.${index}.cause`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                        <FormControl><Textarea placeholder="Jelaskan penyebab..." {...field} /></FormControl>
+                                        <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </TableCell>
+                            <TableCell>
+                                <FormField
+                                    control={form.control}
+                                    name={`surveys.${index}.impact`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                        <FormControl><Textarea placeholder="Jelaskan dampak..." {...field} /></FormControl>
+                                        <FormMessage />
                                         </FormItem>
                                     )}
                                 />
@@ -300,244 +369,44 @@ export default function Survey2Page() {
                             <TableCell className="text-center align-middle">
                                 {level ? <Badge className={cn("text-base", color)}>{level}</Badge> : <span className="text-xs text-muted-foreground">-</span>}
                             </TableCell>
-                          </TableRow>
-                          <CollapsibleContent asChild>
-                             <TableRow>
-                                <TableCell colSpan={7} className="p-0">
-                                    <div className="p-4 space-y-4 bg-muted/50">
-                                         <FormField
-                                            control={form.control}
-                                            name={`surveys.${index}.cause`}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                <FormLabel>Penyebab</FormLabel>
-                                                <FormControl><Textarea placeholder="Jelaskan penyebab kejadian risiko..." {...field} /></FormControl>
-                                                <FormMessage />
-                                                </FormItem>
-                                            )}
-                                            />
-                                            <FormField
-                                            control={form.control}
-                                            name={`surveys.${index}.impact`}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                <FormLabel>Dampak</FormLabel>
-                                                <FormControl><Textarea placeholder="Jelaskan potensi dampaknya..." {...field} /></FormControl>
-                                                <FormMessage />
-                                                </FormItem>
-                                            )}
-                                            />
-                                        <div className="space-y-2 rounded-lg border p-4 bg-background">
-                                            <FormLabel>Kontrol yang Sudah Ada</FormLabel>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                                                <FormField
-                                                    control={form.control}
-                                                    name={`surveys.${index}.kontrolOrganisasi`}
-                                                    render={({ field }) => (
-                                                        <FormItem className="flex flex-col">
-                                                        <FormLabel>Kontrol Organisasi</FormLabel>
-                                                        <Popover open={openKontrolOrganisasiPopovers[index]} onOpenChange={() => togglePopover(index, setOpenKontrolOrganisasiPopovers)}>
-                                                            <PopoverTrigger asChild>
-                                                            <FormControl>
-                                                                <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}>
-                                                                {field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol..."}
-                                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                                                </Button>
-                                                            </FormControl>
-                                                            </PopoverTrigger>
-                                                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                                                            <Command>
-                                                                <CommandInput placeholder="Cari kontrol..." />
-                                                                <CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty>
-                                                                <CommandList>
-                                                                <CommandGroup>
-                                                                    {ORGANIZATIONAL_CONTROLS.map((item) => (
-                                                                    <CommandItem
-                                                                        key={item}
-                                                                        value={item}
-                                                                        onSelect={() => {
-                                                                        const value = field.value || [];
-                                                                        const newValue = value.includes(item) ? value.filter((i) => i !== item) : [...value, item];
-                                                                        form.setValue(`surveys.${index}.kontrolOrganisasi`, newValue);
-                                                                        }}
-                                                                    >
-                                                                        <Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />
-                                                                        {item}
-                                                                    </CommandItem>
-                                                                    ))}
-                                                                </CommandGroup>
-                                                                </CommandList>
-                                                            </Command>
-                                                            </PopoverContent>
-                                                        </Popover>
-                                                        <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                                <FormField
-                                                    control={form.control}
-                                                    name={`surveys.${index}.kontrolOrang`}
-                                                    render={({ field }) => (
-                                                        <FormItem className="flex flex-col">
-                                                        <FormLabel>Kontrol Orang</FormLabel>
-                                                        <Popover open={openKontrolOrangPopovers[index]} onOpenChange={() => togglePopover(index, setOpenKontrolOrangPopovers)}>
-                                                            <PopoverTrigger asChild>
-                                                            <FormControl>
-                                                                <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}>
-                                                                {field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol..."}
-                                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                                                </Button>
-                                                            </FormControl>
-                                                            </PopoverTrigger>
-                                                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                                                            <Command>
-                                                                <CommandInput placeholder="Cari kontrol..." />
-                                                                <CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty>
-                                                                <CommandList>
-                                                                <CommandGroup>
-                                                                    {PEOPLE_CONTROLS.map((item) => (
-                                                                    <CommandItem
-                                                                        key={item}
-                                                                        value={item}
-                                                                        onSelect={() => {
-                                                                        const value = field.value || [];
-                                                                        const newValue = value.includes(item) ? value.filter((i) => i !== item) : [...value, item];
-                                                                        form.setValue(`surveys.${index}.kontrolOrang`, newValue);
-                                                                        }}
-                                                                    >
-                                                                        <Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />
-                                                                        {item}
-                                                                    </CommandItem>
-                                                                    ))}
-                                                                </CommandGroup>
-                                                                </CommandList>
-                                                            </Command>
-                                                            </PopoverContent>
-                                                        </Popover>
-                                                        <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                                <FormField
-                                                    control={form.control}
-                                                    name={`surveys.${index}.kontrolFisik`}
-                                                    render={({ field }) => (
-                                                        <FormItem className="flex flex-col">
-                                                        <FormLabel>Kontrol Fisik</FormLabel>
-                                                        <Popover open={openKontrolFisikPopovers[index]} onOpenChange={() => togglePopover(index, setOpenKontrolFisikPopovers)}>
-                                                            <PopoverTrigger asChild>
-                                                            <FormControl>
-                                                                <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}>
-                                                                {field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol..."}
-                                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                                                </Button>
-                                                            </FormControl>
-                                                            </PopoverTrigger>
-                                                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                                                            <Command>
-                                                                <CommandInput placeholder="Cari kontrol..." />
-                                                                <CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty>
-                                                                <CommandList>
-                                                                <CommandGroup>
-                                                                    {PHYSICAL_CONTROLS.map((item) => (
-                                                                    <CommandItem
-                                                                        key={item}
-                                                                        value={item}
-                                                                        onSelect={() => {
-                                                                        const value = field.value || [];
-                                                                        const newValue = value.includes(item) ? value.filter((i) => i !== item) : [...value, item];
-                                                                        form.setValue(`surveys.${index}.kontrolFisik`, newValue);
-                                                                        }}
-                                                                    >
-                                                                        <Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />
-                                                                        {item}
-                                                                    </CommandItem>
-                                                                    ))}
-                                                                </CommandGroup>
-                                                                </CommandList>
-                                                            </Command>
-                                                            </PopoverContent>
-                                                        </Popover>
-                                                        <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                                <FormField
-                                                    control={form.control}
-                                                    name={`surveys.${index}.kontrolTeknologi`}
-                                                    render={({ field }) => (
-                                                        <FormItem className="flex flex-col">
-                                                        <FormLabel>Kontrol Teknologi</FormLabel>
-                                                        <Popover open={openKontrolTeknologiPopovers[index]} onOpenChange={() => togglePopover(index, setOpenKontrolTeknologiPopovers)}>
-                                                            <PopoverTrigger asChild>
-                                                            <FormControl>
-                                                                <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}>
-                                                                {field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol..."}
-                                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                                                </Button>
-                                                            </FormControl>
-                                                            </PopoverTrigger>
-                                                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                                                            <Command>
-                                                                <CommandInput placeholder="Cari kontrol..." />
-                                                                <CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty>
-                                                                <CommandList>
-                                                                <CommandGroup>
-                                                                    {TECHNOLOGICAL_CONTROLS.map((item) => (
-                                                                    <CommandItem
-                                                                        key={item}
-                                                                        value={item}
-                                                                        onSelect={() => {
-                                                                        const value = field.value || [];
-                                                                        const newValue = value.includes(item) ? value.filter((i) => i !== item) : [...value, item];
-                                                                        form.setValue(`surveys.${index}.kontrolTeknologi`, newValue);
-                                                                        }}
-                                                                    >
-                                                                        <Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />
-                                                                        {item}
-                                                                    </CommandItem>
-                                                                    ))}
-                                                                </CommandGroup>
-                                                                </CommandList>
-                                                            </Command>
-                                                            </PopoverContent>
-                                                        </Popover>
-                                                        <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            </div>
-                                        </div>
-                                        <FormField
-                                            control={form.control}
-                                            name={`surveys.${index}.mitigasi`}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                <FormLabel>Mitigasi</FormLabel>
-                                                <Select onValueChange={field.onChange} value={field.value || ''}>
-                                                    <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Pilih mitigasi" />
-                                                    </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                    {MITIGATION_OPTIONS.map((option) => (
-                                                        <SelectItem key={option} value={option}>
-                                                        {option}
-                                                        </SelectItem>
-                                                    ))}
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
-                                </TableCell>
-                             </TableRow>
-                          </CollapsibleContent>
-                        </>
-                      </Collapsible>
+                            <TableCell>
+                                {renderMultiSelect(index, 'kontrolOrganisasi', ORGANIZATIONAL_CONTROLS, "Pilih kontrol...", openKontrolOrganisasiPopovers, setOpenKontrolOrganisasiPopovers)}
+                            </TableCell>
+                             <TableCell>
+                                {renderMultiSelect(index, 'kontrolOrang', PEOPLE_CONTROLS, "Pilih kontrol...", openKontrolOrangPopovers, setOpenKontrolOrangPopovers)}
+                            </TableCell>
+                             <TableCell>
+                                {renderMultiSelect(index, 'kontrolFisik', PHYSICAL_CONTROLS, "Pilih kontrol...", openKontrolFisikPopovers, setOpenKontrolFisikPopovers)}
+                            </TableCell>
+                            <TableCell>
+                                {renderMultiSelect(index, 'kontrolTeknologi', TECHNOLOGICAL_CONTROLS, "Pilih kontrol...", openKontrolTeknologiPopovers, setOpenKontrolTeknologiPopovers)}
+                            </TableCell>
+                             <TableCell>
+                                <FormField
+                                    control={form.control}
+                                    name={`surveys.${index}.mitigasi`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                        <Select onValueChange={field.onChange} value={field.value || ''}>
+                                            <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Pilih mitigasi" />
+                                            </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                            {MITIGATION_OPTIONS.map((option) => (
+                                                <SelectItem key={option} value={option}>
+                                                {option}
+                                                </SelectItem>
+                                            ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </TableCell>
+                        </TableRow>
                     )
                   })}
                 </TableBody>
