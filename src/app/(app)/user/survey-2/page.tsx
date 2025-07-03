@@ -46,10 +46,10 @@ const singleSurveySchema = z.object({
   impactMagnitude: z.string().optional(),
   cause: z.string().optional(),
   impact: z.string().optional(),
-  kontrolOrganisasi: z.string().optional(),
-  kontrolOrang: z.string().optional(),
-  kontrolFisik: z.string().optional(),
-  kontrolTeknologi: z.string().optional(),
+  kontrolOrganisasi: z.array(z.string()).optional(),
+  kontrolOrang: z.array(z.string()).optional(),
+  kontrolFisik: z.array(z.string()).optional(),
+  kontrolTeknologi: z.array(z.string()).optional(),
 });
 
 const formSchema = z.object({
@@ -110,10 +110,10 @@ export default function Survey2Page() {
                 riskLevel: indicator.level ?? undefined,
                 cause: surveyRow.cause || '',
                 impact: surveyRow.impact || '',
-                kontrolOrganisasi: surveyRow.kontrolOrganisasi || '',
-                kontrolOrang: surveyRow.kontrolOrang || '',
-                kontrolFisik: surveyRow.kontrolFisik || '',
-                kontrolTeknologi: surveyRow.kontrolTeknologi || '',
+                kontrolOrganisasi: surveyRow.kontrolOrganisasi || [],
+                kontrolOrang: surveyRow.kontrolOrang || [],
+                kontrolFisik: surveyRow.kontrolFisik || [],
+                kontrolTeknologi: surveyRow.kontrolTeknologi || [],
             });
         });
 

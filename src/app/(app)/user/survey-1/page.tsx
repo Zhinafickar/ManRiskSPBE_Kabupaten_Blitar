@@ -51,10 +51,10 @@ const formSchema = z.object({
   impact: z.string().min(10, { message: 'Dampak harus diisi minimal 10 karakter.' }),
   frequency: z.string({ required_error: 'Silakan pilih frekuensi.' }),
   impactMagnitude: z.string({ required_error: 'Silakan pilih besaran dampak.' }),
-  kontrolOrganisasi: z.string().optional(),
-  kontrolOrang: z.string().optional(),
-  kontrolFisik: z.string().optional(),
-  kontrolTeknologi: z.string().optional(),
+  kontrolOrganisasi: z.array(z.string()).optional(),
+  kontrolOrang: z.array(z.string()).optional(),
+  kontrolFisik: z.array(z.string()).optional(),
+  kontrolTeknologi: z.array(z.string()).optional(),
   mitigasi: z.string({ required_error: 'Silakan pilih mitigasi.' }),
 });
 
@@ -81,10 +81,10 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
       impact: '',
       frequency: '',
       impactMagnitude: '',
-      kontrolOrganisasi: '',
-      kontrolOrang: '',
-      kontrolFisik: '',
-      kontrolTeknologi: '',
+      kontrolOrganisasi: [],
+      kontrolOrang: [],
+      kontrolFisik: [],
+      kontrolTeknologi: [],
       mitigasi: '',
     },
   });
@@ -371,11 +371,9 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                             <Button
                               variant="outline"
                               role="combobox"
-                              className={cn("w-full justify-between", !field.value && "text-muted-foreground")}
+                              className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}
                             >
-                              {field.value
-                                ? ORGANIZATIONAL_CONTROLS.find(item => item === field.value)
-                                : "Pilih kontrol organisasi..."}
+                              {field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol organisasi..."}
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                           </FormControl>
@@ -391,11 +389,14 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                                     key={item}
                                     value={item}
                                     onSelect={() => {
-                                      form.setValue("kontrolOrganisasi", item);
-                                      setKontrolOrganisasiOpen(false);
+                                      const value = field.value || [];
+                                      const newValue = value.includes(item)
+                                        ? value.filter((i) => i !== item)
+                                        : [...value, item];
+                                      form.setValue("kontrolOrganisasi", newValue);
                                     }}
                                   >
-                                    <Check className={cn("mr-2 h-4 w-4", item === field.value ? "opacity-100" : "opacity-0")} />
+                                    <Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />
                                     {item}
                                   </CommandItem>
                                 ))}
@@ -420,11 +421,9 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                             <Button
                               variant="outline"
                               role="combobox"
-                              className={cn("w-full justify-between", !field.value && "text-muted-foreground")}
+                              className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}
                             >
-                              {field.value
-                                ? PEOPLE_CONTROLS.find(item => item === field.value)
-                                : "Pilih kontrol orang..."}
+                               {field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol orang..."}
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                           </FormControl>
@@ -440,11 +439,14 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                                     key={item}
                                     value={item}
                                     onSelect={() => {
-                                      form.setValue("kontrolOrang", item);
-                                      setKontrolOrangOpen(false);
+                                      const value = field.value || [];
+                                      const newValue = value.includes(item)
+                                        ? value.filter((i) => i !== item)
+                                        : [...value, item];
+                                      form.setValue("kontrolOrang", newValue);
                                     }}
                                   >
-                                    <Check className={cn("mr-2 h-4 w-4", item === field.value ? "opacity-100" : "opacity-0")} />
+                                    <Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />
                                     {item}
                                   </CommandItem>
                                 ))}
@@ -469,11 +471,9 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                             <Button
                               variant="outline"
                               role="combobox"
-                              className={cn("w-full justify-between", !field.value && "text-muted-foreground")}
+                              className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}
                             >
-                              {field.value
-                                ? PHYSICAL_CONTROLS.find(item => item === field.value)
-                                : "Pilih kontrol fisik..."}
+                              {field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol fisik..."}
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                           </FormControl>
@@ -489,11 +489,14 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                                     key={item}
                                     value={item}
                                     onSelect={() => {
-                                      form.setValue("kontrolFisik", item);
-                                      setKontrolFisikOpen(false);
+                                      const value = field.value || [];
+                                      const newValue = value.includes(item)
+                                        ? value.filter((i) => i !== item)
+                                        : [...value, item];
+                                      form.setValue("kontrolFisik", newValue);
                                     }}
                                   >
-                                    <Check className={cn("mr-2 h-4 w-4", item === field.value ? "opacity-100" : "opacity-0")} />
+                                    <Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />
                                     {item}
                                   </CommandItem>
                                 ))}
@@ -518,11 +521,9 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                             <Button
                               variant="outline"
                               role="combobox"
-                              className={cn("w-full justify-between", !field.value && "text-muted-foreground")}
+                              className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}
                             >
-                              {field.value
-                                ? TECHNOLOGICAL_CONTROLS.find(item => item === field.value)
-                                : "Pilih kontrol teknologi..."}
+                              {field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol teknologi..."}
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                           </FormControl>
@@ -538,11 +539,14 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                                     key={item}
                                     value={item}
                                     onSelect={() => {
-                                      form.setValue("kontrolTeknologi", item);
-                                      setKontrolTeknologiOpen(false);
+                                      const value = field.value || [];
+                                      const newValue = value.includes(item)
+                                        ? value.filter((i) => i !== item)
+                                        : [...value, item];
+                                      form.setValue("kontrolTeknologi", newValue);
                                     }}
                                   >
-                                    <Check className={cn("mr-2 h-4 w-4", item === field.value ? "opacity-100" : "opacity-0")} />
+                                    <Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />
                                     {item}
                                   </CommandItem>
                                 ))}
