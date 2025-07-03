@@ -206,7 +206,7 @@ export default function Survey2Page() {
                           }}
                         >
                           <Check className={cn("mr-2 h-4 w-4", (field.value as string[] | undefined)?.includes(item) ? "opacity-100" : "opacity-0")} />
-                          <span className="flex-1">{item}</span>
+                          <span className="flex-1 truncate">{item}</span>
                         </CommandItem>
                       ))}
                     </CommandGroup>
@@ -230,23 +230,23 @@ export default function Survey2Page() {
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent>
             <div className="overflow-x-auto border rounded-lg">
-              <Table>
+              <Table className="table-fixed">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="min-w-[300px] font-semibold sticky left-0 bg-background z-10">Kejadian Risiko TIK</TableHead>
-                    <TableHead className="min-w-[300px] font-semibold">Area Dampak</TableHead>
-                    <TableHead className="min-w-[170px] font-semibold">Waktu Kejadian</TableHead>
-                    <TableHead className="min-w-[250px] font-semibold">Penyebab</TableHead>
-                    <TableHead className="min-w-[250px] font-semibold">Dampak</TableHead>
-                    <TableHead className="min-w-[180px] font-semibold">Frekuensi</TableHead>
-                    <TableHead className="min-w-[180px] font-semibold">Besaran Dampak</TableHead>
-                    <TableHead className="min-w-[120px] text-center font-semibold">Tingkat Risiko</TableHead>
-                    <TableHead className="min-w-[200px] font-semibold">Kontrol Organisasi</TableHead>
-                    <TableHead className="min-w-[200px] font-semibold">Kontrol Orang</TableHead>
-                    <TableHead className="min-w-[200px] font-semibold">Kontrol Fisik</TableHead>
-                    <TableHead className="min-w-[200px] font-semibold">Kontrol Teknologi</TableHead>
-                    <TableHead className="min-w-[200px] font-semibold">Mitigasi</TableHead>
-                    <TableHead className="min-w-[80px] font-semibold text-center">Aksi</TableHead>
+                    <TableHead className="w-[300px] font-semibold sticky left-0 bg-background z-10">Kejadian Risiko TIK</TableHead>
+                    <TableHead className="w-[300px] font-semibold">Area Dampak</TableHead>
+                    <TableHead className="w-[170px] font-semibold">Waktu Kejadian</TableHead>
+                    <TableHead className="w-[250px] font-semibold">Penyebab</TableHead>
+                    <TableHead className="w-[250px] font-semibold">Dampak</TableHead>
+                    <TableHead className="w-[180px] font-semibold">Frekuensi</TableHead>
+                    <TableHead className="w-[180px] font-semibold">Besaran Dampak</TableHead>
+                    <TableHead className="w-[120px] text-center font-semibold">Tingkat Risiko</TableHead>
+                    <TableHead className="w-[200px] font-semibold">Kontrol Organisasi</TableHead>
+                    <TableHead className="w-[200px] font-semibold">Kontrol Orang</TableHead>
+                    <TableHead className="w-[200px] font-semibold">Kontrol Fisik</TableHead>
+                    <TableHead className="w-[200px] font-semibold">Kontrol Teknologi</TableHead>
+                    <TableHead className="w-[200px] font-semibold">Mitigasi</TableHead>
+                    <TableHead className="w-[80px] font-semibold text-center">Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -256,7 +256,7 @@ export default function Survey2Page() {
                     
                     return (
                         <TableRow key={riskEvent.name}>
-                            <TableCell className="font-medium align-top sticky left-0 bg-background z-10">
+                            <TableCell className="font-medium align-top sticky left-0 bg-background z-10 truncate">
                                 {riskEvent.name}
                             </TableCell>
                             <TableCell>
@@ -290,7 +290,7 @@ export default function Survey2Page() {
                                                                         }}
                                                                     >
                                                                         <Check className={cn("mr-2 h-4 w-4", area === field.value ? "opacity-100" : "opacity-0")} />
-                                                                        <span className="flex-1">{area}</span>
+                                                                        <span className="flex-1 truncate">{area}</span>
                                                                     </CommandItem>
                                                                 ))}
                                                             </CommandGroup>
