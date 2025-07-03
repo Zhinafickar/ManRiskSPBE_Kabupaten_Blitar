@@ -28,6 +28,7 @@ import {
     ORGANIZATIONAL_CONTROLS,
     PEOPLE_CONTROLS,
     PHYSICAL_CONTROLS,
+    TECHNOLOGICAL_CONTROLS,
     MITIGATION_OPTIONS
 } from '@/constants/data';
 import { addSurvey } from '@/services/survey-service';
@@ -66,6 +67,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
   const [kontrolOrganisasiOpen, setKontrolOrganisasiOpen] = useState(false);
   const [kontrolOrangOpen, setKontrolOrangOpen] = useState(false);
   const [kontrolFisikOpen, setKontrolFisikOpen] = useState(false);
+  const [kontrolTeknologiOpen, setKontrolTeknologiOpen] = useState(false);
   const [availableImpactAreas, setAvailableImpactAreas] = useState<string[]>([]);
   const [riskIndicator, setRiskIndicator] = useState<RiskIndicator>({ level: null, color: '' });
 
@@ -508,9 +510,47 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                   control={form.control}
                   name="kontrolTeknologi"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Kontrol Teknologi</FormLabel>
-                      <FormControl><Textarea placeholder="Jelaskan kontrol teknologi yang ada..." {...field} /></FormControl>
+                       <Popover open={kontrolTeknologiOpen} onOpenChange={setKontrolTeknologiOpen}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn("w-full justify-between", !field.value && "text-muted-foreground")}
+                            >
+                              {field.value
+                                ? TECHNOLOGICAL_CONTROLS.find(item => item === field.value)
+                                : "Pilih kontrol teknologi..."}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                          <Command>
+                            <CommandInput placeholder="Cari kontrol..." />
+                            <CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty>
+                            <CommandList>
+                              <CommandGroup>
+                                {TECHNOLOGICAL_CONTROLS.map((item) => (
+                                  <CommandItem
+                                    key={item}
+                                    value={item}
+                                    onSelect={() => {
+                                      form.setValue("kontrolTeknologi", item);
+                                      setKontrolTeknologiOpen(false);
+                                    }}
+                                  >
+                                    <Check className={cn("mr-2 h-4 w-4", item === field.value ? "opacity-100" : "opacity-0")} />
+                                    {item}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                       <FormMessage />
                     </FormItem>
                   )}

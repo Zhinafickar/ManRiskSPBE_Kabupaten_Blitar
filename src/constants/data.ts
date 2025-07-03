@@ -367,6 +367,43 @@ export const PHYSICAL_CONTROLS = [
   "7.14 Pembuangan atau penggunaan kembali peralatan secara aman"
 ];
 
+export const TECHNOLOGICAL_CONTROLS = [
+    "8.1 Perangkat titik akhir (endpoint) pengguna",
+    "8.2 Hak akses istimewa",
+    "8.3 Pembatasan akses informasi",
+    "8.4 Akses ke kode sumber (source code)",
+    "8.5 Otentikasi yang aman",
+    "8.6 Manajemen kapasitas",
+    "8.7 Perlindungan terhadap malware",
+    "8.8 Manajemen kerentanan teknis",
+    "8.9 Manajemen konfigurasi.",
+    "8.10 Penghapusan informasi",
+    "8.11 Penyamaran data",
+    "8.12 Pencegahan kebocoran data",
+    "8.13 Pencadangan informasi",
+    "8.14 Redundansi fasilitas pemrosesan informasi",
+    "8.15 Pencatatan (logging)",
+    "8.16 Kegiatan pemantauan",
+    "8.17 Sinkronisasi waktu",
+    "8.18 Penggunaan program utilitas istimewa",
+    "8.19 Instalasi perangkat lunak pada sistem operasional",
+    "8.20 Keamanan jaringan",
+    "8.21 Keamanan layanan jaringan",
+    "8.22 Pemisahan jaringan.",
+    "8.23 Pemfilteran / penyaringan web",
+    "8.24 Penggunaan kriptografi",
+    "8.25 Siklus hidup pengembangan yang aman",
+    "8.26 Persyaratan keamanan aplikasi",
+    "8.27 Mengamankan arsitektur sistem dan prinsip-prinsip rekayasa",
+    "8.28 Pengkodean yang aman",
+    "8.29 Pengujian keamanan dalam pengembangan dan penerimaan",
+    "8.30 Pengembangan yang dialihdayakan.",
+    "8.31 Pemisahan lingkungan pengembangan, pengujian dan produksi",
+    "8.32 Manajemen perubahan",
+    "8.33 Informasi pengujian",
+    "8.34 Perlindungan sistem informasi selama pengujian audit",
+];
+
 export const MITIGATION_OPTIONS = [
   "Eskalasi Risiko",
   "Eksploitasi Risiko",
