@@ -25,7 +25,8 @@ import {
     RISK_EVENTS,
     FREQUENCY_LEVELS,
     IMPACT_MAGNITUDES,
-    ORGANIZATIONAL_CONTROLS
+    ORGANIZATIONAL_CONTROLS,
+    PEOPLE_CONTROLS
 } from '@/constants/data';
 import { addSurvey } from '@/services/survey-service';
 import { useAuth } from '@/hooks/use-auth';
@@ -60,6 +61,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
   const [riskEventOpen, setRiskEventOpen] = useState(false);
   const [impactAreaOpen, setImpactAreaOpen] = useState(false);
   const [kontrolOrganisasiOpen, setKontrolOrganisasiOpen] = useState(false);
+  const [kontrolOrangOpen, setKontrolOrangOpen] = useState(false);
   const [availableImpactAreas, setAvailableImpactAreas] = useState<string[]>([]);
   const [riskIndicator, setRiskIndicator] = useState<RiskIndicator>({ level: null, color: '' });
 
@@ -403,9 +405,47 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                   control={form.control}
                   name="kontrolOrang"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Kontrol Orang</FormLabel>
-                      <FormControl><Textarea placeholder="Jelaskan kontrol orang yang ada..." {...field} /></FormControl>
+                      <Popover open={kontrolOrangOpen} onOpenChange={setKontrolOrangOpen}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn("w-full justify-between", !field.value && "text-muted-foreground")}
+                            >
+                              {field.value
+                                ? PEOPLE_CONTROLS.find(item => item === field.value)
+                                : "Pilih kontrol orang..."}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                          <Command>
+                            <CommandInput placeholder="Cari kontrol..." />
+                            <CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty>
+                            <CommandList>
+                              <CommandGroup>
+                                {PEOPLE_CONTROLS.map((item) => (
+                                  <CommandItem
+                                    key={item}
+                                    value={item}
+                                    onSelect={() => {
+                                      form.setValue("kontrolOrang", item);
+                                      setKontrolOrangOpen(false);
+                                    }}
+                                  >
+                                    <Check className={cn("mr-2 h-4 w-4", item === field.value ? "opacity-100" : "opacity-0")} />
+                                    {item}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                       <FormMessage />
                     </FormItem>
                   )}

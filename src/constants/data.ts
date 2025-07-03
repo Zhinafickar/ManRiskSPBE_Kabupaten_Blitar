@@ -338,3 +338,14 @@ export const ORGANIZATIONAL_CONTROLS = [
   "5.36 Kepatuhan terhadap kebijakan, aturan, dan standar untuk keamanan informasi",
   "5.37 Prosedur operasi terdokumentasi"
 ];
+
+export const PEOPLE_CONTROLS = [
+  "6.1 Penyaringan",
+  "6.2 Syarat dan ketentuan kerja",
+  "6.3 Kesadaran, pendidikan dan pelatihan keamanan informasi",
+  "6.4 Proses pendisiplinan",
+  "6.5 Tanggung Jawab Setelah Pemutusan Hubungan Kerja atau Perubahan Pekerjaan",
+  "6.6 Perjanjian kerahasiaan atau tidak mengungkapkan",
+  "6.7 Kerja jarak jauh",
+  "6.8 Pelaporan peristiwa keamanan informasi"
+];
