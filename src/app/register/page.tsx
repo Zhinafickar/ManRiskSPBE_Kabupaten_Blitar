@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
-import { doc, writeBatch, getDocs, collection } from 'firebase/firestore';
+import { doc, writeBatch } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { useState } from 'react';
 import { isRoleTaken } from '@/services/user-service';
@@ -81,10 +81,8 @@ export default function RegisterPage() {
           return;
       }
 
-      // Check if this is the first user
-      const usersCollection = collection(db, 'users');
-      const usersSnapshot = await getDocs(usersCollection);
-      const isFirstUser = usersSnapshot.empty;
+      // The "first user is superadmin" logic is removed as it violates security rules.
+      // The first user should be promoted to superadmin manually via the Firebase Console.
       
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -97,7 +95,7 @@ export default function RegisterPage() {
 
       const batch = writeBatch(db);
       
-      const userRole = isFirstUser ? 'superadmin' : values.role;
+      const userRole = values.role;
 
       const userRef = doc(db, 'users', user.uid);
       batch.set(userRef, {
@@ -123,6 +121,8 @@ export default function RegisterPage() {
       let description = 'An unknown error occurred.';
       if (error.code === 'auth/email-already-in-use') {
         description = 'This email address is already in use by another account.';
+      } else if (error.code === 'permission-denied') {
+        description = "Registration failed due to a database permission error. Please check Firestore rules.";
       } else {
         description = error.message;
       }
