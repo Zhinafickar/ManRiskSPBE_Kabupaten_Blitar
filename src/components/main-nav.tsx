@@ -4,26 +4,39 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from '@/components/ui/sidebar';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { useAuth } from '@/hooks/use-auth';
 import {
   LayoutDashboard,
   FileText,
-  FilePlus,
-  Book,
   AreaChart,
   Users,
   LogOut,
+  Book,
+  ClipboardList,
+  ChevronDown,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { useState } from 'react';
 
 export function MainNav() {
   const { userProfile } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+
+  const isActiveRiskMenu = pathname.startsWith('/user/survey') || pathname === '/user/results';
+  const [isRiskMenuOpen, setIsRiskMenuOpen] = useState(isActiveRiskMenu);
 
   const handleLogout = async () => {
     if (auth) {
@@ -31,33 +44,6 @@ export function MainNav() {
       router.push('/login');
     }
   };
-
-  const userMenu = [
-    {
-      href: '/user/dashboard',
-      label: 'Dashboard',
-      icon: LayoutDashboard,
-      active: pathname === '/user/dashboard',
-    },
-    {
-      href: '/user/survey-1',
-      label: 'Input Risk',
-      icon: FilePlus,
-      active: pathname === '/user/survey-1',
-    },
-    {
-      href: '/user/results',
-      label: 'Survey Results',
-      icon: FileText,
-      active: pathname === '/user/results',
-    },
-    {
-      href: '/user/tutorial',
-      label: 'Tutorial',
-      icon: Book,
-      active: pathname === '/user/tutorial',
-    },
-  ];
 
   const adminMenu = [
     {
@@ -114,49 +100,113 @@ export function MainNav() {
       case 'superadmin':
         return superAdminMenu;
       default:
-        return userMenu;
+        return []; // User menu is rendered separately
     }
   };
+  
+  if (userProfile?.role === 'admin' || userProfile?.role === 'superadmin') {
+      const menuItems = getMenuItems();
+      const allItems = [
+        ...menuItems,
+        {
+            label: 'Logout',
+            icon: LogOut,
+            onClick: handleLogout,
+            active: false,
+        },
+    ];
+    return (
+        <SidebarMenu>
+            {allItems.map((item: any) => (
+                <SidebarMenuItem key={item.label}>
+                {item.href ? (
+                    <SidebarMenuButton
+                    asChild
+                    isActive={item.active}
+                    tooltip={item.label}
+                    >
+                    <Link href={item.href}>
+                        <item.icon />
+                        <span>{item.label}</span>
+                    </Link>
+                    </SidebarMenuButton>
+                ) : (
+                    <SidebarMenuButton
+                    onClick={item.onClick}
+                    isActive={item.active}
+                    tooltip={item.label}
+                    >
+                    <item.icon />
+                    <span>{item.label}</span>
+                    </SidebarMenuButton>
+                )}
+                </SidebarMenuItem>
+            ))}
+        </SidebarMenu>
+    )
+  }
 
-  const menuItems = getMenuItems();
-
-  const allItems = [
-    ...menuItems,
-    {
-      label: 'Logout',
-      icon: LogOut,
-      onClick: handleLogout,
-      active: false,
-    },
-  ];
-
+  // User Menu
   return (
     <SidebarMenu>
-      {allItems.map((item: any) => (
-        <SidebarMenuItem key={item.label}>
-          {item.href ? (
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive={pathname === '/user/dashboard'} tooltip="Dashboard">
+          <Link href="/user/dashboard">
+            <LayoutDashboard />
+            <span>Dashboard</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+
+      <SidebarMenuItem>
+        <Collapsible open={isRiskMenuOpen} onOpenChange={setIsRiskMenuOpen}>
+          <CollapsibleTrigger asChild>
             <SidebarMenuButton
-              asChild
-              isActive={item.active}
-              tooltip={item.label}
+              isActive={isActiveRiskMenu}
+              className="[&[data-state=open]>svg:last-of-type]:rotate-180"
             >
-              <Link href={item.href}>
-                <item.icon />
-                <span>{item.label}</span>
-              </Link>
+              <ClipboardList />
+              <span className="mr-auto group-data-[collapsible=icon]:hidden">Manajement Risiko</span>
+              <ChevronDown className="size-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden" />
             </SidebarMenuButton>
-          ) : (
-            <SidebarMenuButton
-              onClick={item.onClick}
-              isActive={item.active}
-              tooltip={item.label}
-            >
-              <item.icon />
-              <span>{item.label}</span>
-            </SidebarMenuButton>
-          )}
-        </SidebarMenuItem>
-      ))}
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <SidebarMenuSub>
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton asChild isActive={pathname === '/user/survey-1'}>
+                  <Link href="/user/survey-1">isi survey-1</Link>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton asChild isActive={pathname === '/user/survey-2'}>
+                  <Link href="/user/survey-2">isi survey 2</Link>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton asChild isActive={pathname === '/user/results'}>
+                  <Link href="/user/results">hasil survey</Link>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+            </SidebarMenuSub>
+          </CollapsibleContent>
+        </Collapsible>
+      </SidebarMenuItem>
+
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive={pathname === '/user/tutorial'} tooltip="Tutorial">
+          <Link href="/user/tutorial">
+            <Book />
+            <span>Tutorial</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+      
+      <SidebarMenuItem>
+        <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
+          <LogOut />
+          <span>Logout</span>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
     </SidebarMenu>
   );
 }
