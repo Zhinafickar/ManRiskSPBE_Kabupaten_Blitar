@@ -1,6 +1,6 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
-export default function TutorialPage() {
+export default function TutorialPage({}: {}) {
   return (
     <Card>
       <CardHeader>
