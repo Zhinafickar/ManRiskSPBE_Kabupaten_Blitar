@@ -76,7 +76,7 @@ export default function UserResultsPage() {
     const result = await deleteSurvey(surveyId);
     if (result.success) {
         toast({ title: 'Success', description: result.message });
-        router.refresh();
+        setSurveys(surveys.filter(s => s.id !== surveyId));
     } else {
         toast({ variant: 'destructive', title: 'Error', description: result.message });
     }
@@ -105,7 +105,6 @@ export default function UserResultsPage() {
                 <TableHead>Impact</TableHead>
                 <TableHead>Risk Level</TableHead>
                 <TableHead>Waktu Kejadian</TableHead>
-                <TableHead>Tanggal Lapor</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -118,7 +117,6 @@ export default function UserResultsPage() {
                   <TableCell>{survey.impactMagnitude}</TableCell>
                   <TableCell><RiskIndicatorBadge level={survey.riskLevel} /></TableCell>
                   <TableCell>{survey.eventDate ? new Date(survey.eventDate).toLocaleDateString('id-ID') : 'N/A'}</TableCell>
-                  <TableCell>{new Date(survey.createdAt).toLocaleDateString('id-ID')}</TableCell>
                   <TableCell className="text-right">
                     <AlertDialog>
                       <DropdownMenu>
