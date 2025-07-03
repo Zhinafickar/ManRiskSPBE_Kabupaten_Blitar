@@ -65,6 +65,7 @@ export default function RegisterPage() {
           title: 'Firebase Not Configured',
           description: 'Please add your Firebase credentials to the .env file to enable registration.',
         });
+        setIsLoading(false);
         return;
       }
       
@@ -130,11 +131,7 @@ export default function RegisterPage() {
         title: 'Registration Failed',
         description: description,
       });
-    } finally {
-        // Don't set isLoading to false on success because of redirect
-        if (!router.asPath.includes('/login')) {
-            setIsLoading(false);
-        }
+      setIsLoading(false);
     }
   }
 

@@ -41,6 +41,7 @@ export const ROLES = [
   "Bagian Tata Pemerintahan",
   "Bagian Hukum",
   "Bagian Kesejahteraan Rakyat",
+  "Penguji Coba",
   "Dinas Pemberdayaan Masyarakat Dan Desa"
 ];
 
