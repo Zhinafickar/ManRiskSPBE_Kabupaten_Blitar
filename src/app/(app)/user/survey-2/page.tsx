@@ -35,8 +35,9 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, ChevronsUpDown } from 'lucide-react';
 import { format } from 'date-fns';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 
 const formSchema = z.object({
   riskEvent: z.string().min(5, { message: 'Risk event must be at least 5 characters.' }),
@@ -57,6 +58,7 @@ export default function Survey2Page() {
   const { user, userProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [riskIndicator, setRiskIndicator] = useState<RiskIndicator>({ level: null, color: '' });
+  const [impactAreaOpen, setImpactAreaOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -126,12 +128,47 @@ export default function Survey2Page() {
               control={form.control}
               name="impactArea"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col">
                   <FormLabel>Area Dampak</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl><SelectTrigger><SelectValue placeholder="Select an impact area" /></SelectTrigger></FormControl>
-                    <SelectContent>{IMPACT_AREAS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
-                  </Select>
+                   <Popover open={impactAreaOpen} onOpenChange={setImpactAreaOpen}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn("w-full justify-between", !field.value && "text-muted-foreground")}
+                        >
+                          {field.value
+                            ? IMPACT_AREAS.find(area => area === field.value)
+                            : "Select an impact area"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                      <Command>
+                        <CommandInput placeholder="Search impact area..." />
+                        <CommandEmpty>No impact area found.</CommandEmpty>
+                        <CommandList>
+                          <CommandGroup>
+                            {IMPACT_AREAS.map((area) => (
+                              <CommandItem
+                                key={area}
+                                value={area}
+                                onSelect={() => {
+                                  form.setValue("impactArea", area);
+                                  setImpactAreaOpen(false);
+                                }}
+                              >
+                                <Check className={cn("mr-2 h-4 w-4", area === field.value ? "opacity-100" : "opacity-0")} />
+                                {area}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}

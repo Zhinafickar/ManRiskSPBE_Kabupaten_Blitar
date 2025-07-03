@@ -56,7 +56,8 @@ export default function Survey1Page() {
   const { toast } = useToast();
   const { user, userProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [riskEventOpen, setRiskEventOpen] = useState(false);
+  const [impactAreaOpen, setImpactAreaOpen] = useState(false);
   const [availableImpactAreas, setAvailableImpactAreas] = useState<string[]>([]);
   const [riskIndicator, setRiskIndicator] = useState<RiskIndicator>({ level: null, color: '' });
 
@@ -134,7 +135,7 @@ export default function Survey1Page() {
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Kejadian Risiko</FormLabel>
-                   <Popover open={open} onOpenChange={setOpen}>
+                   <Popover open={riskEventOpen} onOpenChange={setRiskEventOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
@@ -161,7 +162,7 @@ export default function Survey1Page() {
                                 value={event.name}
                                 onSelect={() => {
                                   form.setValue("riskEvent", event.name);
-                                  setOpen(false);
+                                  setRiskEventOpen(false);
                                 }}
                               >
                                 <Check className={cn("mr-2 h-4 w-4", event.name === field.value ? "opacity-100" : "opacity-0")} />
@@ -181,18 +182,60 @@ export default function Survey1Page() {
               control={form.control}
               name="impactArea"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col">
                   <FormLabel>Area Dampak Risiko</FormLabel>
-                  <Select 
-                    onValueChange={field.onChange} 
-                    value={field.value}
-                    disabled={!selectedRiskEvent || availableImpactAreas.length === 0}
-                  >
-                    <FormControl><SelectTrigger><SelectValue placeholder="Pilih area dampak" /></SelectTrigger></FormControl>
-                    <SelectContent>
-                      {availableImpactAreas.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+                  <Popover open={impactAreaOpen} onOpenChange={setImpactAreaOpen}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          disabled={!selectedRiskEvent || availableImpactAreas.length === 0}
+                          className={cn(
+                            "w-full justify-between",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value
+                            ? availableImpactAreas.find(
+                                (area) => area === field.value
+                              )
+                            : "Pilih area dampak..."}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                      <Command>
+                        <CommandInput placeholder="Cari area dampak..." />
+                        <CommandEmpty>Area dampak tidak ditemukan.</CommandEmpty>
+                        <CommandList>
+                          <CommandGroup>
+                            {availableImpactAreas.map((area) => (
+                              <CommandItem
+                                key={area}
+                                value={area}
+                                onSelect={() => {
+                                  form.setValue("impactArea", area);
+                                  setImpactAreaOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    area === field.value
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  )}
+                                />
+                                {area}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}
