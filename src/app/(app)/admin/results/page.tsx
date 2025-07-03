@@ -104,7 +104,7 @@ export default function AdminResultsPage() {
               <TableRow>
                 <TableHead>User Role</TableHead>
                 <TableHead>Risk Event</TableHead>
-                <TableHead>Survey Type</TableHead>
+                <TableHead>Impact Area</TableHead>
                 <TableHead>Frequency</TableHead>
                 <TableHead>Impact</TableHead>
                 <TableHead>Risk Level</TableHead>
@@ -118,11 +118,7 @@ export default function AdminResultsPage() {
                 <TableRow key={survey.id}>
                   <TableCell className="font-medium max-w-xs truncate">{survey.userRole}</TableCell>
                   <TableCell className="max-w-xs truncate">{survey.riskEvent}</TableCell>
-                  <TableCell>
-                    <Badge variant={survey.surveyType === 1 ? 'default' : 'secondary'}>
-                      Survey {survey.surveyType}
-                    </Badge>
-                  </TableCell>
+                  <TableCell className="max-w-xs truncate">{survey.impactArea}</TableCell>
                   <TableCell>{survey.frequency}</TableCell>
                   <TableCell>{survey.impactMagnitude}</TableCell>
                   <TableCell><RiskIndicatorBadge level={survey.riskLevel} /></TableCell>
