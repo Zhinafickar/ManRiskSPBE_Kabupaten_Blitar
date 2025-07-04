@@ -27,31 +27,31 @@ export default function DataPage({}: {}) {
                   <td className="border border-black p-2">1</td>
                   <td className="border border-black p-2 text-left">Hampir tidak terjadi</td>
                   <td className="border border-black p-2">X ≤ 5%</td>
-                  <td className="border border-black p-2">X &lt; 2 kali</td>
+                  <td className="border border-black p-2">X < 2 kali</td>
                 </tr>
                 <tr>
                   <td className="border border-black p-2">2</td>
                   <td className="border border-black p-2 text-left">Jarang terjadi</td>
-                  <td className="border border-black p-2">5% &lt; X ≤ 10%</td>
+                  <td className="border border-black p-2">5% < X ≤ 10%</td>
                   <td className="border border-black p-2">2 ≤ X ≤ 5 kali</td>
                 </tr>
                 <tr>
                   <td className="border border-black p-2">3</td>
                   <td className="border border-black p-2 text-left">Kadang terjadi</td>
-                  <td className="border border-black p-2">10% &lt; X ≤ 20%</td>
+                  <td className="border border-black p-2">10% < X ≤ 20%</td>
                   <td className="border border-black p-2">6 ≤ X ≤ 9 kali</td>
                 </tr>
                 <tr>
                   <td className="border border-black p-2">4</td>
                   <td className="border border-black p-2 text-left">Sering terjadi</td>
-                  <td className="border border-black p-2">20% &lt; X ≤ 50%</td>
+                  <td className="border border-black p-2">20% < X ≤ 50%</td>
                   <td className="border border-black p-2">10 ≤ X ≤ 12 kali</td>
                 </tr>
                 <tr>
                   <td className="border border-black p-2">5</td>
                   <td className="border border-black p-2 text-left">Sangat sering terjadi</td>
-                  <td className="border border-black p-2">X &gt; 50%</td>
-                  <td className="border border-black p-2">&gt; 12 kali</td>
+                  <td className="border border-black p-2">X > 50%</td>
+                  <td className="border border-black p-2">> 12 kali</td>
                 </tr>
               </tbody>
             </table>
@@ -220,43 +220,43 @@ export default function DataPage({}: {}) {
                     </div>
                   </th>
                   <th className="border border-black p-2 font-bold whitespace-nowrap">5<br/>Sangat Sering Terjadi</th>
-                  <td className="border border-black p-2 font-bold bg-green-600 text-white">Rendah</td>
-                  <td className="border border-black p-2 font-bold bg-yellow-500 text-black">Sedang</td>
-                  <td className="border border-black p-2 font-bold bg-red-600 text-white">Bahaya</td>
-                  <td className="border border-black p-2 font-bold bg-red-600 text-white">Bahaya</td>
-                  <td className="border border-black p-2 font-bold bg-red-600 text-white">Bahaya</td>
+                  <td className="border border-black p-2 font-bold bg-green-600 text-white">9</td>
+                  <td className="border border-black p-2 font-bold bg-yellow-500 text-black">15</td>
+                  <td className="border border-black p-2 font-bold bg-red-600 text-white">18</td>
+                  <td className="border border-black p-2 font-bold bg-red-600 text-white">23</td>
+                  <td className="border border-black p-2 font-bold bg-red-600 text-white">25</td>
                 </tr>
                 <tr>
                   <th className="border border-black p-2 font-bold">4<br/>Sering Terjadi</th>
-                  <td className="border border-black p-2 font-bold bg-blue-600 text-white">Minor</td>
-                  <td className="border border-black p-2 font-bold bg-green-600 text-white">Rendah</td>
-                  <td className="border border-black p-2 font-bold bg-yellow-500 text-black">Sedang</td>
-                  <td className="border border-black p-2 font-bold bg-red-600 text-white">Bahaya</td>
-                  <td className="border border-black p-2 font-bold bg-red-600 text-white">Bahaya</td>
+                  <td className="border border-black p-2 font-bold bg-blue-600 text-white">6</td>
+                  <td className="border border-black p-2 font-bold bg-green-600 text-white">12</td>
+                  <td className="border border-black p-2 font-bold bg-yellow-500 text-black">16</td>
+                  <td className="border border-black p-2 font-bold bg-red-600 text-white">19</td>
+                  <td className="border border-black p-2 font-bold bg-red-600 text-white">24</td>
                 </tr>
                 <tr>
                   <th className="border border-black p-2 font-bold whitespace-nowrap">3<br/>Kadang Terjadi</th>
-                  <td className="border border-black p-2 font-bold bg-blue-600 text-white">Minor</td>
-                  <td className="border border-black p-2 font-bold bg-green-600 text-white">Rendah</td>
-                  <td className="border border-black p-2 font-bold bg-yellow-500 text-black">Sedang</td>
-                  <td className="border border-black p-2 font-bold bg-red-600 text-white">Bahaya</td>
-                  <td className="border border-black p-2 font-bold bg-red-600 text-white">Bahaya</td>
+                  <td className="border border-black p-2 font-bold bg-blue-600 text-white">4</td>
+                  <td className="border border-black p-2 font-bold bg-green-600 text-white">10</td>
+                  <td className="border border-black p-2 font-bold bg-yellow-500 text-black">14</td>
+                  <td className="border border-black p-2 font-bold bg-red-600 text-white">17</td>
+                  <td className="border border-black p-2 font-bold bg-red-600 text-white">22</td>
                 </tr>
                  <tr>
                   <th className="border border-black p-2 font-bold">2<br/>Jarang Terjadi</th>
-                  <td className="border border-black p-2 font-bold bg-blue-600 text-white">Minor</td>
-                  <td className="border border-black p-2 font-bold bg-green-600 text-white">Rendah</td>
-                  <td className="border border-black p-2 font-bold bg-green-600 text-white">Rendah</td>
-                  <td className="border border-black p-2 font-bold bg-red-600 text-white">Bahaya</td>
-                  <td className="border border-black p-2 font-bold bg-red-600 text-white">Bahaya</td>
+                  <td className="border border-black p-2 font-bold bg-blue-600 text-white">2</td>
+                  <td className="border border-black p-2 font-bold bg-green-600 text-white">7</td>
+                  <td className="border border-black p-2 font-bold bg-green-600 text-white">11</td>
+                  <td className="border border-black p-2 font-bold bg-red-600 text-white">13</td>
+                  <td className="border border-black p-2 font-bold bg-red-600 text-white">21</td>
                 </tr>
                 <tr>
                   <th className="border border-black p-2 font-bold">1<br/>Hampir Tidak Terjadi</th>
-                  <td className="border border-black p-2 font-bold bg-blue-600 text-white">Minor</td>
-                  <td className="border border-black p-2 font-bold bg-blue-600 text-white">Minor</td>
-                  <td className="border border-black p-2 font-bold bg-green-600 text-white">Rendah</td>
-                  <td className="border border-black p-2 font-bold bg-yellow-500 text-black">Sedang</td>
-                  <td className="border border-black p-2 font-bold bg-red-600 text-white">Bahaya</td>
+                  <td className="border border-black p-2 font-bold bg-blue-600 text-white">1</td>
+                  <td className="border border-black p-2 font-bold bg-blue-600 text-white">3</td>
+                  <td className="border border-black p-2 font-bold bg-green-600 text-white">5</td>
+                  <td className="border border-black p-2 font-bold bg-yellow-500 text-black">8</td>
+                  <td className="border border-black p-2 font-bold bg-red-600 text-white">20</td>
                 </tr>
               </tbody>
             </table>
