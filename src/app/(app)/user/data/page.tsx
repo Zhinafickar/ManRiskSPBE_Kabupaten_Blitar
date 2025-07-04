@@ -10,8 +10,8 @@ export default function DataPage({}: {}) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          <div className="overflow-x-auto p-2 mb-8">
+        <div className="space-y-8">
+          <div className="overflow-x-auto p-2">
             <h2 className="text-xl font-semibold text-center mb-4">Tabel Level Kemungkinan Terjadinya Risiko</h2>
             <table className="min-w-full border-collapse border border-black text-center text-sm">
               <thead className="bg-blue-600 text-white">
@@ -57,7 +57,7 @@ export default function DataPage({}: {}) {
             </table>
           </div>
 
-          <div className="overflow-x-auto p-2 mb-8">
+          <div className="overflow-x-auto p-2">
             <h2 className="text-xl font-semibold text-center mb-4">Tabel Kriteria Dampak Risiko</h2>
             <table className="min-w-full border-collapse border border-black text-sm">
               <thead className="bg-blue-600 text-white">
@@ -220,42 +220,42 @@ export default function DataPage({}: {}) {
                     </div>
                   </th>
                   <th className="border border-black p-2 font-bold whitespace-nowrap">5<br/>Sangat Sering Terjadi</th>
-                  <td className="border border-black p-2 font-bold bg-green-600 text-white">9</td>
-                  <td className="border border-black p-2 font-bold bg-yellow-500 text-black">15</td>
-                  <td className="border border-black p-2 font-bold bg-red-600 text-white">18</td>
-                  <td className="border border-black p-2 font-bold bg-red-600 text-white">23</td>
+                  <td className="border border-black p-2 font-bold bg-green-600 text-white">7</td>
+                  <td className="border border-black p-2 font-bold bg-yellow-500 text-black">12</td>
+                  <td className="border border-black p-2 font-bold bg-red-600 text-white">17</td>
+                  <td className="border border-black p-2 font-bold bg-red-600 text-white">22</td>
                   <td className="border border-black p-2 font-bold bg-red-600 text-white">25</td>
                 </tr>
                 <tr>
                   <th className="border border-black p-2 font-bold">4<br/>Sering Terjadi</th>
-                  <td className="border border-black p-2 font-bold bg-blue-600 text-white">6</td>
-                  <td className="border border-black p-2 font-bold bg-green-600 text-white">12</td>
-                  <td className="border border-black p-2 font-bold bg-yellow-500 text-black">16</td>
+                  <td className="border border-black p-2 font-bold bg-blue-600 text-white">4</td>
+                  <td className="border border-black p-2 font-bold bg-green-600 text-white">9</td>
+                  <td className="border border-black p-2 font-bold bg-yellow-500 text-black">14</td>
                   <td className="border border-black p-2 font-bold bg-red-600 text-white">19</td>
                   <td className="border border-black p-2 font-bold bg-red-600 text-white">24</td>
                 </tr>
                 <tr>
                   <th className="border border-black p-2 font-bold whitespace-nowrap">3<br/>Kadang Terjadi</th>
-                  <td className="border border-black p-2 font-bold bg-blue-600 text-white">4</td>
-                  <td className="border border-black p-2 font-bold bg-green-600 text-white">10</td>
-                  <td className="border border-black p-2 font-bold bg-yellow-500 text-black">14</td>
-                  <td className="border border-black p-2 font-bold bg-red-600 text-white">17</td>
-                  <td className="border border-black p-2 font-bold bg-red-600 text-white">22</td>
+                  <td className="border border-black p-2 font-bold bg-blue-600 text-white">3</td>
+                  <td className="border border-black p-2 font-bold bg-green-600 text-white">8</td>
+                  <td className="border border-black p-2 font-bold bg-yellow-500 text-black">13</td>
+                  <td className="border border-black p-2 font-bold bg-red-600 text-white">18</td>
+                  <td className="border border-black p-2 font-bold bg-red-600 text-white">23</td>
                 </tr>
                  <tr>
                   <th className="border border-black p-2 font-bold">2<br/>Jarang Terjadi</th>
                   <td className="border border-black p-2 font-bold bg-blue-600 text-white">2</td>
-                  <td className="border border-black p-2 font-bold bg-green-600 text-white">7</td>
+                  <td className="border border-black p-2 font-bold bg-green-600 text-white">6</td>
                   <td className="border border-black p-2 font-bold bg-green-600 text-white">11</td>
-                  <td className="border border-black p-2 font-bold bg-red-600 text-white">13</td>
+                  <td className="border border-black p-2 font-bold bg-red-600 text-white">16</td>
                   <td className="border border-black p-2 font-bold bg-red-600 text-white">21</td>
                 </tr>
                 <tr>
                   <th className="border border-black p-2 font-bold">1<br/>Hampir Tidak Terjadi</th>
                   <td className="border border-black p-2 font-bold bg-blue-600 text-white">1</td>
-                  <td className="border border-black p-2 font-bold bg-blue-600 text-white">3</td>
-                  <td className="border border-black p-2 font-bold bg-green-600 text-white">5</td>
-                  <td className="border border-black p-2 font-bold bg-yellow-500 text-black">8</td>
+                  <td className="border border-black p-2 font-bold bg-blue-600 text-white">5</td>
+                  <td className="border border-black p-2 font-bold bg-green-600 text-white">10</td>
+                  <td className="border border-black p-2 font-bold bg-yellow-500 text-black">15</td>
                   <td className="border border-black p-2 font-bold bg-red-600 text-white">20</td>
                 </tr>
               </tbody>
