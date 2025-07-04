@@ -57,6 +57,147 @@ export default function DataPage({}: {}) {
             </table>
           </div>
 
+          <div className="overflow-x-auto p-2 mb-8">
+            <h2 className="text-xl font-semibold text-center mb-4">Tabel Kriteria Dampak Risiko</h2>
+            <table className="min-w-full border-collapse border border-black text-sm">
+              <thead className="bg-blue-600 text-white">
+                <tr>
+                  <th className="border border-black p-2 font-bold align-middle" rowSpan={2}>Area Dampak</th>
+                  <th className="border border-black p-2 font-bold align-middle" rowSpan={2}></th>
+                  <th className="border border-black p-2 font-bold text-center" colSpan={5}>Level Dampak</th>
+                </tr>
+                <tr>
+                  <th className="border border-black p-2 font-bold text-center">1<br/>Tidak Signifikan</th>
+                  <th className="border border-black p-2 font-bold text-center">2<br/>Kurang Signifikan</th>
+                  <th className="border border-black p-2 font-bold text-center">3<br/>Cukup Signifikan</th>
+                  <th className="border border-black p-2 font-bold text-center">4<br/>Signifikan</th>
+                  <th className="border border-black p-2 font-bold text-center">5<br/>Sangat Signifikan</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="border border-black p-2 font-semibold align-middle text-left" rowSpan={2}>Finansial</td>
+                  <td className="border border-black p-2 text-left">Positif</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                </tr>
+                <tr>
+                  <td className="border border-black p-2 text-left">Negatif</td>
+                  <td className="border border-black p-2 text-left">Kerugian 1 jt - 5 jt</td>
+                  <td className="border border-black p-2 text-left">Kerugian 6 jt - 20 jt</td>
+                  <td className="border border-black p-2 text-left">Kerugian 21 jt - 30 jt</td>
+                  <td className="border border-black p-2 text-left">Kerugian 30 jt - 50jt</td>
+                  <td className="border border-black p-2 text-left">Kerugian >50jt</td>
+                </tr>
+                <tr>
+                  <td className="border border-black p-2 font-semibold align-middle text-left" rowSpan={2}>Reputasi</td>
+                  <td className="border border-black p-2 text-left">Positif</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                </tr>
+                <tr>
+                  <td className="border border-black p-2 text-left">Negatif</td>
+                  <td className="border border-black p-2 text-left">Berdampak memberikan reputasi buruk bagi seorang ASN Pemkab Kukar</td>
+                  <td className="border border-black p-2 text-left">Berdampak memberikan reputasi buruk bagi suatu Bidang di instansi Pemkab Kukar</td>
+                  <td className="border border-black p-2 text-left">Berdampak memberikan reputasi buruk bagi suatu instansi Pemkab Kukar</td>
+                  <td className="border border-black p-2 text-left">Berdampak memberikan reputasi buruk bagi beberapa instansi di Pemkab Kukar</td>
+                  <td className="border border-black p-2 text-left">Berdampak memberikan reputasi buruk bagi Pemkab Kukar</td>
+                </tr>
+                <tr>
+                  <td className="border border-black p-2 font-semibold align-middle text-left" rowSpan={2}>Kinerja</td>
+                  <td className="border border-black p-2 text-left">Positif</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                </tr>
+                <tr>
+                  <td className="border border-black p-2 text-left">Negatif</td>
+                  <td className="border border-black p-2 text-left">Tidak berpengaruh dalam mengurangi indeks kinerja</td>
+                  <td className="border border-black p-2 text-left">Kurang signifikan berpengaruh dalam mengurangi indeks kinerja</td>
+                  <td className="border border-black p-2 text-left">Cukup signifikan berpengaruh dalam mengurangi indeks kinerja</td>
+                  <td className="border border-black p-2 text-left">Signifikan berpengaruh dalam mengurangi indeks kinerja</td>
+                  <td className="border border-black p-2 text-left">Sangat signifikan berpengaruh dalam mengurangi indeks kinerja</td>
+                </tr>
+                <tr>
+                  <td className="border border-black p-2 font-semibold align-middle text-left" rowSpan={2}>Layanan Organisasi</td>
+                  <td className="border border-black p-2 text-left">Positif</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                </tr>
+                <tr>
+                  <td className="border border-black p-2 text-left">Negatif</td>
+                  <td className="border border-black p-2 text-left">Layanan terganggu +- 10 menit namun tidak berpengaruh pada indeks kepuasan masyarakat</td>
+                  <td className="border border-black p-2 text-left">Layanan terganggu +- 60 menit namun tidak berpengaruh pada indeks kepuasan masyarakat</td>
+                  <td className="border border-black p-2 text-left">Layanan terganggu +- 5 jam namun tidak berpengaruh pada indeks kepuasan masyarakat</td>
+                  <td className="border border-black p-2 text-left">Layanan terganggu +- 24 jam dan berpengaruh pada indeks kepuasan masyarakat</td>
+                  <td className="border border-black p-2 text-left">Layanan terganggu +- 2 hari dan berpengaruh pada indeks kepuasan masyarakat</td>
+                </tr>
+                <tr>
+                  <td className="border border-black p-2 font-semibold align-middle text-left" rowSpan={2}>Operasional dan Aset TIK</td>
+                  <td className="border border-black p-2 text-left">Positif</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                </tr>
+                <tr>
+                  <td className="border border-black p-2 text-left">Negatif</td>
+                  <td className="border border-black p-2 text-left">Layanan terganggu +- 10 menit namun tidak berpengaruh pada layanan pemerintah</td>
+                  <td className="border border-black p-2 text-left">Layanan terganggu +- 60 menit namun tidak berpengaruh pada layanan pemerintah</td>
+                  <td className="border border-black p-2 text-left">Layanan terganggu +- 5 jam dan berpengaruh pada layanan pemerintah</td>
+                  <td className="border border-black p-2 text-left">Layanan terganggu +- 24 jam dan berpengaruh pada layanan pemerintah</td>
+                  <td className="border border-black p-2 text-left">Layanan terganggu selama lebih dari 2 hari dan berpengaruh pada layanan pemerintah</td>
+                </tr>
+                <tr>
+                  <td className="border border-black p-2 font-semibold align-middle text-left" rowSpan={2}>Hukum dan Regulasi</td>
+                  <td className="border border-black p-2 text-left">Positif</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                </tr>
+                <tr>
+                  <td className="border border-black p-2 text-left">Negatif</td>
+                  <td className="border border-black p-2 text-left">Tidak berpengaruh dalam kepatuhan terhadap regulasi yang ada</td>
+                  <td className="border border-black p-2 text-left">Kurang signifikan berpengaruh dalam kepatuhan terhadap regulasi yang ada</td>
+                  <td className="border border-black p-2 text-left">Cukup signifikan berpengaruh dalam kepatuhan terhadap regulasi yang ada</td>
+                  <td className="border border-black p-2 text-left">Signifikan berpengaruh dalam kepatuhan terhadap regulasi yang ada</td>
+                  <td className="border border-black p-2 text-left">Sangat signifikan berpengaruh dalam kepatuhan terhadap regulasi yang ada</td>
+                </tr>
+                <tr>
+                  <td className="border border-black p-2 font-semibold align-middle text-left" rowSpan={2}>Sumber Daya Manusia</td>
+                  <td className="border border-black p-2 text-left">Positif</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                  <td className="border border-black p-2 text-center">x</td>
+                </tr>
+                <tr>
+                  <td className="border border-black p-2 text-left">Negatif</td>
+                  <td className="border border-black p-2 text-left">Tidak signifikan berdampak pada kecemasan SDM</td>
+                  <td className="border border-black p-2 text-left">Berdampak pada kecemasan SDM</td>
+                  <td className="border border-black p-2 text-left">Berdampak pada produktivitas SDM</td>
+                  <td className="border border-black p-2 text-left">Berdampak pada kesehatan SDM</td>
+                  <td className="border border-black p-2 text-left">Berdampak dapat menyebabkan penyakit kronis - meninggal dunia</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
           <h2 className="text-xl font-semibold text-center mb-4">Matriks Analisis Risiko 5x5</h2>
           <div className="overflow-x-auto p-2">
             <table className="min-w-full border-collapse border border-black text-center text-sm">
