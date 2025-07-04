@@ -1,56 +1,35 @@
-
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper function to check if a user is superadmin
-    function isSuperAdmin() {
-      return exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
-    }
-
-    // Helper function to check if a user is admin or superadmin
-    function isAdminOrSuperAdmin() {
-      let userRole = get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
-      return exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-             (userRole == 'admin' || userRole == 'superadmin');
-    }
-
-    // Users collection rules
-    // - Anyone can create their own user document during signup.
-    // - Users can read their own profile.
-    // - Superadmins can read, update, and delete any user profile.
+    // Allow read & write only to their own user document
     match /users/{userId} {
-      allow read: if request.auth.uid == userId || isSuperAdmin();
-      allow create: if request.auth.uid == userId;
-      allow update, delete: if isSuperAdmin();
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // Roles collection rules
-    // - A user can create a role for themselves during signup.
-    // - Superadmins can manage (read, update, delete) all roles.
-    match /roles/{role} {
-      // allow create for any authenticated user, to handle registration
-      allow create: if request.auth.uid != null;
-      // allow read, update, delete only for superadmins
-      allow read, update, delete: if isSuperAdmin();
+    // Allow user to write to role document only once (by their UID)
+    match /roles/{roleId} {
+      allow create: if request.auth != null;
+      allow read: if true;
+      allow update, delete: if false;
     }
 
-    // Surveys collection rules
-    // - Users can create surveys for themselves.
-    // - Users can read and delete their own surveys.
-    // - Admins and Superadmins can read and delete all surveys.
-    match /surveys/{surveyId} {
-      allow create: if request.auth.uid == request.resource.data.userId;
-      allow read, delete: if request.auth.uid == resource.data.userId || isAdminOrSuperAdmin();
+    // Tambahan jika ada koleksi lain saat registrasi
+    match /profiles/{userId} {
+      allow create, read, update: if request.auth != null && request.auth.uid == userId;
     }
 
-    // Continuity Plans collection rules
-    // - Users can create, read, and delete their own continuity plans.
-    match /continuityPlans/{planId} {
-      allow create: if request.auth.uid == request.resource.data.userId;
-      allow read, delete: if request.auth.uid == resource.data.userId;
+    match /registrations/{regId} {
+      allow create, read: if request.auth != null;
+    }
+
+    match /usernames/{username} {
+      allow create: if request.auth != null;
+    }
+
+    // Fallback untuk koleksi lain
+    match /{document=**} {
+      allow read, write: if request.auth != null;
     }
   }
 }
