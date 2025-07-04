@@ -18,10 +18,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from '@/hooks/use-toast';
 import { addContinuityPlan } from '@/services/continuity-service';
 import { useAuth } from '@/hooks/use-auth';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { getUserSurveys } from '@/services/survey-service';
+
 
 const formSchema = z.object({
-  risiko: z.string().min(1, { message: 'Risiko harus diisi.' }),
+  risiko: z.string({ required_error: 'Risiko harus dipilih.' }).min(1, { message: 'Risiko harus dipilih.' }),
   aktivitas: z.string().min(1, { message: 'Aktivitas harus diisi.' }),
   targetWaktu: z.string().min(1, { message: 'Target waktu harus diisi.' }),
   pic: z.string().min(1, { message: 'PIC harus diisi.' }),
@@ -35,6 +38,7 @@ export default function ContinuityPage({}: {}) {
   const { toast } = useToast();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [availableRisks, setAvailableRisks] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,6 +52,20 @@ export default function ContinuityPage({}: {}) {
       rpo: '',
     },
   });
+
+  useEffect(() => {
+    if (user) {
+      getUserSurveys(user.uid).then(surveys => {
+        const uniqueRisks = new Set<string>();
+        surveys.forEach(survey => {
+          if (survey.riskEvent && survey.impactArea) {
+            uniqueRisks.add(`${survey.riskEvent} - ${survey.impactArea}`);
+          }
+        });
+        setAvailableRisks(Array.from(uniqueRisks));
+      });
+    }
+  }, [user]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!user) {
@@ -87,7 +105,24 @@ export default function ContinuityPage({}: {}) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>RISIKO</FormLabel>
-                  <FormControl><Textarea placeholder="Deskripsikan risiko yang dihadapi..." {...field} /></FormControl>
+                   <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih risiko dari survei yang ada..." />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {availableRisks.length > 0 ? (
+                        availableRisks.map(risk => (
+                          <SelectItem key={risk} value={risk}>{risk}</SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="no-risks" disabled>
+                          Tidak ada risiko yang ditemukan dari survei Anda.
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
