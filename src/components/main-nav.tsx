@@ -23,6 +23,7 @@ import {
   Book,
   ClipboardList,
   ChevronDown,
+  Recycle,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -190,6 +191,15 @@ export function MainNav() {
             </SidebarMenuSub>
           </CollapsibleContent>
         </Collapsible>
+      </SidebarMenuItem>
+      
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive={pathname === '/user/continuity'} tooltip="Kontinuitas/Keberlanjutan">
+          <Link href="/user/continuity">
+            <Recycle />
+            <span>Kontinuitas</span>
+          </Link>
+        </SidebarMenuButton>
       </SidebarMenuItem>
 
       <SidebarMenuItem>
