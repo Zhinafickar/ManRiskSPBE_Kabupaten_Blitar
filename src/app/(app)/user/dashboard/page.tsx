@@ -15,7 +15,6 @@ import {
   AreaChart,
   FileText,
   Recycle,
-  Info,
 } from 'lucide-react';
 
 export default function UserDashboard() {
@@ -101,20 +100,26 @@ export default function UserDashboard() {
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Informasi & Bantuan</CardTitle>
+            <CardHeader>
+            <CardTitle>Panduan Cepat</CardTitle>
             <CardDescription>
-              Akses data referensi dan panduan tutorial penggunaan aplikasi.
+                Langkah-langkah utama penggunaan aplikasi.
             </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild variant="outline" className="w-full">
-              <Link href="/user/data">
-                <Info className="mr-2 h-4 w-4" />
-                Lihat Informasi Penting
-              </Link>
-            </Button>
-          </CardContent>
+            </CardHeader>
+            <CardContent className="text-sm text-muted-foreground space-y-4">
+            <div>
+                <h4 className="font-semibold text-foreground">1. Isi Survei Risiko</h4>
+                <p>Buka menu 'Manajement Risiko' untuk mulai mengisi data menggunakan formulir tunggal atau tabel.</p>
+            </div>
+            <div>
+                <h4 className="font-semibold text-foreground">2. Buat Rencana Kontinuitas</h4>
+                <p>Setelah mengisi survei, Anda dapat membuat rencana keberlanjutan di menu 'Kontinuitas'.</p>
+            </div>
+            <div>
+                <h4 className="font-semibold text-foreground">3. Tinjau Hasil</h4>
+                <p>Lihat semua data yang telah Anda kirimkan dalam bentuk tabel dan grafik di menu hasil masing-masing.</p>
+            </div>
+            </CardContent>
         </Card>
       </div>
     </div>
