@@ -207,6 +207,15 @@ export function MainNav() {
       </SidebarMenuItem>
 
       <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive={pathname === '/user/grafik'} tooltip="Grafik Hasil">
+          <Link href="/user/grafik">
+            <AreaChart />
+            <span>Grafik Hasil</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+
+      <SidebarMenuItem>
         <SidebarMenuButton asChild isActive={pathname === '/user/conclusion'} tooltip="Conclusion/Kesimpulan">
           <Link href="/user/conclusion">
             <FileCheck />
