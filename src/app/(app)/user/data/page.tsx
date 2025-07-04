@@ -12,7 +12,7 @@ export default function DataPage({}: {}) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Data Referensi</CardTitle>
+        <CardTitle>Tabel Data Referensi</CardTitle>
         <CardDescription>
           Informasi mengenai matriks analisis risiko dan level kemungkinan yang digunakan dalam sistem.
         </CardDescription>
