@@ -21,7 +21,7 @@ export default function UserDashboard() {
           <CardHeader>
             <CardTitle>Input Kejadian Risiko</CardTitle>
             <CardDescription>
-              Laporkan kejadian risiko baru untuk penilaian.
+               risiko baru untuk penilaian.
             </CardDescription>
           </CardHeader>
           <CardContent>

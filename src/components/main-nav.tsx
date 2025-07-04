@@ -24,6 +24,7 @@ import {
   ClipboardList,
   ChevronDown,
   Recycle,
+  FileCheck,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -188,7 +189,7 @@ export function MainNav() {
               </SidebarMenuSubItem>
               <SidebarMenuSubItem>
                 <SidebarMenuSubButton asChild isActive={pathname === '/user/results'}>
-                  <Link href="/user/results">hasil survey</Link>
+                  <Link href="/user/results">Hasil Survey Anda</Link>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
             </SidebarMenuSub>
@@ -223,6 +224,15 @@ export function MainNav() {
                 </SidebarMenuSub>
             </CollapsibleContent>
         </Collapsible>
+      </SidebarMenuItem>
+
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive={pathname === '/user/conclusion'} tooltip="Conclusion/Kesimpulan">
+          <Link href="/user/conclusion">
+            <FileCheck />
+            <span>Conclusion/Kesimpulan</span>
+          </Link>
+        </SidebarMenuButton>
       </SidebarMenuItem>
 
       <SidebarMenuItem>
