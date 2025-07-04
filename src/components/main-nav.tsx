@@ -144,6 +144,15 @@ export function MainNav() {
       </SidebarMenuItem>
 
       <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive={pathname === '/user/tutorial'} tooltip="Tutorial">
+          <Link href="/user/tutorial">
+            <Book />
+            <span>Tutorial</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+
+      <SidebarMenuItem>
         <Collapsible open={isRiskMenuOpen} onOpenChange={setIsRiskMenuOpen}>
           <CollapsibleTrigger asChild>
             <SidebarMenuButton
@@ -220,15 +229,6 @@ export function MainNav() {
           <Link href="/user/conclusion">
             <FileCheck />
             <span>Conclusion/Kesimpulan</span>
-          </Link>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-
-      <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={pathname === '/user/tutorial'} tooltip="Tutorial">
-          <Link href="/user/tutorial">
-            <Book />
-            <span>Tutorial</span>
           </Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
