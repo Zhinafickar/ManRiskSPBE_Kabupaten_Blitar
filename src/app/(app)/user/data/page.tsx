@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -69,7 +70,147 @@ export default function DataPage({}: {}) {
           </div>
 
           {/* Tabel Kriteria Dampak Risiko */}
-          {/* (sudah kamu tulis lengkap di atas, tetap dipertahankan) */}
+          <div className="overflow-x-auto p-2">
+            <h2 className="text-xl font-semibold text-center mb-4">
+              Tabel Kriteria Dampak Risiko
+            </h2>
+            <table className="min-w-full border-collapse border border-black text-center text-sm">
+                <thead className="bg-blue-600 text-white">
+                    <tr>
+                        <th className="border border-black p-2 font-bold" rowSpan={2}>Area Dampak</th>
+                        <th className="border border-black p-2 font-bold" colSpan={5}>Level Dampak</th>
+                    </tr>
+                    <tr>
+                        <th className="border border-black p-2 font-bold">1<br/>tidak Signifikan</th>
+                        <th className="border border-black p-2 font-bold">2<br/>Kurang Signifikan</th>
+                        <th className="border border-black p-2 font-bold">3<br/>Cukup Signifikan</th>
+                        <th className="border border-black p-2 font-bold">4<br/>Signifikan</th>
+                        <th className="border border-black p-2 font-bold">5<br/>Sangat Signifikan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td className="border border-black p-2 font-bold" rowSpan={2}>Finansial</td>
+                        <td className="border border-black p-2 text-left">Positif</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                    </tr>
+                    <tr>
+                        <td className="border border-black p-2 text-left">Negatif</td>
+                        <td className="border border-black p-2 text-left">Kerugian 1 jt - 5 jt</td>
+                        <td className="border border-black p-2 text-left">Kerugian 6 jt - 20 jt</td>
+                        <td className="border border-black p-2 text-left">Kerugian 21 jt - 30 jt</td>
+                        <td className="border border-black p-2 text-left">Kerugian 30jt - 50jt</td>
+                        <td className="border border-black p-2 text-left">Kerugian &gt;50jt</td>
+                    </tr>
+                     <tr>
+                        <td className="border border-black p-2 font-bold" rowSpan={2}>Reputasi</td>
+                        <td className="border border-black p-2 text-left">Positif</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                    </tr>
+                    <tr>
+                        <td className="border border-black p-2 text-left">Negatif</td>
+                        <td className="border border-black p-2 text-left">Berdampak memberikan reputasi buruk bagi seorang ASN Pemkab Kukar</td>
+                        <td className="border border-black p-2 text-left">Berdampak memberikan reputasi buruk bagi suatu Bidang di instansi Pemkab Kukar</td>
+                        <td className="border border-black p-2 text-left">Berdampak memberikan reputasi buruk bagi suatu instansi Pemkab Kukar</td>
+                        <td className="border border-black p-2 text-left">Berdampak memberikan reputasi buruk bagi beberapa instansi di Pemkab Kukar</td>
+                        <td className="border border-black p-2 text-left">Berdampak memberikan reputasi buruk bagi Pemkab Kukar</td>
+                    </tr>
+                    <tr>
+                        <td className="border border-black p-2 font-bold" rowSpan={2}>Kinerja</td>
+                        <td className="border border-black p-2 text-left">Positif</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                    </tr>
+                    <tr>
+                        <td className="border border-black p-2 text-left">Negatif</td>
+                        <td className="border border-black p-2 text-left">Tidak berpengaruh dalam mengurangi indeks kinerja</td>
+                        <td className="border border-black p-2 text-left">Kurang signifikan berpengaruh dalam mengurangi indeks kinerja</td>
+                        <td className="border border-black p-2 text-left">Cukup signifikan berpengaruh dalam mengurangi indeks kinerja</td>
+                        <td className="border border-black p-2 text-left">Signifikan berpengaruh dalam mengurangi indeks kinerja</td>
+                        <td className="border border-black p-2 text-left">Sangat signifikan berpengaruh dalam mengurangi indeks kinerja</td>
+                    </tr>
+                    <tr>
+                        <td className="border border-black p-2 font-bold" rowSpan={2}>Layanan Organisasi</td>
+                        <td className="border border-black p-2 text-left">Positif</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                    </tr>
+                    <tr>
+                        <td className="border border-black p-2 text-left">Negatif</td>
+                        <td className="border border-black p-2 text-left">Layanan terganggu +- 10 menit namun tidak berpengaruh pada indeks kepuasan masyarakat</td>
+                        <td className="border border-black p-2 text-left">Layanan terganggu +- 60 menit namun tidak berpengaruh pada indeks kepuasan masyarakat</td>
+                        <td className="border border-black p-2 text-left">Layanan terganggu +- 5 jam namun tidak berpengaruh pada indeks kepuasan masyarakat</td>
+                        <td className="border border-black p-2 text-left">Layanan terganggu +- 24 jam dan berpengaruh pada indeks kepuasan masyarakat</td>
+                        <td className="border border-black p-2 text-left">Layanan terganggu +- 2 hari dan berpengaruh pada indeks kepuasan masyarakat</td>
+                    </tr>
+                    <tr>
+                        <td className="border border-black p-2 font-bold" rowSpan={2}>Operasional dan Aset TIK</td>
+                        <td className="border border-black p-2 text-left">Positif</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                    </tr>
+                    <tr>
+                        <td className="border border-black p-2 text-left">Negatif</td>
+                        <td className="border border-black p-2 text-left">Layanan terganggu +- 10 menit namun tidak berpengaruh pada layanan pemerintah</td>
+                        <td className="border border-black p-2 text-left">Layanan terganggu +- 60 menit namun tidak berpengaruh pada layanan pemerintah</td>
+                        <td className="border border-black p-2 text-left">Layanan terganggu +- 5 jam dan berpengaruh pada layanan pemerintah</td>
+                        <td className="border border-black p-2 text-left">Layanan terganggu +-24 jam dan berpengaruh pada layanan pemerintah</td>
+                        <td className="border border-black p-2 text-left">Layanan terganggu selama lebih dari 2 hari dan berpengaruh pada layanan pemerintah</td>
+                    </tr>
+                    <tr>
+                        <td className="border border-black p-2 font-bold" rowSpan={2}>Hukum dan Regulasi</td>
+                        <td className="border border-black p-2 text-left">Positif</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                    </tr>
+                    <tr>
+                        <td className="border border-black p-2 text-left">Negatif</td>
+                        <td className="border border-black p-2 text-left">Tidak berpengaruh dalam kepatuhan terhadap regulasi yang ada</td>
+                        <td className="border border-black p-2 text-left">Kurang signifikan berpengaruh dalam kepatuhan terhadap regulasi yang ada</td>
+                        <td className="border border-black p-2 text-left">Cukup signifikan berpengaruh dalam kepatuhan terhadap regulasi yang ada</td>
+                        <td className="border border-black p-2 text-left">Signifikan berpengaruh dalam kepatuhan terhadap regulasi yang ada</td>
+                        <td className="border border-black p-2 text-left">Sangat signifikan berpengaruh dalam kepatuhan terhadap regulasi yang ada</td>
+                    </tr>
+                    <tr>
+                        <td className="border border-black p-2 font-bold" rowSpan={2}>Sumber Daya Manusia</td>
+                        <td className="border border-black p-2 text-left">Positif</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2">x</td>
+                    </tr>
+                    <tr>
+                        <td className="border border-black p-2 text-left">Negatif</td>
+                        <td className="border border-black p-2 text-left">Tidak signifikan berdampak pada kecemasan SDM</td>
+                        <td className="border border-black p-2 text-left">Berdampak pada kecemasan SDM</td>
+                        <td className="border border-black p-2 text-left">Berdampak pada produktivitas SDM</td>
+                        <td className="border border-black p-2 text-left">Berdampak pada kesehatan SDM</td>
+                        <td className="border border-black p-2 text-left">Berdampak dapat menyebabkan penyakit kronis - meninggal dunia</td>
+                    </tr>
+                </tbody>
+            </table>
+          </div>
 
           {/* Matriks Risiko 5x5 */}
           <h2 className="text-xl font-semibold text-center mb-4">
@@ -125,25 +266,48 @@ export default function DataPage({}: {}) {
                     </th>
                     {[...Array(5)].map((_, colIndex) => {
                       const bgColors = [
-                        ["green-600", "yellow-500", "red-600", "red-600", "red-600"],
-                        ["blue-600", "green-600", "yellow-500", "red-600", "red-600"],
-                        ["blue-600", "green-600", "yellow-500", "red-600", "red-600"],
-                        ["blue-600", "green-600", "green-600", "red-600", "red-600"],
-                        ["blue-600", "blue-600", "green-600", "yellow-500", "red-600"],
+                        ["bg-green-600", "bg-yellow-500", "bg-red-600", "bg-red-600", "bg-red-600"],
+                        ["bg-blue-600", "bg-green-600", "bg-yellow-500", "bg-red-600", "bg-red-600"],
+                        ["bg-blue-600", "bg-green-600", "bg-yellow-500", "bg-red-600", "bg-red-600"],
+                        ["bg-blue-600", "bg-green-600", "bg-green-600", "bg-red-600", "bg-red-600"],
+                        ["bg-blue-600", "bg-blue-600", "bg-green-600", "bg-yellow-500", "bg-red-600"],
                       ];
-                      const texts = [
+                       const texts = [
+                        ["Tinggi", "Tinggi", "Ekstrim", "Ekstrim", "Ekstrim"],
+                        ["Sedang", "Tinggi", "Tinggi", "Ekstrim", "Ekstrim"],
+                        ["Rendah", "Sedang", "Tinggi", "Tinggi", "Ekstrim"],
+                        ["Rendah", "Sedang", "Sedang", "Tinggi", "Ekstrim"],
+                        ["Rendah", "Rendah", "Sedang", "Sedang", "Tinggi"],
+                      ];
+                       const cellTexts = [
                         ["7", "12", "17", "22", "25"],
                         ["4", "9", "14", "19", "24"],
                         ["3", "8", "13", "18", "23"],
                         ["2", "6", "11", "16", "21"],
                         ["1", "5", "10", "15", "20"],
                       ];
+                      const riskLevels = [
+                        ['Rendah', 'Sedang', 'Bahaya', 'Bahaya', 'Bahaya'],
+                        ['Minor', 'Rendah', 'Sedang', 'Bahaya', 'Bahaya'],
+                        ['Minor', 'Rendah', 'Sedang', 'Bahaya', 'Bahaya'],
+                        ['Minor', 'Rendah', 'Rendah', 'Bahaya', 'Bahaya'],
+                        ['Minor', 'Minor', 'Rendah', 'Sedang', 'Bahaya'],
+                      ];
+
+                      let colorClass = '';
+                      switch (riskLevels[i][colIndex]) {
+                        case 'Bahaya': colorClass = 'bg-red-600'; break;
+                        case 'Sedang': colorClass = 'bg-yellow-500'; break;
+                        case 'Rendah': colorClass = 'bg-green-600'; break;
+                        case 'Minor': colorClass = 'bg-blue-600'; break;
+                      }
+
                       return (
                         <td
                           key={colIndex}
-                          className={`border border-black p-2 font-bold text-white bg-${bgColors[i][colIndex]}`}
+                          className={`border border-black p-2 font-bold text-white ${colorClass}`}
                         >
-                          {texts[i][colIndex]}
+                          {cellTexts[i][colIndex]}
                         </td>
                       );
                     })}
@@ -180,3 +344,5 @@ export default function DataPage({}: {}) {
     </Card>
   );
 }
+
+  
