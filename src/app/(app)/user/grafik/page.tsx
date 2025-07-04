@@ -12,7 +12,7 @@ import { AreaChart } from 'lucide-react';
 const riskLevelColors = {
   Bahaya: 'hsl(var(--destructive))', // Red
   Sedang: 'hsl(var(--chart-4))',      // Yellow/Orange
-  Rendah: 'hsl(var(--accent))',       // Green
+  Rendah: 'hsl(var(--chart-2))',      // Teal/Green
   Minor: 'hsl(var(--chart-1))',       // Blue/Primary
 };
 
