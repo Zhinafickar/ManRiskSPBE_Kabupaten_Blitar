@@ -12,7 +12,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Recycle } from 'lucide-react';
+import { Recycle, Bot } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from '@/hooks/use-toast';
@@ -21,6 +21,8 @@ import { useAuth } from '@/hooks/use-auth';
 import { useEffect, useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getUserSurveys } from '@/services/survey-service';
+import type { Survey } from '@/types/survey';
+import { suggestContinuityPlan } from '@/ai/flows/suggest-continuity-plan';
 
 
 const formSchema = z.object({
@@ -38,6 +40,8 @@ export default function ContinuityPage({}: {}) {
   const { toast } = useToast();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [allSurveys, setAllSurveys] = useState<Survey[]>([]);
   const [availableRisks, setAvailableRisks] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -56,6 +60,7 @@ export default function ContinuityPage({}: {}) {
   useEffect(() => {
     if (user) {
       getUserSurveys(user.uid).then(surveys => {
+        setAllSurveys(surveys);
         const uniqueRisks = new Set<string>();
         surveys.forEach(survey => {
           if (survey.riskEvent && survey.impactArea) {
@@ -66,6 +71,46 @@ export default function ContinuityPage({}: {}) {
       });
     }
   }, [user]);
+  
+  const handleAiSuggestion = async () => {
+    const selectedRisk = form.getValues('risiko');
+    if (!selectedRisk) {
+        toast({
+            variant: 'destructive',
+            title: 'Pilih Risiko',
+            description: 'Anda harus memilih risiko terlebih dahulu untuk mendapatkan saran AI.',
+        });
+        return;
+    }
+    
+    setIsAiLoading(true);
+    try {
+        const result = await suggestContinuityPlan({
+            risiko: selectedRisk,
+            allSurveyData: JSON.stringify(allSurveys),
+        });
+
+        if (result) {
+            form.setValue('aktivitas', result.aktivitas, { shouldValidate: true });
+            form.setValue('targetWaktu', result.targetWaktu, { shouldValidate: true });
+            form.setValue('pic', result.pic, { shouldValidate: true });
+            form.setValue('sumberdaya', result.sumberdaya, { shouldValidate: true });
+            toast({
+                title: 'Saran AI Diterapkan',
+                description: 'Formulir telah diisi dengan saran dari AI. Silakan tinjau kembali.',
+            });
+        }
+    } catch (error) {
+        console.error("Error getting AI suggestion:", error);
+        toast({
+            variant: 'destructive',
+            title: 'Gagal Mendapatkan Saran',
+            description: 'Terjadi kesalahan saat berkomunikasi dengan AI.',
+        });
+    } finally {
+        setIsAiLoading(false);
+    }
+  };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!user) {
@@ -93,40 +138,60 @@ export default function ContinuityPage({}: {}) {
           Kontinuitas/Keberlanjutan
         </CardTitle>
         <CardDescription>
-          Isi formulir untuk perencanaan keberlanjutan dan kontinuitas layanan.
+          Isi formulir untuk perencanaan keberlanjutan dan kontinuitas layanan. Anda bisa mendapatkan saran dari AI setelah memilih risiko.
         </CardDescription>
       </CardHeader>
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="space-y-6">
-            <FormField
-              control={form.control}
-              name="risiko"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>RISIKO</FormLabel>
-                   <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih risiko dari survei yang ada..." />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {availableRisks.length > 0 ? (
-                        availableRisks.map(risk => (
-                          <SelectItem key={risk} value={risk}>{risk}</SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="no-risks" disabled>
-                          Tidak ada risiko yang ditemukan dari survei Anda.
-                        </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="flex flex-col sm:flex-row items-end gap-2">
+              <div className="w-full flex-grow">
+                <FormField
+                  control={form.control}
+                  name="risiko"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>RISIKO</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih risiko dari survei yang ada..." />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {availableRisks.length > 0 ? (
+                            availableRisks.map(risk => (
+                              <SelectItem key={risk} value={risk}>{risk}</SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="no-risks" disabled>
+                              Tidak ada risiko yang ditemukan dari survei Anda.
+                            </SelectItem>
+                          )}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+               <Button type="button" onClick={handleAiSuggestion} disabled={isAiLoading || availableRisks.length === 0} className="w-full sm:w-auto">
+                    {isAiLoading ? (
+                        <>
+                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Memproses...
+                        </>
+                    ) : (
+                        <>
+                            <Bot className="mr-2 h-4 w-4" />
+                            Dapatkan Saran AI
+                        </>
+                    )}
+                </Button>
+            </div>
             <FormField
               control={form.control}
               name="aktivitas"
