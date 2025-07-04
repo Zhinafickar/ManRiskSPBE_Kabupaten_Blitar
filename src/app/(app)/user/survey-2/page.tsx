@@ -18,6 +18,7 @@ import { SurveyTableRow } from './_components/survey-table-row';
 const singleSurveySchema = z.object({
   riskEvent: z.string(),
   impactArea: z.string().optional(),
+  areaDampak: z.string().optional(),
   eventDate: z.date().optional(),
   frequency: z.string().optional(),
   impactMagnitude: z.string().optional(),
@@ -45,6 +46,7 @@ export default function Survey2Page() {
       surveys: RISK_EVENTS.map(event => ({
         riskEvent: event.name,
         impactArea: '',
+        areaDampak: '',
         eventDate: undefined,
         frequency: '',
         impactMagnitude: '',
@@ -66,7 +68,7 @@ export default function Survey2Page() {
     }
 
     const surveysToSubmit = values.surveys.filter(
-        s => s.impactArea && s.eventDate && s.frequency && s.impactMagnitude
+        s => s.impactArea && s.eventDate && s.frequency && s.impactMagnitude && s.areaDampak
     );
 
     if (surveysToSubmit.length === 0) {
@@ -81,6 +83,7 @@ export default function Survey2Page() {
             const indicator = getRiskLevel(surveyRow.frequency!, surveyRow.impactMagnitude!);
             return addSurvey({ 
                 ...surveyRow,
+                areaDampak: surveyRow.areaDampak!,
                 impactArea: surveyRow.impactArea!,
                 eventDate: surveyRow.eventDate!,
                 frequency: surveyRow.frequency!,
@@ -106,6 +109,7 @@ export default function Survey2Page() {
   
   const handleClearRow = (index: number) => {
     form.setValue(`surveys.${index}.impactArea`, '');
+    form.setValue(`surveys.${index}.areaDampak`, '');
     form.setValue(`surveys.${index}.eventDate`, undefined);
     form.setValue(`surveys.${index}.cause`, '');
     form.setValue(`surveys.${index}.impact`, '');
@@ -131,8 +135,9 @@ export default function Survey2Page() {
               <Table className="min-w-max">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[300px] font-semibold sticky left-0 bg-background z-10">Kejadian Risiko TIK</TableHead>
-                    <TableHead className="w-[300px] font-semibold">Area Dampak</TableHead>
+                    <TableHead className="w-[300px] font-semibold sticky left-0 bg-background z-10">Kategori Risiko</TableHead>
+                    <TableHead className="w-[300px] font-semibold">Risiko</TableHead>
+                    <TableHead className="w-[200px] font-semibold">Area Dampak</TableHead>
                     <TableHead className="w-[170px] font-semibold">Waktu Kejadian</TableHead>
                     <TableHead className="w-[250px] font-semibold">Penyebab</TableHead>
                     <TableHead className="w-[250px] font-semibold">Dampak</TableHead>

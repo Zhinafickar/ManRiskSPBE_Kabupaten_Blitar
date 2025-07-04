@@ -6,7 +6,7 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FREQUENCY_LEVELS, IMPACT_MAGNITUDES, ORGANIZATIONAL_CONTROLS, PEOPLE_CONTROLS, PHYSICAL_CONTROLS, TECHNOLOGICAL_CONTROLS, MITIGATION_OPTIONS } from '@/constants/data';
+import { FREQUENCY_LEVELS, IMPACT_MAGNITUDES, ORGANIZATIONAL_CONTROLS, PEOPLE_CONTROLS, PHYSICAL_CONTROLS, TECHNOLOGICAL_CONTROLS, MITIGATION_OPTIONS, AREA_DAMPAK_OPTIONS } from '@/constants/data';
 import { getRiskLevel } from '@/lib/risk-matrix';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -21,6 +21,7 @@ import { Textarea } from '@/components/ui/textarea';
 const singleSurveySchema = z.object({
   riskEvent: z.string(),
   impactArea: z.string().optional(),
+  areaDampak: z.string().optional(),
   eventDate: z.date().optional(),
   frequency: z.string().optional(),
   impactMagnitude: z.string().optional(),
@@ -132,15 +133,15 @@ export function SurveyTableRow({ index, riskEvent, handleClearRow }: SurveyTable
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button variant="outline" role="combobox" className={cn("w-full justify-between text-left h-auto min-h-10", !field.value && "text-muted-foreground")}>
-                      <span className="whitespace-normal break-words flex-1 pr-2">{field.value ? field.value : "Pilih area..."}</span>
+                      <span className="whitespace-normal break-words flex-1 pr-2">{field.value ? field.value : "Pilih risiko..."}</span>
                       <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
                 <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
                   <Command>
-                    <CommandInput placeholder="Cari area dampak..." />
-                    <CommandEmpty>Area dampak tidak ditemukan.</CommandEmpty>
+                    <CommandInput placeholder="Cari risiko..." />
+                    <CommandEmpty>Risiko tidak ditemukan.</CommandEmpty>
                     <CommandList>
                       <CommandGroup>
                         {riskEvent.impactAreas.map((area) => (
@@ -161,6 +162,23 @@ export function SurveyTableRow({ index, riskEvent, handleClearRow }: SurveyTable
                   </Command>
                 </PopoverContent>
               </Popover>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </TableCell>
+       <TableCell className="align-top">
+        <FormField
+          control={control}
+          name={`surveys.${index}.areaDampak`}
+          render={({ field }) => (
+            <FormItem>
+              <Select onValueChange={field.onChange} value={field.value || ''}>
+                <FormControl><SelectTrigger><SelectValue placeholder="Pilih area" /></SelectTrigger></FormControl>
+                <SelectContent>
+                  {AREA_DAMPAK_OPTIONS.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
