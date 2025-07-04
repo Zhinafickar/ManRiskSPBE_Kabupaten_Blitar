@@ -16,7 +16,7 @@ export default function TutorialPage({}: {}) {
             <table className="min-w-full border-collapse border border-black text-center text-sm">
               <tbody>
                 <tr>
-                  <th className="border border-black p-2 font-bold align-middle" rowSpan={2}>Matriks Analisis Risiko 5x5</th>
+                  <th className="border border-black p-2 font-bold align-middle" rowSpan={2} colSpan={2}>Matriks Analisis Risiko 5x5</th>
                   <th className="border border-black p-2 font-bold" colSpan={5}>Level Dampak</th>
                 </tr>
                 <tr>
@@ -32,28 +32,12 @@ export default function TutorialPage({}: {}) {
                         <span className="w-28">Level Kemungkinan</span>
                     </div>
                   </th>
-                  <th className="border border-black p-2 font-bold">1<br/>Hampir Tidak Terjadi</th>
-                  <td className="border border-black p-2 font-bold bg-blue-300 text-black">1</td>
-                  <td className="border border-black p-2 font-bold bg-blue-300 text-black">3</td>
-                  <td className="border border-black p-2 font-bold bg-blue-300 text-black">5</td>
-                  <td className="border border-black p-2 font-bold bg-green-400 text-black">8</td>
-                  <td className="border border-black p-2 font-bold bg-orange-400 text-black">20</td>
-                </tr>
-                 <tr>
-                  <th className="border border-black p-2 font-bold">2<br/>Jarang Terjadi</th>
-                  <td className="border border-black p-2 font-bold bg-green-400 text-black">2</td>
-                  <td className="border border-black p-2 font-bold bg-green-400 text-black">7</td>
-                  <td className="border border-black p-2 font-bold bg-yellow-400 text-black">11</td>
-                  <td className="border border-black p-2 font-bold bg-orange-400 text-black">13</td>
-                  <td className="border border-black p-2 font-bold bg-red-500 text-white">21</td>
-                </tr>
-                 <tr>
-                  <th className="border border-black p-2 font-bold whitespace-nowrap">3<br/>Kadang - Kadang Terjadi</th>
-                  <td className="border border-black p-2 font-bold bg-blue-300 text-black">4</td>
-                  <td className="border border-black p-2 font-bold bg-green-400 text-black">10</td>
-                  <td className="border border-black p-2 font-bold bg-yellow-400 text-black">14</td>
-                  <td className="border border-black p-2 font-bold bg-orange-400 text-black">17</td>
-                  <td className="border border-black p-2 font-bold bg-red-500 text-white">22</td>
+                  <th className="border border-black p-2 font-bold">5<br/>Hampir Pasti Terjadi</th>
+                  <td className="border border-black p-2 font-bold bg-green-400 text-black">9</td>
+                  <td className="border border-black p-2 font-bold bg-yellow-400 text-black">15</td>
+                  <td className="border border-black p-2 font-bold bg-orange-400 text-black">18</td>
+                  <td className="border border-black p-2 font-bold bg-red-500 text-white">23</td>
+                  <td className="border border-black p-2 font-bold bg-red-500 text-white">25</td>
                 </tr>
                 <tr>
                   <th className="border border-black p-2 font-bold">4<br/>Sering Terjadi</th>
@@ -64,12 +48,28 @@ export default function TutorialPage({}: {}) {
                   <td className="border border-black p-2 font-bold bg-red-500 text-white">24</td>
                 </tr>
                 <tr>
-                  <th className="border border-black p-2 font-bold">5<br/>Hampir Pasti Terjadi</th>
-                  <td className="border border-black p-2 font-bold bg-green-400 text-black">9</td>
-                  <td className="border border-black p-2 font-bold bg-yellow-400 text-black">15</td>
-                  <td className="border border-black p-2 font-bold bg-orange-400 text-black">18</td>
-                  <td className="border border-black p-2 font-bold bg-red-500 text-white">23</td>
-                  <td className="border border-black p-2 font-bold bg-red-500 text-white">25</td>
+                  <th className="border border-black p-2 font-bold whitespace-nowrap">3<br/>Kadang - Kadang Terjadi</th>
+                  <td className="border border-black p-2 font-bold bg-blue-300 text-black">4</td>
+                  <td className="border border-black p-2 font-bold bg-green-400 text-black">10</td>
+                  <td className="border border-black p-2 font-bold bg-yellow-400 text-black">14</td>
+                  <td className="border border-black p-2 font-bold bg-orange-400 text-black">17</td>
+                  <td className="border border-black p-2 font-bold bg-red-500 text-white">22</td>
+                </tr>
+                 <tr>
+                  <th className="border border-black p-2 font-bold">2<br/>Jarang Terjadi</th>
+                  <td className="border border-black p-2 font-bold bg-green-400 text-black">2</td>
+                  <td className="border border-black p-2 font-bold bg-green-400 text-black">7</td>
+                  <td className="border border-black p-2 font-bold bg-yellow-400 text-black">11</td>
+                  <td className="border border-black p-2 font-bold bg-orange-400 text-black">13</td>
+                  <td className="border border-black p-2 font-bold bg-red-500 text-white">21</td>
+                </tr>
+                <tr>
+                  <th className="border border-black p-2 font-bold">1<br/>Hampir Tidak Terjadi</th>
+                  <td className="border border-black p-2 font-bold bg-blue-300 text-black">1</td>
+                  <td className="border border-black p-2 font-bold bg-blue-300 text-black">3</td>
+                  <td className="border border-black p-2 font-bold bg-blue-300 text-black">5</td>
+                  <td className="border border-black p-2 font-bold bg-green-400 text-black">8</td>
+                  <td className="border border-black p-2 font-bold bg-orange-400 text-black">20</td>
                 </tr>
               </tbody>
             </table>
