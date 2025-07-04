@@ -11,6 +11,52 @@ export default function TutorialPage({}: {}) {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
+          <div className="overflow-x-auto p-2 mb-8">
+            <h2 className="text-xl font-semibold text-center mb-4">Tabel Level Kemungkinan Terjadinya Risiko</h2>
+            <table className="min-w-full border-collapse border border-black text-center text-sm">
+              <thead className="bg-blue-600 text-white">
+                <tr>
+                  <th className="border border-black p-2 font-bold">No.</th>
+                  <th className="border border-black p-2 font-bold">Frekuensi Kejadian</th>
+                  <th className="border border-black p-2 font-bold">Persentase Kemungkinan Terjadinya dalam Satu Tahun</th>
+                  <th className="border border-black p-2 font-bold">Jumlah Frekuensi Kemungkinan Terjadinya dalam Satu Tahun</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="border border-black p-2">1</td>
+                  <td className="border border-black p-2 text-left">Hampir tidak terjadi</td>
+                  <td className="border border-black p-2">X ≤ 5%</td>
+                  <td className="border border-black p-2">X &lt; 2 kali</td>
+                </tr>
+                <tr>
+                  <td className="border border-black p-2">2</td>
+                  <td className="border border-black p-2 text-left">Jarang terjadi</td>
+                  <td className="border border-black p-2">5% &lt; X ≤ 10%</td>
+                  <td className="border border-black p-2">2 ≤ X ≤ 5 kali</td>
+                </tr>
+                <tr>
+                  <td className="border border-black p-2">3</td>
+                  <td className="border border-black p-2 text-left">Kadang terjadi</td>
+                  <td className="border border-black p-2">10% &lt; X ≤ 20%</td>
+                  <td className="border border-black p-2">6 ≤ X ≤ 9 kali</td>
+                </tr>
+                <tr>
+                  <td className="border border-black p-2">4</td>
+                  <td className="border border-black p-2 text-left">Sering terjadi</td>
+                  <td className="border border-black p-2">20% &lt; X ≤ 50%</td>
+                  <td className="border border-black p-2">10 ≤ X ≤ 12 kali</td>
+                </tr>
+                <tr>
+                  <td className="border border-black p-2">5</td>
+                  <td className="border border-black p-2 text-left">Sangat sering terjadi</td>
+                  <td className="border border-black p-2">X &gt; 50%</td>
+                  <td className="border border-black p-2">&gt; 12 kali</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
           <h2 className="text-xl font-semibold text-center mb-4">Matriks Analisis Risiko 5x5</h2>
           <div className="overflow-x-auto p-2">
             <table className="min-w-full border-collapse border border-black text-center text-sm">
