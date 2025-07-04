@@ -191,6 +191,16 @@ export const IMPACT_MAGNITUDES = [
   'Sangat Signifikan',
 ];
 
+export const AREA_DAMPAK_OPTIONS = [
+  "Finansial",
+  "Reputasi",
+  "Kinerja",
+  "Layanan Organisasi",
+  "Operasional dan Aset TIK",
+  "Hukum dan Regulasi",
+  "Sumber Daya Manusia"
+];
+
 export const IMPACT_AREAS = [
     "Program kerja atau sumber daya tidak sejalan dengan strategi dan prioritas organisasi.",
     "Terdapat duplikasi dalam inisatif",

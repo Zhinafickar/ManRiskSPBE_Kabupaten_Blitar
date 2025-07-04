@@ -4,6 +4,7 @@ export interface Survey {
     userRole: string;
     riskEvent: string;
     impactArea: string;
+    areaDampak?: string;
     cause: string;
     impact: string;
     frequency: string;

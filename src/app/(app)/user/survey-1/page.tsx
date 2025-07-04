@@ -29,7 +29,8 @@ import {
     PEOPLE_CONTROLS,
     PHYSICAL_CONTROLS,
     TECHNOLOGICAL_CONTROLS,
-    MITIGATION_OPTIONS
+    MITIGATION_OPTIONS,
+    AREA_DAMPAK_OPTIONS,
 } from '@/constants/data';
 import { addSurvey } from '@/services/survey-service';
 import { useAuth } from '@/hooks/use-auth';
@@ -46,6 +47,7 @@ import { format } from 'date-fns';
 const formSchema = z.object({
   riskEvent: z.string({ required_error: 'Silakan pilih kategori risiko.' }).min(1, { message: 'Kategori risiko harus diisi.' }),
   impactArea: z.string({ required_error: 'Silakan pilih risiko.' }).min(1, { message: 'Risiko harus diisi.' }),
+  areaDampak: z.string({ required_error: 'Area dampak harus diisi.' }).min(1, { message: 'Area dampak harus diisi.' }),
   eventDate: z.date({ required_error: 'Waktu kejadian harus diisi.' }),
   cause: z.string().min(10, { message: 'Penyebab harus diisi minimal 10 karakter.' }),
   impact: z.string().min(10, { message: 'Dampak harus diisi minimal 10 karakter.' }),
@@ -76,6 +78,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
     defaultValues: {
       riskEvent: '',
       impactArea: '',
+      areaDampak: '',
       eventDate: undefined,
       cause: '',
       impact: '',
@@ -251,6 +254,20 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                 </FormItem>
               )}
             />
+             <FormField
+                control={form.control}
+                name="areaDampak"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Area Dampak</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl><SelectTrigger><SelectValue placeholder="Pilih area dampak" /></SelectTrigger></FormControl>
+                        <SelectContent>{AREA_DAMPAK_OPTIONS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
+                    </Select>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
             <FormField
               control={form.control}
               name="eventDate"

@@ -107,8 +107,9 @@ export default function AdminResultsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>User Role</TableHead>
-                <TableHead>Risk Event</TableHead>
-                <TableHead>Impact Area</TableHead>
+                <TableHead>Kategori Risiko</TableHead>
+                <TableHead>Risiko</TableHead>
+                <TableHead>Area Dampak</TableHead>
                 <TableHead>Frequency</TableHead>
                 <TableHead>Impact</TableHead>
                 <TableHead>Risk Level</TableHead>
@@ -123,6 +124,7 @@ export default function AdminResultsPage() {
                   <TableCell className="font-medium max-w-xs truncate">{survey.userRole}</TableCell>
                   <TableCell className="max-w-xs truncate">{survey.riskEvent}</TableCell>
                   <TableCell className="max-w-xs truncate">{survey.impactArea}</TableCell>
+                  <TableCell className="max-w-xs truncate">{survey.areaDampak || 'N/A'}</TableCell>
                   <TableCell>{survey.frequency}</TableCell>
                   <TableCell>{survey.impactMagnitude}</TableCell>
                   <TableCell><RiskIndicatorBadge level={survey.riskLevel} /></TableCell>
