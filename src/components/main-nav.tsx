@@ -19,7 +19,6 @@ import {
   FileText,
   AreaChart,
   Users,
-  LogOut,
   Book,
   ClipboardList,
   ChevronDown,
@@ -27,28 +26,18 @@ import {
   FileCheck,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 export function MainNav() {
   const { userProfile } = useAuth();
   const pathname = usePathname();
-  const router = useRouter();
 
   const isActiveRiskMenu = pathname.startsWith('/user/survey') || pathname === '/user/results';
   const [isRiskMenuOpen, setIsRiskMenuOpen] = useState(isActiveRiskMenu);
   
   const isActiveContinuityMenu = pathname.startsWith('/user/continuity');
   const [isContinuityMenuOpen, setIsContinuityMenuOpen] = useState(isActiveContinuityMenu);
-
-  const handleLogout = async () => {
-    if (auth) {
-      await signOut(auth);
-      router.push('/login');
-    }
-  };
 
   const adminMenu = [
     {
@@ -111,18 +100,9 @@ export function MainNav() {
   
   if (userProfile?.role === 'admin' || userProfile?.role === 'superadmin') {
       const menuItems = getMenuItems();
-      const allItems = [
-        ...menuItems,
-        {
-            label: 'Logout',
-            icon: LogOut,
-            onClick: handleLogout,
-            active: false,
-        },
-    ];
     return (
         <SidebarMenu>
-            {allItems.map((item: any) => (
+            {menuItems.map((item: any) => (
                 <SidebarMenuItem key={item.label}>
                 {item.href ? (
                     <SidebarMenuButton
@@ -241,13 +221,6 @@ export function MainNav() {
             <Book />
             <span>Tutorial</span>
           </Link>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-      
-      <SidebarMenuItem>
-        <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
-          <LogOut />
-          <span>Logout</span>
         </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>
