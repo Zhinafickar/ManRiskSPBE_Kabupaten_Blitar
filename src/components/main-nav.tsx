@@ -19,12 +19,11 @@ import {
   FileText,
   AreaChart,
   Users,
-  Book,
   ClipboardList,
   ChevronDown,
   Recycle,
   FileCheck,
-  Database,
+  Info,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -33,6 +32,9 @@ import { useState } from 'react';
 export function MainNav() {
   const { userProfile } = useAuth();
   const pathname = usePathname();
+
+  const isActiveInfoMenu = pathname === '/user/data' || pathname === '/user/tutorial';
+  const [isInfoMenuOpen, setIsInfoMenuOpen] = useState(isActiveInfoMenu);
 
   const isActiveRiskMenu = pathname.startsWith('/user/survey') || pathname === '/user/results';
   const [isRiskMenuOpen, setIsRiskMenuOpen] = useState(isActiveRiskMenu);
@@ -145,21 +147,32 @@ export function MainNav() {
       </SidebarMenuItem>
 
       <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={pathname === '/user/data'} tooltip="Data Referensi">
-          <Link href="/user/data">
-            <Database />
-            <span>Data Referensi</span>
-          </Link>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-
-      <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={pathname === '/user/tutorial'} tooltip="Tutorial">
-          <Link href="/user/tutorial">
-            <Book />
-            <span>Tutorial</span>
-          </Link>
-        </SidebarMenuButton>
+        <Collapsible open={isInfoMenuOpen} onOpenChange={setIsInfoMenuOpen}>
+          <CollapsibleTrigger asChild>
+            <SidebarMenuButton
+              isActive={isActiveInfoMenu}
+              className="[&[data-state=open]>svg:last-of-type]:rotate-180"
+            >
+              <Info />
+              <span className="mr-auto group-data-[collapsible=icon]:hidden">Informasi Penting</span>
+              <ChevronDown className="size-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden" />
+            </SidebarMenuButton>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <SidebarMenuSub>
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton asChild isActive={pathname === '/user/data'}>
+                  <Link href="/user/data">Data Referensi</Link>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton asChild isActive={pathname === '/user/tutorial'}>
+                  <Link href="/user/tutorial">Tutorial</Link>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+            </SidebarMenuSub>
+          </CollapsibleContent>
+        </Collapsible>
       </SidebarMenuItem>
 
       <SidebarMenuItem>
