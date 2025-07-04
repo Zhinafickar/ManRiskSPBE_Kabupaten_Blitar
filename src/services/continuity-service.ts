@@ -1,5 +1,5 @@
 import { db, isFirebaseConfigured } from '@/lib/firebase';
-import { collection, getDocs, addDoc, query, where, doc, deleteDoc, orderBy } from 'firebase/firestore';
+import { collection, getDocs, addDoc, query, where, doc, deleteDoc } from 'firebase/firestore';
 import { ContinuityPlan } from '@/types/continuity';
 
 export async function addContinuityPlan(planData: Omit<ContinuityPlan, 'id' | 'createdAt' | 'userId'> & { userId: string }) {
@@ -17,7 +17,8 @@ export async function addContinuityPlan(planData: Omit<ContinuityPlan, 'id' | 'c
 export async function getUserContinuityPlans(userId: string): Promise<ContinuityPlan[]> {
     if (!isFirebaseConfigured || !db) return [];
     const plansCol = collection(db, 'continuityPlans');
-    const q = query(plansCol, where("userId", "==", userId), orderBy("createdAt", "desc"));
+    // Remove orderBy to avoid needing a composite index. Sorting is now done on the client.
+    const q = query(plansCol, where("userId", "==", userId));
     const planSnapshot = await getDocs(q);
     const planList = planSnapshot.docs.map(doc => {
         const data = doc.data();
@@ -34,6 +35,10 @@ export async function getUserContinuityPlans(userId: string): Promise<Continuity
             createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : new Date().toISOString()
         } as ContinuityPlan;
     });
+
+    // Sort the results on the client-side in descending order of creation time
+    planList.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    
     return planList;
 }
 
