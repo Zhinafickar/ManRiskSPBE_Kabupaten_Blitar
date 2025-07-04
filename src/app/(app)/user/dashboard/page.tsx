@@ -15,6 +15,7 @@ import {
   AreaChart,
   FileText,
   Recycle,
+  ClipboardCheck,
 } from 'lucide-react';
 
 export default function UserDashboard() {
@@ -77,20 +78,25 @@ export default function UserDashboard() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Lihat Hasil Anda</CardTitle>
+            <CardTitle>Tinjau Hasil</CardTitle>
             <CardDescription>
-              Tinjau semua survei yang telah Anda kirimkan dalam format tabel
-              atau grafik.
+              Lihat hasil survei, rencana kontinuitas, dan visualisasi data Anda di sini.
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-4 sm:flex-row">
-            <Button asChild className="w-full sm:w-auto">
+          <CardContent className="grid grid-cols-1 gap-4">
+            <Button asChild>
               <Link href="/user/results">
                 <FileText className="mr-2 h-4 w-4" />
                 Lihat Tabel Hasil
               </Link>
             </Button>
-            <Button asChild variant="secondary" className="w-full sm:w-auto">
+            <Button asChild variant="secondary">
+              <Link href="/user/continuity-results">
+                <ClipboardCheck className="mr-2 h-4 w-4" />
+                Lihat Hasil Kontinuitas
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
               <Link href="/user/grafik">
                 <AreaChart className="mr-2 h-4 w-4" />
                 Lihat Grafik
