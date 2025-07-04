@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -78,6 +77,7 @@ export default function DataPage({}: {}) {
                 <thead className="bg-blue-600 text-white">
                     <tr>
                         <th className="border border-black p-2 font-bold" rowSpan={2}>Area Dampak</th>
+                        <th className="border border-black p-2 font-bold" rowSpan={2}></th>
                         <th className="border border-black p-2 font-bold" colSpan={5}>Level Dampak</th>
                     </tr>
                     <tr>
@@ -344,5 +344,3 @@ export default function DataPage({}: {}) {
     </Card>
   );
 }
-
-  
