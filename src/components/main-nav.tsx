@@ -38,6 +38,9 @@ export function MainNav() {
 
   const isActiveRiskMenu = pathname.startsWith('/user/survey') || pathname === '/user/results';
   const [isRiskMenuOpen, setIsRiskMenuOpen] = useState(isActiveRiskMenu);
+  
+  const isActiveContinuityMenu = pathname.startsWith('/user/continuity');
+  const [isContinuityMenuOpen, setIsContinuityMenuOpen] = useState(isActiveContinuityMenu);
 
   const handleLogout = async () => {
     if (auth) {
@@ -194,12 +197,32 @@ export function MainNav() {
       </SidebarMenuItem>
       
       <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={pathname === '/user/continuity'} tooltip="Kontinuitas/Keberlanjutan">
-          <Link href="/user/continuity">
-            <Recycle />
-            <span>Kontinuitas</span>
-          </Link>
-        </SidebarMenuButton>
+        <Collapsible open={isContinuityMenuOpen} onOpenChange={setIsContinuityMenuOpen}>
+            <CollapsibleTrigger asChild>
+                <SidebarMenuButton
+                isActive={isActiveContinuityMenu}
+                className="[&[data-state=open]>svg:last-of-type]:rotate-180"
+                >
+                    <Recycle />
+                    <span className="mr-auto group-data-[collapsible=icon]:hidden">Kontinuitas</span>
+                    <ChevronDown className="size-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden" />
+                </SidebarMenuButton>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+                <SidebarMenuSub>
+                    <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={pathname === '/user/continuity'}>
+                            <Link href="/user/continuity">Input Rencana</Link>
+                        </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={pathname === '/user/continuity-results'}>
+                            <Link href="/user/continuity-results">Hasil Rencana</Link>
+                        </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                </SidebarMenuSub>
+            </CollapsibleContent>
+        </Collapsible>
       </SidebarMenuItem>
 
       <SidebarMenuItem>
