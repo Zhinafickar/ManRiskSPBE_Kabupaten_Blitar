@@ -24,6 +24,7 @@ import {
   ChevronDown,
   Recycle,
   FileCheck,
+  Database,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -139,6 +140,15 @@ export function MainNav() {
           <Link href="/user/dashboard">
             <LayoutDashboard />
             <span>Dashboard</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive={pathname === '/user/data'} tooltip="Data Referensi">
+          <Link href="/user/data">
+            <Database />
+            <span>Data Referensi</span>
           </Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
