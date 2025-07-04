@@ -129,7 +129,7 @@ export default function RegisterPage({ params, searchParams }: { params: any, se
           <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={180} height={170} />
           <h1 className="text-2xl font-bold mt-4">Create an Account</h1>
           <p className="text-muted-foreground">
-            Fill in the details below to join Manajement Resiko. Use real account to get the verify mail to get Access.
+            Fill in the details below to join the Survey. Use real account to get the verify mail to get Access.
           </p>
         </div>
 

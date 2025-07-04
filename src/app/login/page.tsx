@@ -132,8 +132,8 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center text-center">
         <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={350} height={340} />
-            <h1 className="text-2xl font-bold mt-4">Manajement Resiko</h1>
-            <p className="text-muted-foreground">Sistem ini dirancang untuk membantu instansi pemerintah dalam mengidentifikasi, menganalisis, dan memitigasi berbagai potensi risiko operasional, strategis, dan kepatuhan guna mendukung tata kelola yang efektif dan transparan.</p>
+            <h1 className="text-2xl font-bold mt-4">Manajemen Resiko SPBE</h1>
+            <p className="text-muted-foreground">Proses sistematis yang digunakan untuk mengidentifikasi, menilai, mengendalikan, dan memantau risiko yang dapat mengganggu kelancaran penerapan SPBE di instansi pemerintah.</p>
         </div>
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

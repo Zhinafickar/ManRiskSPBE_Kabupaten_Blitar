@@ -44,8 +44,8 @@ import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 
 const formSchema = z.object({
-  riskEvent: z.string({ required_error: 'Silakan pilih kejadian risiko.' }).min(1, { message: 'Kejadian risiko harus diisi.' }),
-  impactArea: z.string({ required_error: 'Silakan pilih area dampak.' }).min(1, { message: 'Area dampak harus diisi.' }),
+  riskEvent: z.string({ required_error: 'Silakan pilih kategori risiko.' }).min(1, { message: 'Kategori risiko harus diisi.' }),
+  impactArea: z.string({ required_error: 'Silakan pilih risiko.' }).min(1, { message: 'Risiko harus diisi.' }),
   eventDate: z.date({ required_error: 'Waktu kejadian harus diisi.' }),
   cause: z.string().min(10, { message: 'Penyebab harus diisi minimal 10 karakter.' }),
   impact: z.string().min(10, { message: 'Dampak harus diisi minimal 10 karakter.' }),
@@ -135,7 +135,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
     <Card>
       <CardHeader>
         <CardTitle>Input Kejadian Risiko</CardTitle>
-        <CardDescription>Isi formulir penilaian risiko di bawah ini. Pilih kejadian risiko untuk melihat area dampak yang relevan.</CardDescription>
+        <CardDescription>Isi formulir penilaian risiko di bawah ini. Pilih kategori risiko untuk melihat risiko yang relevan.</CardDescription>
       </CardHeader>
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -145,7 +145,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
               name="riskEvent"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Kejadian Risiko (ISO 31000 dan Cobit 5 for risk)</FormLabel>
+                  <FormLabel>Kategori Risiko (ISO 31000 dan Cobit 5 for risk)</FormLabel>
                    <Popover open={riskEventOpen} onOpenChange={setRiskEventOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -156,15 +156,15 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                         >
                           {field.value
                             ? RISK_EVENTS.find(event => event.name === field.value)?.name
-                            : "Pilih kejadian risiko..."}
+                            : "Pilih kategori risiko..."}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
                     <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                       <Command>
-                        <CommandInput placeholder="Cari kejadian risiko..." />
-                        <CommandEmpty>Kejadian risiko tidak ditemukan.</CommandEmpty>
+                        <CommandInput placeholder="Cari kategori risiko..." />
+                        <CommandEmpty>Kategori risiko tidak ditemukan.</CommandEmpty>
                         <CommandList>
                           <CommandGroup>
                             {RISK_EVENTS.map((event) => (
@@ -194,7 +194,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
               name="impactArea"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Area Dampak (ISO 31000 dan Cobit 5 for risk)</FormLabel>
+                  <FormLabel>Risiko (ISO 31000 dan Cobit 5 for risk)</FormLabel>
                   <Popover open={impactAreaOpen} onOpenChange={setImpactAreaOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -211,15 +211,15 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                             ? availableImpactAreas.find(
                                 (area) => area === field.value
                               )
-                            : "Pilih area dampak..."}
+                            : "Pilih risiko..."}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
                     <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                       <Command>
-                        <CommandInput placeholder="Cari area dampak..." />
-                        <CommandEmpty>Area dampak tidak ditemukan.</CommandEmpty>
+                        <CommandInput placeholder="Cari risiko..." />
+                        <CommandEmpty>Risiko tidak ditemukan.</CommandEmpty>
                         <CommandList>
                           <CommandGroup>
                             {availableImpactAreas.map((area) => (
