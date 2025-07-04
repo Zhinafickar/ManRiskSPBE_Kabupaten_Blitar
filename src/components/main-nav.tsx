@@ -24,6 +24,12 @@ import {
   Recycle,
   FileCheck,
   Info,
+  Database,
+  BookOpen,
+  FilePenLine,
+  TableProperties,
+  FilePlus2,
+  ClipboardCheck,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -162,12 +168,18 @@ export function MainNav() {
             <SidebarMenuSub>
               <SidebarMenuSubItem>
                 <SidebarMenuSubButton asChild isActive={pathname === '/user/data'}>
-                  <Link href="/user/data">Data Referensi</Link>
+                  <Link href="/user/data">
+                    <Database />
+                    <span>Data Referensi</span>
+                  </Link>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
               <SidebarMenuSubItem>
                 <SidebarMenuSubButton asChild isActive={pathname === '/user/tutorial'}>
-                  <Link href="/user/tutorial">Tutorial</Link>
+                  <Link href="/user/tutorial">
+                    <BookOpen />
+                    <span>Tutorial</span>
+                  </Link>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
             </SidebarMenuSub>
@@ -191,17 +203,26 @@ export function MainNav() {
             <SidebarMenuSub>
               <SidebarMenuSubItem>
                 <SidebarMenuSubButton asChild isActive={pathname === '/user/survey-1'}>
-                  <Link href="/user/survey-1">Input Form (Single)</Link>
+                  <Link href="/user/survey-1">
+                    <FilePenLine />
+                    <span>Input Form (Single)</span>
+                  </Link>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
               <SidebarMenuSubItem>
                 <SidebarMenuSubButton asChild isActive={pathname === '/user/survey-2'}>
-                  <Link href="/user/survey-2">input Tabel (Multi)</Link>
+                  <Link href="/user/survey-2">
+                    <TableProperties />
+                    <span>input Tabel (Multi)</span>
+                  </Link>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
               <SidebarMenuSubItem>
                 <SidebarMenuSubButton asChild isActive={pathname === '/user/results'}>
-                  <Link href="/user/results">Hasil Survey Anda</Link>
+                  <Link href="/user/results">
+                    <FileText />
+                    <span>Hasil Survey Anda</span>
+                  </Link>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
             </SidebarMenuSub>
@@ -225,12 +246,18 @@ export function MainNav() {
                 <SidebarMenuSub>
                     <SidebarMenuSubItem>
                         <SidebarMenuSubButton asChild isActive={pathname === '/user/continuity'}>
-                            <Link href="/user/continuity">Input Rencana</Link>
+                            <Link href="/user/continuity">
+                                <FilePlus2 />
+                                <span>Input Rencana</span>
+                            </Link>
                         </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                     <SidebarMenuSubItem>
                         <SidebarMenuSubButton asChild isActive={pathname === '/user/continuity-results'}>
-                            <Link href="/user/continuity-results">Hasil Rencana</Link>
+                            <Link href="/user/continuity-results">
+                                <ClipboardCheck />
+                                <span>Hasil Rencana</span>
+                            </Link>
                         </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                 </SidebarMenuSub>
