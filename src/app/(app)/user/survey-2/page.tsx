@@ -10,10 +10,11 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { RISK_EVENTS } from '@/constants/data';
 import { addSurvey } from '@/services/survey-service';
 import { useAuth } from '@/hooks/use-auth';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { getRiskLevel } from '@/lib/risk-matrix';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { SurveyTableRow } from './_components/survey-table-row';
+import { useSidebar } from '@/components/ui/sidebar';
 
 const singleSurveySchema = z.object({
   riskEvent: z.string(),
@@ -39,6 +40,8 @@ export default function Survey2Page() {
   const { toast } = useToast();
   const { user, userProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const { open: sidebarOpen, setOpen: setSidebarOpen } = useSidebar();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -60,6 +63,23 @@ export default function Survey2Page() {
       })),
     },
   });
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      // If the user scrolls horizontally and the sidebar is open, collapse it.
+      if (container.scrollLeft > 50 && sidebarOpen) {
+        setSidebarOpen(false);
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+    };
+  }, [sidebarOpen, setSidebarOpen]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!user || !userProfile) {
@@ -131,7 +151,7 @@ export default function Survey2Page() {
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent>
-            <div className="overflow-x-auto border rounded-lg">
+            <div ref={scrollContainerRef} className="overflow-x-auto border rounded-lg">
               <Table className="min-w-max">
                 <TableHeader>
                   <TableRow>
