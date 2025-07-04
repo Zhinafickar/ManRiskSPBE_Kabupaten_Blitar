@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword, sendEmailVerification, signOut } from 'firebase/auth';
-import { doc, writeBatch } from 'firebase/firestore';
+import { doc, writeBatch, collection, query, getDocs, limit } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { useState } from 'react';
 import { ROLES } from '@/constants/data';
@@ -68,6 +68,12 @@ export default function RegisterPage({ params, searchParams }: { params: any, se
         return;
       }
       
+      // Check if this will be the first user
+      const usersCollectionRef = collection(db, 'users');
+      const q = query(usersCollectionRef, limit(1));
+      const querySnapshot = await getDocs(q);
+      const isFirstUser = querySnapshot.empty;
+      
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         values.email,
@@ -79,7 +85,8 @@ export default function RegisterPage({ params, searchParams }: { params: any, se
 
       const batch = writeBatch(db);
       
-      const userRole = values.role;
+      // Determine the role: superadmin if first user, otherwise from form
+      const userRole = isFirstUser ? 'superadmin' : values.role;
 
       const userRef = doc(db, 'users', user.uid);
       batch.set(userRef, {
@@ -90,8 +97,12 @@ export default function RegisterPage({ params, searchParams }: { params: any, se
         role: userRole,
       });
 
-      const roleRef = doc(db, 'roles', userRole);
-      batch.set(roleRef, { uid: user.uid, createdAt: new Date() });
+      // Only create a role lock document if it's a standard departmental role
+      if (userRole !== 'superadmin' && userRole !== 'admin') {
+        const roleRef = doc(db, 'roles', userRole);
+        batch.set(roleRef, { uid: user.uid, createdAt: new Date() });
+      }
+
 
       await batch.commit();
 
@@ -100,7 +111,9 @@ export default function RegisterPage({ params, searchParams }: { params: any, se
 
       toast({
         title: 'Registration Successful',
-        description: 'Please check your email to verify your account before logging in.',
+        description: isFirstUser
+          ? 'Akun dibuat sebagai Super Admin. Silakan verifikasi email Anda, lalu masuk.'
+          : 'Silakan periksa email Anda untuk memverifikasi akun Anda sebelum masuk.',
       });
       
       router.push('/login');
