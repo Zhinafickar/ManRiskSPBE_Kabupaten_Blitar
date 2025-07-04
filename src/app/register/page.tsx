@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification, signOut } from 'firebase/auth';
 import { doc, writeBatch } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { useState } from 'react';
@@ -94,6 +94,9 @@ export default function RegisterPage({ params, searchParams }: { params: any, se
       batch.set(roleRef, { uid: user.uid, createdAt: new Date() });
 
       await batch.commit();
+
+      // Sign out immediately to force manual login after verification
+      await signOut(auth);
 
       toast({
         title: 'Registration Successful',
