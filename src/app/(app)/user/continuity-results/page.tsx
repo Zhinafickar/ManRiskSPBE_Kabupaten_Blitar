@@ -44,7 +44,7 @@ export default function ContinuityResultsPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Hasil Rencana Kontinuitas</CardTitle>
+        <CardTitle>Rencana Kontinuitas</CardTitle>
         <CardDescription>Berikut adalah semua rencana kontinuitas yang telah Anda kirimkan.</CardDescription>
       </CardHeader>
       <CardContent>

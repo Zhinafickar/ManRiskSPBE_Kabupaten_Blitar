@@ -256,7 +256,7 @@ export function MainNav() {
                         <SidebarMenuSubButton asChild isActive={pathname === '/user/continuity-results'}>
                             <Link href="/user/continuity-results">
                                 <ClipboardCheck />
-                                <span>Hasil Rencana</span>
+                                <span>Rencana Terinput</span>
                             </Link>
                         </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
@@ -269,7 +269,7 @@ export function MainNav() {
         <SidebarMenuButton asChild isActive={pathname === '/user/grafik'} tooltip="Grafik Hasil">
           <Link href="/user/grafik">
             <AreaChart />
-            <span>Grafik Hasil</span>
+            <span>Grafik</span>
           </Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
