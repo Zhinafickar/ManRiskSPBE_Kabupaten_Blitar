@@ -15,7 +15,7 @@ import { useEffect, type ReactNode } from 'react';
 import { MainNav } from '@/components/main-nav';
 import { UserNav } from '@/components/user-nav';
 import { Skeleton } from '@/components/ui/skeleton';
-import Image from 'next/image';
+import { Icons } from '@/components/icons';
 
 function AppLayoutSkeleton() {
   return (
@@ -78,7 +78,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2">
-            <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-2.jpg" alt="Logo" width={90} height={85} />
+            <Icons.logo className="h-8 w-8 text-primary" />
             <h1 className="text-lg font-semibold">Manajement Resiko</h1>
           </div>
         </SidebarHeader>
