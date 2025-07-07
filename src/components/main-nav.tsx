@@ -170,7 +170,7 @@ export function MainNav() {
                 <SidebarMenuSubButton asChild isActive={pathname === '/user/data'}>
                   <Link href="/user/data">
                     <Database />
-                    <span>Data Referensi</span>
+                    <span>Referensi Perhitungan</span>
                   </Link>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
