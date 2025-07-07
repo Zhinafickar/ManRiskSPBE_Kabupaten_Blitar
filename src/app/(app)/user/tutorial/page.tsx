@@ -1,7 +1,6 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { BookOpen, ClipboardList, Recycle, FileCheck, ArrowRight } from "lucide-react";
-import Image from "next/image";
 
 export default function TutorialPage({}: {}) {
   return (
@@ -29,17 +28,7 @@ export default function TutorialPage({}: {}) {
               <ol className="list-decimal list-inside space-y-2">
                 <li>Buka menu navigasi di sebelah kiri, lalu klik pada bagian <strong>Manajement Risiko</strong>.</li>
                 <li>
-                  <div className="my-4 overflow-hidden rounded-lg border shadow-sm">
-                    <Image
-                      src="https://placehold.co/800x300.png"
-                      alt="Menu navigasi untuk input data survei"
-                      width={800}
-                      height={300}
-                      className="w-full object-cover"
-                      data-ai-hint="sidebar navigation menu"
-                    />
-                  </div>
-                  Anda akan melihat dua pilihan untuk menginput data (seperti ditunjukkan pada gambar di atas):
+                  Anda akan melihat dua pilihan untuk menginput data:
                   <ul className="list-disc list-inside pl-6 mt-2 space-y-1">
                     <li><strong>Input Form (Single):</strong> Gunakan ini jika Anda ingin melaporkan satu kejadian risiko secara detail.</li>
                     <li><strong>input Tabel (Multi):</strong> Gunakan ini jika Anda ingin melaporkan beberapa kejadian risiko sekaligus dalam format tabel yang lebih cepat.</li>
