@@ -29,11 +29,6 @@ export default function TutorialPage({}: {}) {
               <ol className="list-decimal list-inside space-y-2">
                 <li>Buka menu navigasi di sebelah kiri, lalu klik pada bagian <strong>Manajement Risiko</strong>.</li>
                 <li>
-                  Anda akan melihat dua pilihan untuk menginput data:
-                  <ul className="list-disc list-inside pl-6 mt-2 space-y-1">
-                    <li><strong>Input Form (Single):</strong> Gunakan ini jika Anda ingin melaporkan satu kejadian risiko secara detail.</li>
-                    <li><strong>input Tabel (Multi):</strong> Gunakan ini jika Anda ingin melaporkan beberapa kejadian risiko sekaligus dalam format tabel yang lebih cepat.</li>
-                  </ul>
                   <div className="my-4 overflow-hidden rounded-lg border shadow-sm">
                     <Image
                       src="https://placehold.co/800x300.png"
@@ -41,9 +36,14 @@ export default function TutorialPage({}: {}) {
                       width={800}
                       height={300}
                       className="w-full object-cover"
-                      data-ai-hint="navigation menu"
+                      data-ai-hint="sidebar navigation menu"
                     />
                   </div>
+                  Anda akan melihat dua pilihan untuk menginput data (seperti ditunjukkan pada gambar di atas):
+                  <ul className="list-disc list-inside pl-6 mt-2 space-y-1">
+                    <li><strong>Input Form (Single):</strong> Gunakan ini jika Anda ingin melaporkan satu kejadian risiko secara detail.</li>
+                    <li><strong>input Tabel (Multi):</strong> Gunakan ini jika Anda ingin melaporkan beberapa kejadian risiko sekaligus dalam format tabel yang lebih cepat.</li>
+                  </ul>
                 </li>
                 <li>Isi semua kolom yang diperlukan. Perhatikan bahwa Tingkat Risiko akan dihitung secara otomatis setelah Anda memilih Frekuensi dan Besaran Dampak.</li>
                 <li>Setelah selesai, klik tombol "Kirim Survei" atau "Kirim Semua".</li>
