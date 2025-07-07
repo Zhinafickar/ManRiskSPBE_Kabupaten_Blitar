@@ -30,6 +30,7 @@ import {
   TableProperties,
   FilePlus2,
   ClipboardCheck,
+  Printer,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -275,10 +276,10 @@ export function MainNav() {
       </SidebarMenuItem>
 
       <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={pathname === '/user/conclusion'} tooltip="Conclusion/Kesimpulan">
+        <SidebarMenuButton asChild isActive={pathname === '/user/conclusion'} tooltip="Laporan Akhir">
           <Link href="/user/conclusion">
-            <FileCheck />
-            <span>Conclusion/Kesimpulan</span>
+            <Printer />
+            <span>Laporan Akhir</span>
           </Link>
         </SidebarMenuButton>
       </SidebarMenuItem>

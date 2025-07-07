@@ -6,23 +6,25 @@ import { getUserSurveys } from '@/services/survey-service';
 import { getUserContinuityPlans } from '@/services/continuity-service';
 import type { Survey } from '@/types/survey';
 import type { ContinuityPlan } from '@/types/continuity';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, type ChartConfig } from "@/components/ui/chart";
-import { PieChart, Pie, Cell } from 'recharts';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { AlertTriangle, CheckCircle2, FileCheck, Info, ShieldAlert } from 'lucide-react';
+import { Printer } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
+// --- Chart Configs ---
 const riskLevelColors = {
-  Bahaya: 'hsl(var(--destructive))', // Red
-  Sedang: 'hsl(var(--chart-4))',      // Yellow/Orange
-  Rendah: 'hsl(var(--chart-2))',      // Teal/Green
-  Minor: 'hsl(var(--chart-1))',       // Blue/Primary
+  Bahaya: 'hsl(var(--destructive))',
+  Sedang: 'hsl(48, 100%, 60%)',
+  Rendah: 'hsl(var(--chart-2))',
+  Minor: 'hsl(var(--chart-1))',
 };
 
-const chartConfig = {
+const pieChartConfig = {
   count: { label: 'Jumlah' },
   Bahaya: { label: 'Bahaya', color: riskLevelColors.Bahaya },
   Sedang: { label: 'Sedang', color: riskLevelColors.Sedang },
@@ -30,12 +32,11 @@ const chartConfig = {
   Minor: { label: 'Minor', color: riskLevelColors.Minor },
 } satisfies ChartConfig;
 
-type ChartData = {
-  name: keyof typeof riskLevelColors;
-  value: number;
-  fill: string;
-}[];
+const barChartConfig = {
+  jumlah: { label: "Jumlah Risiko", color: "hsl(var(--chart-1))" },
+} satisfies ChartConfig;
 
+// --- Helper Components ---
 function RiskIndicatorBadge({ level }: { level?: string }) {
     if (!level) return <Badge variant="outline">N/A</Badge>;
     let colorClass = 'bg-gray-400 text-white hover:bg-gray-500';
@@ -48,20 +49,23 @@ function RiskIndicatorBadge({ level }: { level?: string }) {
     return <Badge className={cn(colorClass)}>{level}</Badge>;
 }
 
-function ConclusionSkeleton() {
+function ReportSkeleton() {
     return (
         <div className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2">
-                <Skeleton className="h-48 w-full" />
-                <Skeleton className="h-48 w-full" />
+            <div className="flex justify-between items-center">
+                <Skeleton className="h-8 w-64" />
+                <Skeleton className="h-10 w-32" />
             </div>
-            <Skeleton className="h-96 w-full" />
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-64 w-full" />
+            <Skeleton className="h-64 w-full" />
         </div>
     )
 }
 
-export default function ConclusionPage() {
-    const { user } = useAuth();
+// --- Main Component ---
+export default function ReportPage() {
+    const { user, userProfile } = useAuth();
     const [surveys, setSurveys] = useState<Survey[]>([]);
     const [plans, setPlans] = useState<ContinuityPlan[]>([]);
     const [loading, setLoading] = useState(true);
@@ -80,18 +84,36 @@ export default function ConclusionPage() {
         }
     }, [user]);
 
-    const { chartData, totalSurveys, topRisks, riskPlanMap } = useMemo(() => {
-        const riskCounts: { [key: string]: number } = { Bahaya: 0, Sedang: 0, Rendah: 0, Minor: 0 };
-        let validSurveys = 0;
-        
-        surveys.forEach(survey => {
-            if (survey.riskLevel && survey.riskLevel in riskCounts) {
-                riskCounts[survey.riskLevel]++;
-                validSurveys++;
-            }
-        });
+    const reportData = useMemo(() => {
+        if (!surveys || surveys.length === 0) return null;
 
-        const dataForChart = Object.entries(riskCounts)
+        // Uraian 1 Data
+        const impactAreaCounts = surveys.reduce((acc, survey) => {
+            if (survey.areaDampak) {
+                acc[survey.areaDampak] = (acc[survey.areaDampak] || 0) + 1;
+            }
+            return acc;
+        }, {} as Record<string, number>);
+        const tikCount = impactAreaCounts['Operasional dan Aset TIK'] || 0;
+        const sdmCount = impactAreaCounts['Sumber Daya Manusia'] || 0;
+        const totalImpactAreas = surveys.filter(s => s.areaDampak).length;
+        const isTikSdmDominant = totalImpactAreas > 0 && (tikCount + sdmCount) / totalImpactAreas > 0.5;
+        const uraian1 = isTikSdmDominant ? "Mayoritas area dampak terdapat pada Teknologi Informasi dan SDM, maka departemen TIK dan HRD diprioritaskan dalam mitigasi awal." : "Distribusi area dampak beragam, mitigasi perlu mempertimbangkan berbagai area secara seimbang.";
+
+        // Uraian 2 Data
+        const riskLevelCounts = surveys.reduce((acc, survey) => {
+             if (survey.riskLevel) {
+                acc[survey.riskLevel] = (acc[survey.riskLevel] || 0) + 1;
+            }
+            return acc;
+        }, {} as Record<string, number>);
+        const highMediumCount = (riskLevelCounts['Bahaya'] || 0) + (riskLevelCounts['Sedang'] || 0);
+        const lowMinorCount = (riskLevelCounts['Rendah'] || 0) + (riskLevelCounts['Minor'] || 0);
+        const isHighMediumDominant = highMediumCount > lowMinorCount;
+        const uraian2 = isHighMediumDominant ? "Risiko dengan kategori 'Bahaya' dan 'Sedang' mendominasi, maka risiko-risiko tersebut menjadi prioritas mitigasi awal." : "Risiko didominasi oleh kategori 'Rendah' dan 'Minor', namun tetap memerlukan pemantauan berkelanjutan.";
+
+        // Pie Chart Data
+        const pieChartData = Object.entries(riskLevelCounts)
             .filter(([, value]) => value > 0)
             .map(([name, value]) => ({
                 name: name as keyof typeof riskLevelColors,
@@ -99,44 +121,69 @@ export default function ConclusionPage() {
                 fill: riskLevelColors[name as keyof typeof riskLevelColors],
             }));
         
-        const riskPriorityOrder = { 'Bahaya': 1, 'Sedang': 2, 'Rendah': 3, 'Minor': 4 };
-        const sortedTopRisks = surveys
-            .filter(s => s.riskLevel === 'Bahaya' || s.riskLevel === 'Sedang')
-            .sort((a, b) => riskPriorityOrder[a.riskLevel as keyof typeof riskPriorityOrder] - riskPriorityOrder[b.riskLevel as keyof typeof riskPriorityOrder]);
+        // Bar Chart & Uraian 3 Data
+        const riskCategoryCounts = surveys.reduce((acc, survey) => {
+            acc[survey.riskEvent] = (acc[survey.riskEvent] || 0) + 1;
+            return acc;
+        }, {} as Record<string, number>);
+        const barChartData = Object.entries(riskCategoryCounts).map(([name, jumlah]) => ({ name, jumlah }));
+        
+        const highRiskByCategory = surveys.reduce((acc, survey) => {
+            if (survey.riskLevel === 'Bahaya') {
+                acc[survey.riskEvent] = (acc[survey.riskEvent] || 0) + 1;
+            }
+            return acc;
+        }, {} as Record<string, number>);
+        const dominantHighRiskCategory = Object.keys(highRiskByCategory).length > 0 ? Object.entries(highRiskByCategory).reduce((a, b) => a[1] > b[1] ? a : b)[0] : null;
+        const uraian3 = dominantHighRiskCategory ? `Dominasi risiko berada pada kategori '${dominantHighRiskCategory}' dengan tingkat 'Bahaya', maka prioritas harus pada penguatan sistem keamanan informasi di area terkait.` : "Tidak ada dominasi risiko 'Bahaya' pada kategori tertentu, namun kewaspadaan menyeluruh tetap diperlukan.";
 
-        const planMap = new Map<string, ContinuityPlan>();
-        plans.forEach(plan => {
-            planMap.set(plan.risiko, plan);
-        });
+        // Uraian 4 Data
+        const weakControls = surveys.filter(s => (s.kontrolTeknologi?.length || 0) < 1 || (s.kontrolOrang?.length || 0) < 1).length;
+        const isControlWeak = surveys.length > 0 && (weakControls / surveys.length) > 0.5;
+        const uraian4 = isControlWeak ? "Banyak kontrol yang masih lemah terutama di sisi teknologi dan orang, maka disarankan peningkatan pelatihan dan pembaruan sistem keamanan." : "Kontrol yang ada secara umum sudah cukup memadai, namun peninjauan berkala tetap direkomendasikan.";
+
+        // Uraian 5 Data
+        const planMap = new Map<string, ContinuityPlan>(plans.map(p => [p.risiko, p]));
+        const highPrioRisks = surveys.filter(s => s.riskLevel === 'Bahaya' || s.riskLevel === 'Sedang');
+        const allHighPrioHavePlans = highPrioRisks.length > 0 && highPrioRisks.every(risk => planMap.has(`${risk.riskEvent} - ${risk.impactArea}`));
+        const uraian5 = highPrioRisks.length > 0 && allHighPrioHavePlans ? "Seluruh strategi keberlanjutan untuk risiko prioritas telah diisi dan diterapkan, maka organisasi dinyatakan siap menghadapi risiko SPBE secara berkelanjutan." : "Beberapa risiko prioritas belum memiliki strategi keberlanjutan. Disarankan untuk segera melengkapi rencana kontinuitas untuk memastikan kesiapan organisasi.";
+
 
         return {
-            chartData: dataForChart,
-            totalSurveys: validSurveys,
-            topRisks: sortedTopRisks,
-            riskPlanMap: planMap
+            uraian1,
+            uraian2,
+            uraian3,
+            uraian4,
+            uraian5,
+            pieChartData,
+            barChartData,
+            totalSurveys: surveys.length,
+            highPrioRisks,
+            planMap,
         };
     }, [surveys, plans]);
 
+    const handlePrint = () => {
+        window.print();
+    };
+
     if (loading) {
-        return <ConclusionSkeleton />;
+        return <ReportSkeleton />;
     }
     
-    if (surveys.length === 0) {
+    if (!userProfile || !reportData) {
         return (
             <Card>
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <FileCheck className="h-6 w-6" />
-                        Conclusion/Kesimpulan
-                    </CardTitle>
+                    <CardTitle>Laporan Akhir Analisis Risiko</CardTitle>
                     <CardDescription>
-                        Summary and conclusions from your risk assessments.
+                        Generate laporan akhir hasil analisis risiko SPBE.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="flex items-center justify-center h-64 border-2 border-dashed rounded-lg">
                         <p className="text-muted-foreground text-center">
-                            Anda belum mengirimkan survei risiko apa pun. <br/> Halaman ini akan menampilkan rangkuman setelah Anda memasukkan data.
+                            Anda belum mengirimkan survei risiko apa pun. <br/> Laporan akan tersedia setelah Anda memasukkan data.
                         </p>
                     </div>
                 </CardContent>
@@ -144,137 +191,193 @@ export default function ConclusionPage() {
         );
     }
 
-    return (
-        <div className="space-y-6">
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <FileCheck className="h-6 w-6" />
-                        Conclusion/Kesimpulan
-                    </CardTitle>
-                    <CardDescription>
-                       Ringkasan dan kesimpulan dari semua data penilaian risiko dan rencana kontinuitas yang telah Anda kirimkan.
-                    </CardDescription>
-                </CardHeader>
-            </Card>
+    const { uraian1, uraian2, uraian3, uraian4, uraian5, pieChartData, barChartData, totalSurveys, highPrioRisks, planMap } = reportData;
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-1 space-y-6">
-                     <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Info className="h-5 w-5" />
-                                Ringkasan Umum
-                            </CardTitle>
-                            <CardDescription>Jumlah total data yang telah Anda kirimkan.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4 text-center">
-                            <div className="flex justify-around">
-                                <div>
-                                    <p className="text-4xl font-bold">{surveys.length}</p>
-                                    <p className="text-sm text-muted-foreground">Survei Risiko</p>
-                                </div>
-                                <div>
-                                    <p className="text-4xl font-bold">{plans.length}</p>
-                                    <p className="text-sm text-muted-foreground">Rencana Kontinuitas</p>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <ShieldAlert className="h-5 w-5" />
-                                Distribusi Tingkat Risiko
-                            </CardTitle>
-                            <CardDescription>Visualisasi persentase tingkat risiko dari total survei.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            {chartData.length > 0 ? (
-                                <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[200px]">
-                                    <PieChart>
-                                    <ChartTooltip
-                                        cursor={false}
-                                        content={
-                                            <ChartTooltipContent
-                                                formatter={(value) => `${value} (${((value / totalSurveys) * 100).toFixed(0)}%)`}
-                                                hideLabel
-                                            />
-                                        }
-                                    />
-                                    <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={40} outerRadius={60}>
-                                        {chartData.map((entry) => (
-                                        <Cell key={`cell-${entry.name}`} fill={entry.fill} />
-                                        ))}
-                                    </Pie>
-                                    <ChartLegend content={<ChartLegendContent nameKey="name" />} className="text-xs -mt-2" />
-                                </PieChart>
-                                </ChartContainer>
-                            ) : (
-                                <div className="flex items-center justify-center h-[200px]">
-                                    <p className="text-muted-foreground">Tidak ada data untuk ditampilkan.</p>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                </div>
-                
-                <div className="lg:col-span-2">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <AlertTriangle className="h-5 w-5" />
-                                Risiko Prioritas (Bahaya & Sedang)
-                            </CardTitle>
-                            <CardDescription>Daftar risiko dengan tingkat tertinggi yang memerlukan perhatian dan rencana mitigasi.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            {topRisks.length > 0 ? (
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Tingkat Risiko</TableHead>
-                                            <TableHead>Risiko</TableHead>
-                                            <TableHead>Area Dampak</TableHead>
-                                            <TableHead className="text-center">Status Rencana Kontinuitas</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {topRisks.map((risk) => {
-                                            const riskIdentifier = `${risk.riskEvent} - ${risk.impactArea}`;
-                                            const hasPlan = riskPlanMap.has(riskIdentifier);
-                                            return (
-                                                <TableRow key={risk.id}>
-                                                    <TableCell><RiskIndicatorBadge level={risk.riskLevel} /></TableCell>
-                                                    <TableCell className="font-medium max-w-sm truncate">{risk.riskEvent}</TableCell>
-                                                    <TableCell className="max-w-sm truncate">{risk.impactArea}</TableCell>
-                                                    <TableCell className="text-center">
-                                                        {hasPlan ? (
-                                                            <Badge variant="secondary" className="text-green-700 border-green-300">
-                                                                <CheckCircle2 className="mr-2 h-4 w-4"/> Ada
-                                                            </Badge>
-                                                        ) : (
-                                                            <Badge variant="destructive">
-                                                                <AlertTriangle className="mr-2 h-4 w-4"/> Belum Ada
-                                                            </Badge>
-                                                        )}
-                                                    </TableCell>
-                                                </TableRow>
-                                            );
-                                        })}
-                                    </TableBody>
-                                </Table>
-                            ) : (
-                                <div className="text-center py-10">
-                                    <p className="text-muted-foreground">
-                                        Selamat! Tidak ada risiko dengan tingkat 'Bahaya' atau 'Sedang' yang teridentifikasi.
-                                    </p>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                </div>
-            </div>
-        </div>
+    return (
+      <div className="space-y-6">
+          <style jsx global>{`
+            @media print {
+              body * {
+                visibility: hidden;
+              }
+              .printable-area, .printable-area * {
+                visibility: visible;
+              }
+              .printable-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 1rem;
+                margin: 0;
+              }
+              .no-print {
+                display: none;
+              }
+               .card-print {
+                border: 1px solid #e5e7eb;
+                break-inside: avoid;
+              }
+            }
+          `}</style>
+          
+          <div className="flex justify-between items-center no-print">
+              <h1 className="text-3xl font-bold">Laporan Akhir</h1>
+              <Button onClick={handlePrint}>
+                  <Printer className="mr-2 h-4 w-4" />
+                  Cetak Laporan
+              </Button>
+          </div>
+
+          <div className="printable-area space-y-8">
+              <div className="text-center space-y-2 mb-8">
+                <h1 className="text-2xl font-bold">Laporan Akhir Hasil Analisis Risiko SPBE</h1>
+                <p className="text-muted-foreground">{userProfile.role}</p>
+              </div>
+              
+              {/* Biografi Pengguna */}
+              <Card className="card-print">
+                  <CardHeader><CardTitle>Biografi Pengguna</CardTitle></CardHeader>
+                  <CardContent>
+                      <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-sm">
+                          <div><span className="font-semibold block text-muted-foreground">Nama:</span> {userProfile.fullName}</div>
+                          <div><span className="font-semibold block text-muted-foreground">Jabatan/Departemen:</span> {userProfile.role}</div>
+                          <div><span className="font-semibold block text-muted-foreground">Tanggal Laporan:</span> {new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                          <div><span className="font-semibold block text-muted-foreground">Email:</span> {userProfile.email}</div>
+                      </div>
+                  </CardContent>
+              </Card>
+
+              {/* Tabel 1 */}
+              <Card className="card-print">
+                  <CardHeader>
+                      <CardTitle>Tabel 1: Klasifikasi Risiko dan Area Terdampak</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                      <Table>
+                          <TableHeader><TableRow><TableHead>Kategori Risiko</TableHead><TableHead>Risiko</TableHead><TableHead>Area Dampak</TableHead></TableRow></TableHeader>
+                          <TableBody>
+                              {surveys.map(s => (
+                                  <TableRow key={s.id}><TableCell>{s.riskEvent}</TableCell><TableCell>{s.impactArea}</TableCell><TableCell>{s.areaDampak}</TableCell></TableRow>
+                              ))}
+                          </TableBody>
+                      </Table>
+                  </CardContent>
+                  <CardFooter><p className="text-sm text-muted-foreground italic">{uraian1}</p></CardFooter>
+              </Card>
+
+              {/* Tabel 2 */}
+              <Card className="card-print">
+                  <CardHeader>
+                      <CardTitle>Tabel 2: Analisis Kuantitatif Risiko</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                       <Table>
+                          <TableHeader><TableRow><TableHead>Kategori Risiko</TableHead><TableHead>Risiko</TableHead><TableHead>Frekuensi</TableHead><TableHead>Besaran Dampak</TableHead><TableHead>Tingkat Risiko</TableHead></TableRow></TableHeader>
+                          <TableBody>
+                              {surveys.map(s => (
+                                  <TableRow key={s.id}>
+                                      <TableCell>{s.riskEvent}</TableCell>
+                                      <TableCell>{s.impactArea}</TableCell>
+                                      <TableCell>{s.frequency}</TableCell>
+                                      <TableCell>{s.impactMagnitude}</TableCell>
+                                      <TableCell><RiskIndicatorBadge level={s.riskLevel} /></TableCell>
+                                  </TableRow>
+                              ))}
+                          </TableBody>
+                      </Table>
+                  </CardContent>
+                   <CardFooter><p className="text-sm text-muted-foreground italic">{uraian2}</p></CardFooter>
+              </Card>
+
+              {/* Grafik */}
+              <Card className="card-print">
+                  <CardHeader>
+                      <CardTitle>Grafik Analisis Risiko</CardTitle>
+                  </CardHeader>
+                  <CardContent className="grid md:grid-cols-2 gap-8 items-center">
+                      <div>
+                          <h3 className="font-semibold text-center mb-2">Distribusi Tingkat Risiko</h3>
+                          <ChartContainer config={pieChartConfig} className="mx-auto aspect-square max-h-[250px]">
+                              <PieChart>
+                                  <ChartTooltip content={<ChartTooltipContent formatter={(value) => `${value} (${((Number(value) / totalSurveys) * 100).toFixed(0)}%)`} hideLabel />} />
+                                  <Pie data={pieChartData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={40} outerRadius={80} label>
+                                      {pieChartData.map((entry) => (<Cell key={`cell-${entry.name}`} fill={entry.fill} />))}
+                                  </Pie>
+                                  <ChartLegend content={<ChartLegendContent nameKey="name" />} />
+                              </PieChart>
+                          </ChartContainer>
+                      </div>
+                      <div>
+                          <h3 className="font-semibold text-center mb-2">Jumlah Risiko per Kategori</h3>
+                           <ChartContainer config={barChartConfig} className="h-[250px] w-full">
+                                <BarChart data={barChartData} layout="vertical" margin={{ left: 120 }}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis type="number" />
+                                    <YAxis dataKey="name" type="category" width={120} tick={{ fontSize: 10, width: 110 }} interval={0} />
+                                    <ChartTooltip cursor={{fill: 'hsl(var(--muted))'}} content={<ChartTooltipContent hideLabel />} />
+                                    <Bar dataKey="jumlah" fill="var(--color-jumlah)" radius={4} />
+                                </BarChart>
+                            </ChartContainer>
+                      </div>
+                  </CardContent>
+                  <CardFooter><p className="text-sm text-muted-foreground italic">{uraian3}</p></CardFooter>
+              </Card>
+
+              {/* Tabel 3 */}
+               <Card className="card-print">
+                  <CardHeader>
+                      <CardTitle>Tabel 3: Evaluasi Kontrol dan Mitigasi</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                      <Table>
+                          <TableHeader><TableRow><TableHead>Risiko</TableHead><TableHead>Kontrol Organisasi</TableHead><TableHead>Kontrol Orang</TableHead><TableHead>Kontrol Fisik</TableHead><TableHead>Kontrol Teknologi</TableHead><TableHead>Mitigasi</TableHead></TableRow></TableHeader>
+                          <TableBody>
+                              {surveys.map(s => (
+                                  <TableRow key={s.id}>
+                                      <TableCell className="max-w-xs truncate">{s.riskEvent} - {s.impactArea}</TableCell>
+                                      <TableCell>{s.kontrolOrganisasi?.length || 0} Terpilih</TableCell>
+                                      <TableCell>{s.kontrolOrang?.length || 0} Terpilih</TableCell>
+                                      <TableCell>{s.kontrolFisik?.length || 0} Terpilih</TableCell>
+                                      <TableCell>{s.kontrolTeknologi?.length || 0} Terpilih</TableCell>
+                                      <TableCell>{s.mitigasi}</TableCell>
+                                  </TableRow>
+                              ))}
+                          </TableBody>
+                      </Table>
+                  </CardContent>
+                  <CardFooter><p className="text-sm text-muted-foreground italic">{uraian4}</p></CardFooter>
+              </Card>
+
+              {/* Tabel 4 */}
+              <Card className="card-print">
+                  <CardHeader>
+                      <CardTitle>Tabel 4: Tabel Keberlanjutan</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                       <Table>
+                          <TableHeader><TableRow><TableHead>Risiko Prioritas</TableHead><TableHead>Strategi Keberlanjutan</TableHead><TableHead>Status Implementasi</TableHead></TableRow></TableHeader>
+                          <TableBody>
+                              {highPrioRisks.map(risk => {
+                                  const riskIdentifier = `${risk.riskEvent} - ${risk.impactArea}`;
+                                  const plan = planMap.get(riskIdentifier);
+                                  return (
+                                    <TableRow key={risk.id}>
+                                      <TableCell>{riskIdentifier}</TableCell>
+                                      <TableCell>{plan?.aktivitas || "Belum Dibuat"}</TableCell>
+                                      <TableCell>
+                                          {plan ? <Badge variant="secondary" className="text-green-700 border-green-300">Telah Dibuat</Badge> : <Badge variant="destructive">Belum Ada</Badge>}
+                                      </TableCell>
+                                    </TableRow>
+                                  );
+                              })}
+                          </TableBody>
+                      </Table>
+                      {highPrioRisks.length === 0 && <p className="text-center text-muted-foreground py-4">Tidak ada risiko prioritas (Bahaya/Sedang) yang teridentifikasi.</p>}
+                  </CardContent>
+                  <CardFooter><p className="text-sm text-muted-foreground italic">{uraian5}</p></CardFooter>
+              </Card>
+          </div>
+      </div>
     );
 }
