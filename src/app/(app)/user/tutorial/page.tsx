@@ -1,6 +1,7 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { BookOpen, ClipboardList, Recycle, FileCheck, ArrowRight } from "lucide-react";
+import Image from "next/image";
 
 export default function TutorialPage({}: {}) {
   return (
@@ -33,6 +34,16 @@ export default function TutorialPage({}: {}) {
                     <li><strong>Input Form (Single):</strong> Gunakan ini jika Anda ingin melaporkan satu kejadian risiko secara detail.</li>
                     <li><strong>input Tabel (Multi):</strong> Gunakan ini jika Anda ingin melaporkan beberapa kejadian risiko sekaligus dalam format tabel yang lebih cepat.</li>
                   </ul>
+                  <div className="my-4 overflow-hidden rounded-lg border shadow-sm">
+                    <Image
+                      src="https://placehold.co/800x300.png"
+                      alt="Menu navigasi untuk input data survei"
+                      width={800}
+                      height={300}
+                      className="w-full object-cover"
+                      data-ai-hint="navigation menu"
+                    />
+                  </div>
                 </li>
                 <li>Isi semua kolom yang diperlukan. Perhatikan bahwa Tingkat Risiko akan dihitung secara otomatis setelah Anda memilih Frekuensi dan Besaran Dampak.</li>
                 <li>Setelah selesai, klik tombol "Kirim Survei" atau "Kirim Semua".</li>
