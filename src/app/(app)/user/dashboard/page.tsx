@@ -223,7 +223,7 @@ export default function UserDashboard() {
           Selamat Datang, {userProfile?.fullName}!
         </h1>
         <p className="text-muted-foreground">
-          Dasbor ini memberikan ringkasan cepat tentang profil dan aktivitas Anda.
+          Dasboard ini memberikan ringkasan tentang profil dan aktivitas Anda.
         </p>
       </div>
 

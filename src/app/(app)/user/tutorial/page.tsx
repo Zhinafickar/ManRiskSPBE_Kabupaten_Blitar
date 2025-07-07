@@ -8,10 +8,10 @@ export default function TutorialPage({}: {}) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <BookOpen className="h-6 w-6" />
-          Tutorial Penggunaan Aplikasi
+          Tutorial Penggunaan Web
         </CardTitle>
         <CardDescription>
-          Panduan langkah demi langkah untuk menggunakan aplikasi Manajemen Risiko SPBE.
+          Panduan langkah demi langkah untuk menggunakan web Manajemen Risiko SPBE.
         </CardDescription>
       </CardHeader>
       <CardContent>
