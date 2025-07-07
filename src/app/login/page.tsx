@@ -20,7 +20,7 @@ import { auth, isFirebaseConfigured } from '@/lib/firebase';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Icons } from '@/components/icons';
+import Image from 'next/image';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
@@ -131,7 +131,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center text-center">
-            <Icons.logo className="h-24 w-24 text-primary" />
+            <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={96} height={96} />
             <h1 className="text-2xl font-bold mt-4">Manajemen Resiko SPBE</h1>
             <p className="text-muted-foreground">Proses sistematis yang digunakan untuk mengidentifikasi, menilai, mengendalikan, dan memantau risiko yang dapat mengganggu kelancaran penerapan SPBE di instansi pemerintah.</p>
         </div>

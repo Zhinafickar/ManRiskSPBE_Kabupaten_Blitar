@@ -24,7 +24,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
-import { Icons } from '@/components/icons';
+import Image from 'next/image';
 
 const formSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
@@ -131,7 +131,7 @@ export default function RegisterPage({ params, searchParams }: { params: any, se
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center text-center">
-          <Icons.logo className="h-20 w-20 text-primary" />
+          <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={80} height={80} />
           <h1 className="text-2xl font-bold mt-4">Create an Account</h1>
           <p className="text-muted-foreground">
             Fill in the details below to join the Survey. Use real account to get the verify mail to get Access.
