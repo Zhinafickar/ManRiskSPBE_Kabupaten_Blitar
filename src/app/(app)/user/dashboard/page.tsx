@@ -13,7 +13,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { User, Activity, HelpCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { Survey } from '@/types/survey';
+import type { ContinuityPlan } from '@/types/continuity';
 import { getUserSurveys } from '@/services/survey-service';
+import { getUserContinuityPlans } from '@/services/continuity-service';
 import { cn } from '@/lib/utils';
 
 // User Info Card Component
@@ -71,13 +73,18 @@ function UserInfoCard() {
 function RiskSummaryCard() {
   const { user } = useAuth();
   const [surveys, setSurveys] = useState<Survey[]>([]);
+  const [plans, setPlans] = useState<ContinuityPlan[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
-      getUserSurveys(user.uid)
-        .then(setSurveys)
-        .finally(() => setLoading(false));
+        Promise.all([
+            getUserSurveys(user.uid),
+            getUserContinuityPlans(user.uid)
+        ]).then(([userSurveys, userPlans]) => {
+            setSurveys(userSurveys);
+            setPlans(userPlans);
+        }).finally(() => setLoading(false));
     } else {
         setLoading(false);
     }
@@ -88,7 +95,7 @@ function RiskSummaryCard() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Activity className="h-6 w-6" /> Ringkasan Risiko
+            <Activity className="h-6 w-6" /> Ringkasan Aktivitas
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -141,14 +148,20 @@ function RiskSummaryCard() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Activity className="h-6 w-6" /> Ringkasan Risiko
+          <Activity className="h-6 w-6" /> Ringkasan Aktivitas
         </CardTitle>
-        <CardDescription>Jumlah risiko yang telah Anda laporkan berdasarkan tingkatannya.</CardDescription>
+        <CardDescription>Jumlah data yang telah Anda laporkan dan tingkat risikonya.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="text-center">
-            <p className="text-sm text-muted-foreground">Total Survei Dilaporkan</p>
-            <p className="text-4xl font-bold">{surveys.length}</p>
+        <div className="flex justify-around text-center">
+            <div>
+                <p className="text-sm text-muted-foreground">Total Survei</p>
+                <p className="text-4xl font-bold">{surveys.length}</p>
+            </div>
+            <div>
+                <p className="text-sm text-muted-foreground">Total Kontinuitas</p>
+                <p className="text-4xl font-bold">{plans.length}</p>
+            </div>
         </div>
         {surveys.length > 0 ? (
             <div className="space-y-2 rounded-lg border p-4">
