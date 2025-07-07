@@ -16,7 +16,7 @@ import { Recycle } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from '@/hooks/use-toast';
-import { addContinuityPlan } from '@/services/continuity-service';
+import { addContinuityPlan, getUserContinuityPlans } from '@/services/continuity-service';
 import { useAuth } from '@/hooks/use-auth';
 import { useEffect, useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -40,6 +40,7 @@ export default function ContinuityPage({}: {}) {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [availableRisks, setAvailableRisks] = useState<string[]>([]);
+  const [hasSurveys, setHasSurveys] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -56,14 +57,24 @@ export default function ContinuityPage({}: {}) {
 
   useEffect(() => {
     if (user) {
-      getUserSurveys(user.uid).then(surveys => {
+      Promise.all([
+        getUserSurveys(user.uid),
+        getUserContinuityPlans(user.uid)
+      ]).then(([surveys, plans]) => {
+        setHasSurveys(surveys.length > 0);
+
         const uniqueRisks = new Set<string>();
         surveys.forEach(survey => {
           if (survey.riskEvent && survey.impactArea) {
             uniqueRisks.add(`${survey.riskEvent} - ${survey.impactArea}`);
           }
         });
-        setAvailableRisks(Array.from(uniqueRisks));
+
+        const submittedRisks = new Set<string>(plans.map(plan => plan.risiko));
+
+        const unsubmittedRisks = Array.from(uniqueRisks).filter(risk => !submittedRisks.has(risk));
+        
+        setAvailableRisks(unsubmittedRisks);
       });
     }
   }, [user]);
@@ -77,6 +88,8 @@ export default function ContinuityPage({}: {}) {
     try {
         await addContinuityPlan({ ...values, userId: user.uid });
         toast({ title: 'Sukses', description: 'Rencana kontinuitas berhasil disimpan.' });
+        // Refresh the list of available risks after submission
+        setAvailableRisks(availableRisks.filter(risk => risk !== values.risiko));
         form.reset();
     } catch (error) {
         toast({ variant: 'destructive', title: 'Error', description: 'Gagal menyimpan rencana.' });
@@ -119,7 +132,10 @@ export default function ContinuityPage({}: {}) {
                             ))
                           ) : (
                             <SelectItem value="no-risks" disabled>
-                              Tidak ada risiko yang ditemukan dari survei Anda.
+                              {hasSurveys
+                                ? "Semua risiko yang teridentifikasi sudah memiliki rencana."
+                                : "Tidak ada risiko yang ditemukan dari survei Anda."
+                              }
                             </SelectItem>
                           )}
                         </SelectContent>

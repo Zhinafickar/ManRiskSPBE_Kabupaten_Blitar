@@ -131,7 +131,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center text-center">
-            <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={96} height={96} />
+            <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={288} height={288} />
             <h1 className="text-2xl font-bold mt-4">Manajemen Resiko SPBE</h1>
             <p className="text-muted-foreground">Proses sistematis yang digunakan untuk mengidentifikasi, menilai, mengendalikan, dan memantau risiko yang dapat mengganggu kelancaran penerapan SPBE di instansi pemerintah.</p>
         </div>
