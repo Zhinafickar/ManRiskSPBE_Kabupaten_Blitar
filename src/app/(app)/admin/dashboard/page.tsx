@@ -72,7 +72,7 @@ export default function AdminDashboard() {
             <CardTitle>Data Visualization</CardTitle>
             <CardDescription>
               Explore graphical representations of the survey data for better insights.
-            </Description>
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Button asChild>
