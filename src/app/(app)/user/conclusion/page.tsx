@@ -251,7 +251,7 @@ export default function ReportPage() {
               {/* Tabel 1 */}
               <Card className="card-print">
                   <CardHeader>
-                      <CardTitle>Tabel 1: Klasifikasi Risiko dan Area Terdampak</CardTitle>
+                      <CardTitle>Klasifikasi Risiko dan Area Terdampak</CardTitle>
                   </CardHeader>
                   <CardContent>
                       <Table>
@@ -269,7 +269,7 @@ export default function ReportPage() {
               {/* Tabel 2 */}
               <Card className="card-print">
                   <CardHeader>
-                      <CardTitle>Tabel 2: Analisis Kuantitatif Risiko</CardTitle>
+                      <CardTitle>Analisis Kuantitatif Risiko</CardTitle>
                   </CardHeader>
                   <CardContent>
                        <Table>
@@ -327,7 +327,7 @@ export default function ReportPage() {
               {/* Tabel 3 */}
                <Card className="card-print">
                   <CardHeader>
-                      <CardTitle>Tabel 3: Evaluasi Kontrol dan Mitigasi</CardTitle>
+                      <CardTitle>Evaluasi Kontrol dan Mitigasi</CardTitle>
                   </CardHeader>
                   <CardContent>
                       <Table>
@@ -352,7 +352,7 @@ export default function ReportPage() {
               {/* Tabel 4 */}
               <Card className="card-print">
                   <CardHeader>
-                      <CardTitle>Tabel 4: Tabel Keberlanjutan</CardTitle>
+                      <CardTitle>Keberlanjutan</CardTitle>
                   </CardHeader>
                   <CardContent>
                        <Table>
