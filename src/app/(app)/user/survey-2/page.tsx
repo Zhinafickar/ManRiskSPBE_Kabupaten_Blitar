@@ -154,22 +154,22 @@ export default function Survey2Page() {
             <div ref={scrollContainerRef} className="overflow-x-auto border rounded-lg">
               <Table className="min-w-max">
                 <TableHeader>
-                  <TableRow className="border-b-primary/20 bg-primary/10 hover:bg-primary/10">
-                    <TableHead className="w-[300px] font-bold text-foreground sticky left-0 bg-primary/10 z-20">Kategori Risiko</TableHead>
-                    <TableHead className="w-[300px] font-bold text-foreground">Risiko</TableHead>
-                    <TableHead className="w-[200px] font-bold text-foreground">Area Dampak</TableHead>
-                    <TableHead className="w-[170px] font-bold text-foreground">Waktu Kejadian</TableHead>
-                    <TableHead className="w-[250px] font-bold text-foreground">Penyebab</TableHead>
-                    <TableHead className="w-[250px] font-bold text-foreground">Dampak</TableHead>
-                    <TableHead className="w-[180px] font-bold text-foreground">Frekuensi</TableHead>
-                    <TableHead className="w-[180px] font-bold text-foreground">Besaran Dampak</TableHead>
-                    <TableHead className="w-[120px] text-center font-bold text-foreground">Tingkat Risiko</TableHead>
-                    <TableHead className="w-[200px] font-bold text-foreground">Kontrol Organisasi</TableHead>
-                    <TableHead className="w-[200px] font-bold text-foreground">Kontrol Orang</TableHead>
-                    <TableHead className="w-[200px] font-bold text-foreground">Kontrol Fisik</TableHead>
-                    <TableHead className="w-[200px] font-bold text-foreground">Kontrol Teknologi</TableHead>
-                    <TableHead className="w-[200px] font-bold text-foreground">Mitigasi</TableHead>
-                    <TableHead className="w-[80px] font-bold text-foreground text-center">Aksi</TableHead>
+                  <TableRow className="border-b-primary/20 bg-primary hover:bg-primary/90">
+                    <TableHead className="w-[300px] font-bold text-primary-foreground sticky left-0 bg-primary z-20">Kategori Risiko</TableHead>
+                    <TableHead className="w-[300px] font-bold text-primary-foreground">Risiko</TableHead>
+                    <TableHead className="w-[200px] font-bold text-primary-foreground">Area Dampak</TableHead>
+                    <TableHead className="w-[170px] font-bold text-primary-foreground">Waktu Kejadian</TableHead>
+                    <TableHead className="w-[250px] font-bold text-primary-foreground">Penyebab</TableHead>
+                    <TableHead className="w-[250px] font-bold text-primary-foreground">Dampak</TableHead>
+                    <TableHead className="w-[180px] font-bold text-primary-foreground">Frekuensi</TableHead>
+                    <TableHead className="w-[180px] font-bold text-primary-foreground">Besaran Dampak</TableHead>
+                    <TableHead className="w-[120px] text-center font-bold text-primary-foreground">Tingkat Risiko</TableHead>
+                    <TableHead className="w-[200px] font-bold text-primary-foreground">Kontrol Organisasi</TableHead>
+                    <TableHead className="w-[200px] font-bold text-primary-foreground">Kontrol Orang</TableHead>
+                    <TableHead className="w-[200px] font-bold text-primary-foreground">Kontrol Fisik</TableHead>
+                    <TableHead className="w-[200px] font-bold text-primary-foreground">Kontrol Teknologi</TableHead>
+                    <TableHead className="w-[200px] font-bold text-primary-foreground">Mitigasi</TableHead>
+                    <TableHead className="w-[80px] font-bold text-primary-foreground text-center">Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
