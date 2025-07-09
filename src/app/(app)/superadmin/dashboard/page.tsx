@@ -3,7 +3,7 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Users, FileText, AreaChart } from "lucide-react";
+import { Users, FileText, AreaChart, Shield } from "lucide-react";
 import { RiskAnalysisCard } from "@/app/(app)/_components/risk-analysis-card";
 
 export default function SuperAdminDashboard() {
@@ -18,7 +18,7 @@ export default function SuperAdminDashboard() {
       
       <RiskAnalysisCard />
 
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader>
             <CardTitle>User Management</CardTitle>
@@ -27,6 +27,17 @@ export default function SuperAdminDashboard() {
           <CardContent>
             <Button asChild>
               <Link href="/superadmin/users"><Users className="mr-2 h-4 w-4" />Manage Users</Link>
+            </Button>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Role Management</CardTitle>
+            <CardDescription>View all roles and see which users are assigned to them.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild>
+              <Link href="/superadmin/role-management"><Shield className="mr-2 h-4 w-4" />Manage Roles</Link>
             </Button>
           </CardContent>
         </Card>

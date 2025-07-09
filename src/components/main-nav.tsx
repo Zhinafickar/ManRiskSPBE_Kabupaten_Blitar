@@ -31,6 +31,7 @@ import {
   FilePlus2,
   ClipboardCheck,
   Printer,
+  Shield,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -88,6 +89,12 @@ export function MainNav() {
       label: 'User Management',
       icon: Users,
       active: pathname.startsWith('/superadmin/users'),
+    },
+    {
+      href: '/superadmin/role-management',
+      label: 'Role Management',
+      icon: Shield,
+      active: pathname.startsWith('/superadmin/role-management'),
     },
     {
       href: '/superadmin/results',
