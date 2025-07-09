@@ -1,4 +1,3 @@
-'use client';
 
 import {
   Card,
@@ -25,12 +24,12 @@ export default function DataPage({}: {}) {
               Tabel Level Kemungkinan Terjadinya Risiko
             </h2>
             <table className="min-w-full border-collapse border border-black text-center text-sm">
-              <thead className="bg-blue-600 text-white">
-                <tr>
-                  <th className="border border-black p-2 font-bold">No.</th>
-                  <th className="border border-black p-2 font-bold">Frekuensi Kejadian</th>
-                  <th className="border border-black p-2 font-bold">Persentase Kemungkinan Terjadinya dalam Satu Tahun</th>
-                  <th className="border border-black p-2 font-bold">Jumlah Frekuensi Kemungkinan Terjadinya dalam Satu Tahun</th>
+              <thead>
+                <tr className="border-b-primary/20 bg-primary hover:bg-primary/90">
+                  <th className="border border-black p-2 font-bold text-primary-foreground">No.</th>
+                  <th className="border border-black p-2 font-bold text-primary-foreground">Frekuensi Kejadian</th>
+                  <th className="border border-black p-2 font-bold text-primary-foreground">Persentase Kemungkinan Terjadinya dalam Satu Tahun</th>
+                  <th className="border border-black p-2 font-bold text-primary-foreground">Jumlah Frekuensi Kemungkinan Terjadinya dalam Satu Tahun</th>
                 </tr>
               </thead>
               <tbody>
@@ -74,18 +73,18 @@ export default function DataPage({}: {}) {
               Tabel Kriteria Dampak Risiko
             </h2>
             <table className="min-w-full border-collapse border border-black text-center text-sm">
-                <thead className="bg-blue-600 text-white">
-                    <tr>
-                        <th className="border border-black p-2 font-bold" rowSpan={2}>Area Dampak</th>
-                        <th className="border border-black p-2 font-bold" rowSpan={2}></th>
-                        <th className="border border-black p-2 font-bold" colSpan={5}>Level Dampak</th>
+                <thead>
+                    <tr className="border-b-primary/20 bg-primary hover:bg-primary/90">
+                        <th className="border border-black p-2 font-bold text-primary-foreground" rowSpan={2}>Area Dampak</th>
+                        <th className="border border-black p-2 font-bold text-primary-foreground" rowSpan={2}></th>
+                        <th className="border border-black p-2 font-bold text-primary-foreground" colSpan={5}>Level Dampak</th>
                     </tr>
-                    <tr>
-                        <th className="border border-black p-2 font-bold">1<br/>tidak Signifikan</th>
-                        <th className="border border-black p-2 font-bold">2<br/>Kurang Signifikan</th>
-                        <th className="border border-black p-2 font-bold">3<br/>Cukup Signifikan</th>
-                        <th className="border border-black p-2 font-bold">4<br/>Signifikan</th>
-                        <th className="border border-black p-2 font-bold">5<br/>Sangat Signifikan</th>
+                    <tr className="border-b-primary/20 bg-primary hover:bg-primary/90">
+                        <th className="border border-black p-2 font-bold text-primary-foreground">1<br/>tidak Signifikan</th>
+                        <th className="border border-black p-2 font-bold text-primary-foreground">2<br/>Kurang Signifikan</th>
+                        <th className="border border-black p-2 font-bold text-primary-foreground">3<br/>Cukup Signifikan</th>
+                        <th className="border border-black p-2 font-bold text-primary-foreground">4<br/>Signifikan</th>
+                        <th className="border border-black p-2 font-bold text-primary-foreground">5<br/>Sangat Signifikan</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -219,24 +218,24 @@ export default function DataPage({}: {}) {
           <div className="overflow-x-auto p-2">
             <table className="min-w-full border-collapse border border-black text-center text-sm">
               <tbody>
-                <tr>
+                <tr className="border-b-primary/20 bg-primary hover:bg-primary/90">
                   <th
-                    className="border border-black p-2 font-bold align-middle"
+                    className="border border-black p-2 font-bold align-middle text-primary-foreground"
                     rowSpan={2}
                     colSpan={2}
                   >
                     Matriks Analisis Risiko 5x5
                   </th>
-                  <th className="border border-black p-2 font-bold" colSpan={5}>
+                  <th className="border border-black p-2 font-bold text-primary-foreground" colSpan={5}>
                     Level Dampak
                   </th>
                 </tr>
-                <tr>
-                  <th className="border border-black p-2 font-bold">1<br />Tidak Signifikan</th>
-                  <th className="border border-black p-2 font-bold">2<br />Kurang Signifikan</th>
-                  <th className="border border-black p-2 font-bold">3<br />Cukup Signifikan</th>
-                  <th className="border border-black p-2 font-bold">4<br />Signifikan</th>
-                  <th className="border border-black p-2 font-bold">5<br />Sangat Signifikan</th>
+                <tr className="border-b-primary/20 bg-primary hover:bg-primary/90">
+                  <th className="border border-black p-2 font-bold text-primary-foreground">1<br />Tidak Signifikan</th>
+                  <th className="border border-black p-2 font-bold text-primary-foreground">2<br />Kurang Signifikan</th>
+                  <th className="border border-black p-2 font-bold text-primary-foreground">3<br />Cukup Signifikan</th>
+                  <th className="border border-black p-2 font-bold text-primary-foreground">4<br />Signifikan</th>
+                  <th className="border border-black p-2 font-bold text-primary-foreground">5<br />Sangat Signifikan</th>
                 </tr>
 
                 {/* Baris 5 hingga 1 Level Kemungkinan */}
