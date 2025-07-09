@@ -15,7 +15,7 @@ import {
 import { useAuth } from '@/hooks/use-auth';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { User, Activity, HelpCircle, ChevronDown } from 'lucide-react';
+import { User, Activity, HelpCircle, Eye, EyeOff } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { Survey } from '@/types/survey';
 import type { ContinuityPlan } from '@/types/continuity';
@@ -58,12 +58,11 @@ function UserInfoCard() {
                 Informasi akun Anda yang terdaftar dalam sistem.
               </CardDescription>
             </div>
-            <ChevronDown
-              className={cn(
-                'h-5 w-5 shrink-0 transition-transform',
-                isOpen && 'rotate-180'
-              )}
-            />
+            {isOpen ? (
+              <EyeOff className="h-5 w-5 shrink-0" />
+            ) : (
+              <Eye className="h-5 w-5 shrink-0" />
+            )}
           </CollapsibleTrigger>
         </CardHeader>
         <CollapsibleContent>
