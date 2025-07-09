@@ -80,7 +80,7 @@ export default function DataPage({}: {}) {
                         <th className="border border-black p-2 font-bold text-primary-foreground" colSpan={5}>Level Dampak</th>
                     </tr>
                     <tr className="border-b-primary/20 bg-primary hover:bg-primary/90">
-                        <th className="border border-black p-2 font-bold text-primary-foreground">1<br/>tidak Signifikan</th>
+                        <th className="border border-black p-2 font-bold text-primary-foreground">1<br/>Tidak Signifikan</th>
                         <th className="border border-black p-2 font-bold text-primary-foreground">2<br/>Kurang Signifikan</th>
                         <th className="border border-black p-2 font-bold text-primary-foreground">3<br/>Cukup Signifikan</th>
                         <th className="border border-black p-2 font-bold text-primary-foreground">4<br/>Signifikan</th>
