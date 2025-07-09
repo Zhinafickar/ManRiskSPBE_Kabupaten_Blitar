@@ -121,7 +121,7 @@ export default function SuperAdminResultsPage() {
             <TableBody>
               {surveys.map((survey) => (
                 <TableRow key={survey.id}>
-                  <TableCell className="font-medium max-w-xs truncate">{survey.userRole}</TableCell>
+                  <TableCell className="font-medium max-w-xs truncate">{survey.userRole || 'N/A'}</TableCell>
                   <TableCell className="max-w-xs truncate">{survey.riskEvent}</TableCell>
                   <TableCell className="max-w-xs truncate">{survey.impactArea}</TableCell>
                   <TableCell className="max-w-xs truncate">{survey.areaDampak || 'N/A'}</TableCell>

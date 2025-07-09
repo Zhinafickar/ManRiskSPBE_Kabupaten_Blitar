@@ -74,7 +74,7 @@ export default function SuperAdminContinuityResultsPage() {
             <TableBody>
               {plans.map((plan) => (
                 <TableRow key={plan.id}>
-                  <TableCell className="font-medium max-w-xs truncate">{plan.userRole}</TableCell>
+                  <TableCell className="font-medium max-w-xs truncate">{plan.userRole || 'N/A'}</TableCell>
                   <TableCell className="max-w-xs truncate">{plan.risiko}</TableCell>
                   <TableCell className="max-w-xs truncate">{plan.aktivitas}</TableCell>
                   <TableCell>{plan.targetWaktu}</TableCell>
