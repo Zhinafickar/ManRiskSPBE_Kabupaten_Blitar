@@ -1,6 +1,7 @@
 export interface ContinuityPlan {
   id: string;
   userId: string;
+  userRole: string;
   risiko: string;
   aktivitas: string;
   targetWaktu: string;

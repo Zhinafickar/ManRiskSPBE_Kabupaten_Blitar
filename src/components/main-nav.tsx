@@ -63,6 +63,12 @@ export function MainNav() {
       active: pathname === '/admin/results',
     },
     {
+      href: '/admin/continuity-results',
+      label: 'Continuity Results',
+      icon: ClipboardCheck,
+      active: pathname === '/admin/continuity-results',
+    },
+    {
       href: '/admin/visualization',
       label: 'Visualization',
       icon: AreaChart,
@@ -82,6 +88,12 @@ export function MainNav() {
       label: 'Survey Results',
       icon: FileText,
       active: pathname === '/superadmin/results',
+    },
+    {
+      href: '/superadmin/continuity-results',
+      label: 'Continuity Results',
+      icon: ClipboardCheck,
+      active: pathname === '/superadmin/continuity-results',
     },
     {
       href: '/superadmin/visualization',

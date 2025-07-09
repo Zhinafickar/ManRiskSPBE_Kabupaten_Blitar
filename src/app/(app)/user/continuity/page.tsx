@@ -37,7 +37,7 @@ const formSchema = z.object({
 
 export default function ContinuityPage({}: {}) {
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [availableRisks, setAvailableRisks] = useState<string[]>([]);
   const [hasSurveys, setHasSurveys] = useState(false);
@@ -80,13 +80,13 @@ export default function ContinuityPage({}: {}) {
   }, [user]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!user) {
+    if (!user || !userProfile) {
         toast({ variant: 'destructive', title: 'Error', description: 'Anda harus masuk untuk mengirimkan rencana.' });
         return;
     }
     setIsLoading(true);
     try {
-        await addContinuityPlan({ ...values, userId: user.uid });
+        await addContinuityPlan({ ...values, userId: user.uid, userRole: userProfile.role });
         toast({ title: 'Sukses', description: 'Rencana kontinuitas berhasil disimpan.' });
         // Refresh the list of available risks after submission
         setAvailableRisks(availableRisks.filter(risk => risk !== values.risiko));
