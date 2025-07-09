@@ -1,16 +1,52 @@
+'use client';
+
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { FileText, AreaChart } from "lucide-react";
+import { FileText, AreaChart, HelpCircle } from "lucide-react";
+import { RiskAnalysisCard } from "@/app/(app)/_components/risk-analysis-card";
 
-export default function AdminDashboard({}: {}) {
+export default function AdminDashboard() {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
         <p className="text-muted-foreground">
-          Manage and review all user-submitted risk surveys.
+          Review organization-wide risk data and analyses.
         </p>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+            <RiskAnalysisCard />
+        </div>
+        <div className="lg:col-span-1">
+            <Card className="h-full">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <HelpCircle className="h-6 w-6" />
+                        Admin Guide
+                    </CardTitle>
+                    <CardDescription>
+                        Your role and capabilities on this platform.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground space-y-3">
+                    <div>
+                        <h4 className="font-semibold text-foreground">Review All Data</h4>
+                        <p>View all survey results and business continuity plans submitted by every user.</p>
+                    </div>
+                    <div>
+                        <h4 className="font-semibold text-foreground">Analyze Trends</h4>
+                        <p>The AI-Powered analysis provides a summary of emerging risk trends across the organization.</p>
+                    </div>
+                    <div>
+                        <h4 className="font-semibold text-foreground">Explore Visualizations</h4>
+                        <p>Use the data visualization page to see graphical representations of risk distribution.</p>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -18,7 +54,7 @@ export default function AdminDashboard({}: {}) {
           <CardHeader>
             <CardTitle>View All Survey Results</CardTitle>
             <CardDescription>
-              Access and review a comprehensive table of all survey data submitted by users.
+              Access a comprehensive table of all survey data submitted by users.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -36,7 +72,7 @@ export default function AdminDashboard({}: {}) {
             <CardTitle>Data Visualization</CardTitle>
             <CardDescription>
               Explore graphical representations of the survey data for better insights.
-            </CardDescription>
+            </Description>
           </CardHeader>
           <CardContent>
             <Button asChild>
