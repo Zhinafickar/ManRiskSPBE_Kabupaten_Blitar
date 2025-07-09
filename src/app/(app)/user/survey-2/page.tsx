@@ -154,8 +154,8 @@ export default function Survey2Page() {
             <div ref={scrollContainerRef} className="overflow-x-auto border rounded-lg">
               <Table className="min-w-max">
                 <TableHeader>
-                  <TableRow className="bg-muted/50 hover:bg-muted/50">
-                    <TableHead className="w-[300px] font-bold text-foreground sticky left-0 bg-muted/50 z-20">Kategori Risiko</TableHead>
+                  <TableRow className="border-b-primary/20 bg-primary/10 hover:bg-primary/10">
+                    <TableHead className="w-[300px] font-bold text-foreground sticky left-0 bg-primary/10 z-20">Kategori Risiko</TableHead>
                     <TableHead className="w-[300px] font-bold text-foreground">Risiko</TableHead>
                     <TableHead className="w-[200px] font-bold text-foreground">Area Dampak</TableHead>
                     <TableHead className="w-[170px] font-bold text-foreground">Waktu Kejadian</TableHead>
