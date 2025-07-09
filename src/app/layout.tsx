@@ -7,7 +7,7 @@ import { Toaster } from '@/components/ui/toaster';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: ' Resiko',
+  title: 'MenRisk Kab Blitar',
   description: 'A web application for risk assessment surveys.',
 };
 

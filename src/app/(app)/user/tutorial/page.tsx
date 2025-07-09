@@ -26,7 +26,7 @@ export default function TutorialPage({}: {}) {
             <AccordionContent className="space-y-4 pl-8">
               <p>Langkah pertama adalah mengidentifikasi dan melaporkan risiko yang ada di unit kerja Anda.</p>
               <ol className="list-decimal list-inside space-y-2">
-                <li>Buka menu navigasi di sebelah kiri, lalu klik pada bagian <strong>Manajement Risiko</strong>.</li>
+                <li>Buka menu navigasi di sebelah kiri, lalu klik pada bagian <strong>Manajemen Risiko</strong>.</li>
                 <li>
                   Anda akan melihat dua pilihan untuk menginput data:
                   <ul className="list-disc list-inside pl-6 mt-2 space-y-1">
@@ -71,7 +71,7 @@ export default function TutorialPage({}: {}) {
               <ul className="list-none space-y-3">
                 <li className="flex items-start gap-2">
                   <ArrowRight className="h-4 w-4 mt-1 text-primary flex-shrink-0"/>
-                  <span><strong>Hasil Survey Anda:</strong> Di bawah menu "Manajement Risiko", halaman ini menampilkan semua data survei risiko Anda dalam format tabel.</span>
+                  <span><strong>Hasil Survey Anda:</strong> Di bawah menu "Manajemen Risiko", halaman ini menampilkan semua data survei risiko Anda dalam format tabel.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <ArrowRight className="h-4 w-4 mt-1 text-primary flex-shrink-0"/>

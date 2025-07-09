@@ -7,10 +7,15 @@ import {
   CardDescription,
   CardContent,
 } from '@/components/ui/card';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { useAuth } from '@/hooks/use-auth';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { User, Activity, HelpCircle } from 'lucide-react';
+import { User, Activity, HelpCircle, ChevronDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { Survey } from '@/types/survey';
 import type { ContinuityPlan } from '@/types/continuity';
@@ -21,6 +26,7 @@ import { cn } from '@/lib/utils';
 // User Info Card Component
 function UserInfoCard() {
   const { userProfile } = useAuth();
+  const [isOpen, setIsOpen] = useState(true);
 
   if (!userProfile) {
     return (
@@ -41,30 +47,48 @@ function UserInfoCard() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <User className="h-6 w-6" /> Profil Anda
-        </CardTitle>
-        <CardDescription>Informasi akun Anda yang terdaftar dalam sistem.</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3 text-sm">
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Nama Lengkap</span>
-          <span className="font-medium">{userProfile.fullName}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Peran/Jabatan</span>
-          <span className="font-medium">{userProfile.role}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Email</span>
-          <span className="font-medium">{userProfile.email}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">No. Telepon</span>
-          <span className="font-medium">{userProfile.phoneNumber || 'N/A'}</span>
-        </div>
-      </CardContent>
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CardHeader className="p-0">
+          <CollapsibleTrigger className="flex w-full items-center justify-between rounded-t-lg p-6 text-left transition-colors hover:bg-muted/50">
+            <div className="space-y-1.5">
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-6 w-6" /> Profil Anda
+              </CardTitle>
+              <CardDescription>
+                Informasi akun Anda yang terdaftar dalam sistem.
+              </CardDescription>
+            </div>
+            <ChevronDown
+              className={cn(
+                'h-5 w-5 shrink-0 transition-transform',
+                isOpen && 'rotate-180'
+              )}
+            />
+          </CollapsibleTrigger>
+        </CardHeader>
+        <CollapsibleContent>
+          <CardContent className="space-y-3 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Nama Lengkap</span>
+              <span className="font-medium">{userProfile.fullName}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Peran/Jabatan</span>
+              <span className="font-medium">{userProfile.role}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Email</span>
+              <span className="font-medium">{userProfile.email}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">No. Telepon</span>
+              <span className="font-medium">
+                {userProfile.phoneNumber || 'N/A'}
+              </span>
+            </div>
+          </CardContent>
+        </CollapsibleContent>
+      </Collapsible>
     </Card>
   );
 }
@@ -197,7 +221,7 @@ function QuickGuideCard() {
       <CardContent className="text-sm text-muted-foreground space-y-4">
         <div>
             <h4 className="font-semibold text-foreground">1. Isi Survei Risiko</h4>
-            <p>Buka menu 'Manajement Risiko' di bilah sisi untuk mulai mengisi data menggunakan formulir tunggal atau tabel.</p>
+            <p>Buka menu 'Manajemen Risiko' di bilah sisi untuk mulai mengisi data menggunakan formulir tunggal atau tabel.</p>
         </div>
         <div>
             <h4 className="font-semibold text-foreground">2. Buat Rencana Kontinuitas</h4>

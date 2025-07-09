@@ -79,7 +79,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <SidebarHeader>
           <div className="flex items-center gap-2">
             <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={96} height={96} />
-            <h1 className="text-lg font-semibold">Manajement Resiko</h1>
+            <h1 className="text-lg font-semibold">Manajemen Risiko</h1>
           </div>
         </SidebarHeader>
         <SidebarContent>

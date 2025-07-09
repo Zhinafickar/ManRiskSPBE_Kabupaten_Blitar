@@ -196,7 +196,7 @@ export function MainNav() {
               className="[&[data-state=open]>svg:last-of-type]:rotate-180"
             >
               <ClipboardList />
-              <span className="mr-auto group-data-[collapsible=icon]:hidden">Manajement Risiko</span>
+              <span className="mr-auto group-data-[collapsible=icon]:hidden">Manajemen Risiko</span>
               <ChevronDown className="size-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden" />
             </SidebarMenuButton>
           </CollapsibleTrigger>
