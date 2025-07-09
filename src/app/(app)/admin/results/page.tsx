@@ -105,17 +105,17 @@ export default function AdminResultsPage() {
         ) : surveys.length > 0 ? (
           <Table>
             <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead>User Role</TableHead>
-                <TableHead>Kategori Risiko</TableHead>
-                <TableHead>Risiko</TableHead>
-                <TableHead>Area Dampak</TableHead>
-                <TableHead>Frequency</TableHead>
-                <TableHead>Impact</TableHead>
-                <TableHead>Risk Level</TableHead>
-                <TableHead>Waktu Kejadian</TableHead>
-                <TableHead>Mitigasi</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+              <TableRow className="border-b-primary/20 bg-primary hover:bg-primary/90">
+                <TableHead className="text-primary-foreground">User Role</TableHead>
+                <TableHead className="text-primary-foreground">Kategori Risiko</TableHead>
+                <TableHead className="text-primary-foreground">Risiko</TableHead>
+                <TableHead className="text-primary-foreground">Area Dampak</TableHead>
+                <TableHead className="text-primary-foreground">Frequency</TableHead>
+                <TableHead className="text-primary-foreground">Impact</TableHead>
+                <TableHead className="text-primary-foreground">Risk Level</TableHead>
+                <TableHead className="text-primary-foreground">Waktu Kejadian</TableHead>
+                <TableHead className="text-primary-foreground">Mitigasi</TableHead>
+                <TableHead className="text-right text-primary-foreground">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

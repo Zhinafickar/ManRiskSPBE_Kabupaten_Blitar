@@ -57,14 +57,14 @@ export default function ContinuityResultsPage() {
         ) : plans.length > 0 ? (
           <Table>
             <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead>Risiko</TableHead>
-                <TableHead>Aktivitas</TableHead>
-                <TableHead>Target Waktu</TableHead>
-                <TableHead>PIC</TableHead>
-                <TableHead>RTO</TableHead>
-                <TableHead>RPO</TableHead>
-                <TableHead className="text-right">Aksi</TableHead>
+              <TableRow className="border-b-primary/20 bg-primary hover:bg-primary/90">
+                <TableHead className="text-primary-foreground">Risiko</TableHead>
+                <TableHead className="text-primary-foreground">Aktivitas</TableHead>
+                <TableHead className="text-primary-foreground">Target Waktu</TableHead>
+                <TableHead className="text-primary-foreground">PIC</TableHead>
+                <TableHead className="text-primary-foreground">RTO</TableHead>
+                <TableHead className="text-primary-foreground">RPO</TableHead>
+                <TableHead className="text-right text-primary-foreground">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

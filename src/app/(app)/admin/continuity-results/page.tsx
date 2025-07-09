@@ -60,15 +60,15 @@ export default function AdminContinuityResultsPage() {
         ) : plans.length > 0 ? (
           <Table>
             <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead>User Role</TableHead>
-                <TableHead>Risiko</TableHead>
-                <TableHead>Aktivitas</TableHead>
-                <TableHead>Target Waktu</TableHead>
-                <TableHead>PIC</TableHead>
-                <TableHead>RTO</TableHead>
-                <TableHead>RPO</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+              <TableRow className="border-b-primary/20 bg-primary hover:bg-primary/90">
+                <TableHead className="text-primary-foreground">User Role</TableHead>
+                <TableHead className="text-primary-foreground">Risiko</TableHead>
+                <TableHead className="text-primary-foreground">Aktivitas</TableHead>
+                <TableHead className="text-primary-foreground">Target Waktu</TableHead>
+                <TableHead className="text-primary-foreground">PIC</TableHead>
+                <TableHead className="text-primary-foreground">RTO</TableHead>
+                <TableHead className="text-primary-foreground">RPO</TableHead>
+                <TableHead className="text-right text-primary-foreground">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

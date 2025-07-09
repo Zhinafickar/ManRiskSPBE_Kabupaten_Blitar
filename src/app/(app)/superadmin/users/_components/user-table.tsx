@@ -93,12 +93,12 @@ export function UserTable({ users, allRoles }: UserTableProps) {
       <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Full Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Phone Number</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+            <TableRow className="border-b-primary/20 bg-primary hover:bg-primary/90">
+              <TableHead className="text-primary-foreground">Full Name</TableHead>
+              <TableHead className="text-primary-foreground">Email</TableHead>
+              <TableHead className="text-primary-foreground">Phone Number</TableHead>
+              <TableHead className="text-primary-foreground">Role</TableHead>
+              <TableHead className="text-right text-primary-foreground">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
