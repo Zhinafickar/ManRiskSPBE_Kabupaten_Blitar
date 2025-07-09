@@ -17,35 +17,8 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-3">
             <RiskAnalysisCard />
-        </div>
-        <div className="lg:col-span-1">
-            <Card className="h-full">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <HelpCircle className="h-6 w-6" />
-                        Admin Guide
-                    </CardTitle>
-                    <CardDescription>
-                        Your role and capabilities on this platform.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="text-sm text-muted-foreground space-y-3">
-                    <div>
-                        <h4 className="font-semibold text-foreground">Review All Data</h4>
-                        <p>View all survey results and business continuity plans submitted by every user.</p>
-                    </div>
-                    <div>
-                        <h4 className="font-semibold text-foreground">Analyze Trends</h4>
-                        <p>The AI-Powered analysis provides a summary of emerging risk trends across the organization.</p>
-                    </div>
-                    <div>
-                        <h4 className="font-semibold text-foreground">Explore Visualizations</h4>
-                        <p>Use the data visualization page to see graphical representations of risk distribution.</p>
-                    </div>
-                </CardContent>
-            </Card>
         </div>
       </div>
 
