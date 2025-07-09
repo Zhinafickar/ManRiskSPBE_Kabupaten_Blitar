@@ -100,7 +100,7 @@ export default function UserResultsPage() {
         ) : surveys.length > 0 ? (
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="bg-muted/50">
                 <TableHead>Kategori Risiko</TableHead>
                 <TableHead>Risiko</TableHead>
                 <TableHead>Area Dampak</TableHead>

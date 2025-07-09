@@ -60,7 +60,7 @@ export default function AdminContinuityResultsPage() {
         ) : plans.length > 0 ? (
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="bg-muted/50">
                 <TableHead>User Role</TableHead>
                 <TableHead>Risiko</TableHead>
                 <TableHead>Aktivitas</TableHead>

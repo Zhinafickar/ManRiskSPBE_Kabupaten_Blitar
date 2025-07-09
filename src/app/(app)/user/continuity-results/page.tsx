@@ -57,7 +57,7 @@ export default function ContinuityResultsPage() {
         ) : plans.length > 0 ? (
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="bg-muted/50">
                 <TableHead>Risiko</TableHead>
                 <TableHead>Aktivitas</TableHead>
                 <TableHead>Target Waktu</TableHead>

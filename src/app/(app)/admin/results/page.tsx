@@ -105,7 +105,7 @@ export default function AdminResultsPage() {
         ) : surveys.length > 0 ? (
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="bg-muted/50">
                 <TableHead>User Role</TableHead>
                 <TableHead>Kategori Risiko</TableHead>
                 <TableHead>Risiko</TableHead>
