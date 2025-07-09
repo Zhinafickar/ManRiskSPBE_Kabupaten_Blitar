@@ -86,7 +86,11 @@ export default function ContinuityPage({}: {}) {
     }
     setIsLoading(true);
     try {
-        await addContinuityPlan({ ...values, userId: user.uid, userRole: userProfile.role });
+        await addContinuityPlan({
+            ...values,
+            userId: user.uid,
+            userRole: userProfile.role
+        });
         toast({ title: 'Sukses', description: 'Rencana kontinuitas berhasil disimpan.' });
         // Refresh the list of available risks after submission
         setAvailableRisks(availableRisks.filter(risk => risk !== values.risiko));
