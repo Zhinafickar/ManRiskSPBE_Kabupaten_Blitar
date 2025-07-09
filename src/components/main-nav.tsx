@@ -84,6 +84,12 @@ export function MainNav() {
       active: pathname === '/superadmin/dashboard',
     },
     {
+      href: '/superadmin/users',
+      label: 'User Management',
+      icon: Users,
+      active: pathname.startsWith('/superadmin/users'),
+    },
+    {
       href: '/superadmin/results',
       label: 'Survey Results',
       icon: FileText,
@@ -100,12 +106,6 @@ export function MainNav() {
       label: 'Visualization',
       icon: AreaChart,
       active: pathname === '/superadmin/visualization',
-    },
-    {
-      href: '/superadmin/users',
-      label: 'User Management',
-      icon: Users,
-      active: pathname === '/superadmin/users',
     },
   ];
 

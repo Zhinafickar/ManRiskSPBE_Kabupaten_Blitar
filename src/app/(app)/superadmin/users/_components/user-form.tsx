@@ -95,7 +95,7 @@ export function UserForm({ isOpen, setIsOpen, user, allRoles }: UserFormProps) {
 
     if (result.success) {
       toast({ title: 'Success', description: result.message });
-      router.refresh();
+      router.refresh(); // This will re-run the server component's fetch logic on the page
       setIsOpen(false);
     } else {
       toast({ variant: 'destructive', title: 'Error', description: result.message });
@@ -131,7 +131,7 @@ export function UserForm({ isOpen, setIsOpen, user, allRoles }: UserFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email</FormLabel>
-                  <FormControl><Input placeholder="name@example.com" {...field} disabled={!!user} /></FormControl>
+                  <FormControl><Input placeholder="name@example.com" {...field} disabled /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -153,7 +153,7 @@ export function UserForm({ isOpen, setIsOpen, user, allRoles }: UserFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Role</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                     <FormControl><SelectTrigger><SelectValue placeholder="Select a role" /></SelectTrigger></FormControl>
                     <SelectContent>
                       {allRoles.map((role) => (

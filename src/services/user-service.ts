@@ -1,6 +1,7 @@
 import { db, isFirebaseConfigured } from '@/lib/firebase';
 import { collection, getDocs, doc, setDoc, deleteDoc, query, where, getDoc, writeBatch } from 'firebase/firestore';
 import type { UserProfile } from '@/types/user';
+import { ADMIN_ROLES } from '@/constants/admin-data';
 
 export async function getAllUsers(): Promise<UserProfile[]> {
   if (!isFirebaseConfigured || !db) return [];
@@ -28,23 +29,6 @@ export async function isRoleTaken(role: string): Promise<boolean> {
     return false; // Role is not taken
   }
 
-  const roleData = roleDoc.data();
-  const existingUid = roleData.uid;
-  const creationTime = roleData.createdAt?.toDate(); // Firestore timestamp
-
-  // Cleanup threshold: 1 minute (60 * 1000 ms)
-  const STALE_THRESHOLD_MS = 60 * 1000;
-
-  if (creationTime && (new Date().getTime() - creationTime.getTime() > STALE_THRESHOLD_MS)) {
-      // The role reservation is older than the threshold.
-      // We assume the user is unverified and clean up their data.
-      // This does NOT delete their Firebase Auth account, only their user data and role reservation.
-      console.warn(`Stale role reservation '${role}' for UID ${existingUid} is being cleared.`);
-      await deleteUserData(existingUid);
-      return false; // The role is now considered available.
-  }
-
-  // If not stale, the role is considered taken.
   return true;
 }
 
@@ -67,27 +51,36 @@ export async function updateUserData(user: Pick<UserProfile, 'uid' | 'fullName' 
 
         const oldRole = userDoc.data().role;
         const newRole = user.role;
+        const isOldRoleDepartmental = !ADMIN_ROLES.includes(oldRole);
+        const isNewRoleDepartmental = !ADMIN_ROLES.includes(newRole);
 
         const batch = writeBatch(db);
 
+        // Update user document
         batch.set(userRef, { 
             fullName: user.fullName, 
             role: newRole, 
             phoneNumber: user.phoneNumber || null 
         }, { merge: true });
 
+        // Handle role change in 'roles' collection if it changed
         if (oldRole !== newRole) {
-            const newRoleRef = doc(db, 'roles', newRole);
-            const newRoleDoc = await getDoc(newRoleRef);
-            if (newRoleDoc.exists() && newRoleDoc.data().uid !== user.uid) {
-                return { success: false, message: `Role '${newRole}' is already taken.` };
+            // If new role is departmental, check if it's taken
+            if (isNewRoleDepartmental) {
+                const newRoleRef = doc(db, 'roles', newRole);
+                const newRoleDoc = await getDoc(newRoleRef);
+                if (newRoleDoc.exists() && newRoleDoc.data().uid !== user.uid) {
+                    return { success: false, message: `Role '${newRole}' is already taken.` };
+                }
+                // Create lock for new role
+                batch.set(newRoleRef, { uid: user.uid, createdAt: new Date() });
             }
             
-            if (oldRole) {
+            // If old role was departmental, remove the lock
+            if (isOldRoleDepartmental && oldRole) {
                 const oldRoleRef = doc(db, 'roles', oldRole);
                 batch.delete(oldRoleRef);
             }
-            batch.set(newRoleRef, { uid: user.uid, createdAt: new Date() });
         }
 
         await batch.commit();
@@ -106,19 +99,23 @@ export async function deleteUserData(uid: string) {
         const userDoc = await getDoc(userRef);
 
         if (!userDoc.exists()) {
-            return { success: false, message: 'User not found.' };
+            return { success: true, message: 'User data not found, nothing to delete.' };
         }
 
         const userRole = userDoc.data().role;
-        const roleRef = doc(db, 'roles', userRole);
+        const isDepartmentalRole = !ADMIN_ROLES.includes(userRole);
 
         const batch = writeBatch(db);
         batch.delete(userRef);
         
-        // Check if the role document actually exists before trying to delete it
-        const roleDocSnapshot = await getDoc(roleRef);
-        if (roleDocSnapshot.exists() && roleDocSnapshot.data().uid === uid) {
-             batch.delete(roleRef);
+        // If it was a departmental role, also delete the role lock
+        if (isDepartmentalRole && userRole) {
+            const roleRef = doc(db, 'roles', userRole);
+            const roleDocSnapshot = await getDoc(roleRef);
+            // Only delete if the lock belongs to this user
+            if (roleDocSnapshot.exists() && roleDocSnapshot.data().uid === uid) {
+                 batch.delete(roleRef);
+            }
         }
 
         await batch.commit();

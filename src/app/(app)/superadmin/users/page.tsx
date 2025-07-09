@@ -7,11 +7,12 @@ import { ROLES } from "@/constants/data";
 import { UserTable } from "./_components/user-table";
 import type { UserProfile } from '@/types/user';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ADMIN_ROLES } from '@/constants/admin-data';
 
 export default function UserManagementPage() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
-  const allRoles = [...ROLES, 'admin', 'superadmin']; // All possible roles
+  const allRoles = [...ROLES, ...ADMIN_ROLES]; // All possible roles
 
   useEffect(() => {
     getAllUsers()
