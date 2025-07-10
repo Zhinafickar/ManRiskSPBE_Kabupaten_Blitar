@@ -155,7 +155,7 @@ export default function Survey2Page() {
               <Table className="min-w-max">
                 <TableHeader>
                   <TableRow className="border-b-primary/20 bg-primary hover:bg-primary/90">
-                    <TableHead className="w-[300px] font-bold text-primary-foreground sticky left-0 bg-primary z-20">Kategori Risiko</TableHead>
+                    <TableHead className="w-[300px] font-bold text-primary-foreground sticky left-0 bg-primary z-10">Kategori Risiko</TableHead>
                     <TableHead className="w-[300px] font-bold text-primary-foreground">Risiko</TableHead>
                     <TableHead className="w-[200px] font-bold text-primary-foreground">Area Dampak</TableHead>
                     <TableHead className="w-[170px] font-bold text-primary-foreground">Waktu Kejadian</TableHead>
