@@ -400,7 +400,24 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                 </div>
             </div>
             <div className="space-y-2 rounded-lg border p-4">
-              <FormLabel>Kendali Sesuai ISO 27001</FormLabel>
+              <div className="flex items-center gap-2">
+                <FormLabel>Kendali Sesuai ISO 27001</FormLabel>
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-5 w-5 rounded-full">
+                            <Info className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80">
+                        <div className="space-y-2">
+                            <h4 className="font-medium leading-none">Penjelasan Standar</h4>
+                            <p className="text-sm text-muted-foreground">
+                                <strong>ISO 27001:</strong> Standar internasional untuk sistem manajemen keamanan informasi (SMKI), menyediakan kerangka kerja untuk melindungi aset informasi.
+                            </p>
+                        </div>
+                    </PopoverContent>
+                </Popover>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                  <FormField
                   control={form.control}
@@ -637,4 +654,5 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
     </Card>
   );
 }
+
 
