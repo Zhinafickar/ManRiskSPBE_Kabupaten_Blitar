@@ -101,13 +101,13 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
         <div className="flex h-full flex-col">
           <div className="flex h-14 items-center justify-between border-b px-4">
             <div className="flex items-center gap-2 min-w-0">
-                <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={96} height={96} />
-                <h1 className="text-lg font-semibold">Manajemen Risiko</h1>
+                <Image src="https://seeklogo.com/images/U/uin-malang-logo-D73042B34B-seeklogo.com.png" alt="Logo" width={40} height={40} />
+                <h1 className="text-lg font-semibold">UIN MALANG</h1>
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={toggleSidebar}>
-              <X className="h-4 w-4" />
-            </Button>
           </div>
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 self-end m-2" onClick={toggleSidebar}>
+              <X className="h-4 w-4" />
+          </Button>
           <ScrollArea className="flex-1">
             <div className="px-3 py-4">
                  <MainNav />
