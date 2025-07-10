@@ -10,10 +10,10 @@ import { getUserSurveys } from '@/services/survey-service';
 import { AreaChart } from 'lucide-react';
 
 const riskLevelColors = {
-  Bahaya: 'hsl(var(--destructive))', // Red
-  Sedang: 'hsl(48, 100%, 60%)',      // Yellow/Orange
-  Rendah: 'hsl(var(--chart-2))',      // Teal/Green
-  Minor: 'hsl(var(--chart-1))',       // Blue/Primary
+  Bahaya: 'hsl(0, 72%, 51%)',     // bg-red-600
+  Sedang: 'hsl(45, 93%, 47%)',    // bg-yellow-500
+  Rendah: 'hsl(142, 69%, 31%)',   // bg-green-600
+  Minor: 'hsl(221, 83%, 53%)',    // bg-blue-600
 };
 
 const chartConfig = {

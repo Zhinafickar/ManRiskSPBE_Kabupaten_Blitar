@@ -11,10 +11,10 @@ import { TrendingUp } from 'lucide-react';
 
 // --- Chart Configs ---
 const riskLevelColors = {
-  Bahaya: 'hsl(var(--destructive))',
-  Sedang: 'hsl(48, 100%, 60%)',
-  Rendah: 'hsl(var(--chart-2))',
-  Minor: 'hsl(var(--chart-1))',
+  Bahaya: 'hsl(0, 72%, 51%)',     // bg-red-600
+  Sedang: 'hsl(45, 93%, 47%)',    // bg-yellow-500
+  Rendah: 'hsl(142, 69%, 31%)',   // bg-green-600
+  Minor: 'hsl(221, 83%, 53%)',    // bg-blue-600
 };
 
 const pieChartConfig = {
