@@ -34,7 +34,10 @@ export default function SuperAdminContinuityResultsPage() {
 
   useEffect(() => {
     getAllContinuityPlans()
-      .then(setPlans)
+      .then(data => {
+        const filteredData = data.filter(plan => plan.userRole !== 'Penguji Coba');
+        setPlans(filteredData);
+      })
       .finally(() => setLoading(false));
   }, []);
 

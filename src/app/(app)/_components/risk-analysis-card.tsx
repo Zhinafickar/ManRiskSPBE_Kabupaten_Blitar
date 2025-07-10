@@ -58,7 +58,10 @@ export function RiskAnalysisCard() { // Keep the exported name the same to avoid
 
   useEffect(() => {
     getAllSurveyData()
-      .then(setSurveys)
+      .then(data => {
+        const filteredData = data.filter(survey => survey.userRole !== 'Penguji Coba');
+        setSurveys(filteredData);
+      })
       .finally(() => setLoading(false));
   }, []);
 

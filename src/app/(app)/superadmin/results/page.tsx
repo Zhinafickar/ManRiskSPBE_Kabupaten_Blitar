@@ -67,7 +67,10 @@ export default function SuperAdminResultsPage() {
 
   useEffect(() => {
     getAllSurveyData()
-      .then(setSurveys)
+      .then(data => {
+        const filteredData = data.filter(survey => survey.userRole !== 'Penguji Coba');
+        setSurveys(filteredData);
+      })
       .finally(() => setLoading(false));
   }, []);
 
