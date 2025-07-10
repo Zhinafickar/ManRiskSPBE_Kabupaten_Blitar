@@ -79,8 +79,9 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <SidebarHeader>
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={96} height={96} className="group-data-[collapsible=icon]:hidden" />
-            <h1 className="text-lg font-semibold group-data-[collapsible=icon]:hidden">Manajemen Risiko</h1>
+            <h1 className="text-lg font-semibold group-data-[collapsible=icon]:hidden min-w-0">Manajemen Risiko</h1>
           </div>
+           <SidebarTrigger className="hidden md:flex ml-auto" />
         </SidebarHeader>
         <SidebarContent>
           <MainNav />
@@ -89,15 +90,14 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           {/* Can add footer items here if needed */}
         </SidebarFooter>
       </Sidebar>
-      <SidebarInset>
+      <div className="flex-1 flex flex-col">
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
             <SidebarTrigger className="md:hidden" />
-            <SidebarTrigger className="hidden md:flex" />
             <div className="flex-1" />
             <UserNav />
         </header>
         <main className="flex-1 p-4 sm:p-6">{children}</main>
-      </SidebarInset>
+      </div>
     </SidebarProvider>
   );
 }
