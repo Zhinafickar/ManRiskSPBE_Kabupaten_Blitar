@@ -66,6 +66,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
   const [isLoading, setIsLoading] = useState(false);
   const [riskEventOpen, setRiskEventOpen] = useState(false);
   const [impactAreaOpen, setImpactAreaOpen] = useState(false);
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [kontrolOrganisasiOpen, setKontrolOrganisasiOpen] = useState(false);
   const [kontrolOrangOpen, setKontrolOrangOpen] = useState(false);
   const [kontrolFisikOpen, setKontrolFisikOpen] = useState(false);
@@ -274,7 +275,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Waktu Kejadian</FormLabel>
-                  <Popover>
+                  <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
@@ -297,7 +298,12 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                       <Calendar
                         mode="single"
                         selected={field.value}
-                        onSelect={field.onChange}
+                        onSelect={(date) => {
+                           if (date) {
+                              field.onChange(date);
+                              setDatePickerOpen(false);
+                           }
+                        }}
                         disabled={(date) =>
                           date > new Date() || date < new Date("1900-01-01")
                         }
