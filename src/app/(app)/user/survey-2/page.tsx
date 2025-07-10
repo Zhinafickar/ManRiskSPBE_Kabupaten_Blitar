@@ -147,7 +147,8 @@ export default function Survey2Page() {
     <Card>
       <CardHeader>
         <CardTitle>Input Survey (Tampilan Tabel)</CardTitle>
-        <CardDescription>Isi data untuk setiap kejadian risiko yang telah ditentukan. Hanya baris yang terisi lengkap yang akan dikirim.</CardDescription>
+        <CardDescription>Isi data untuk setiap kejadian risiko yang telah ditentukan. Hanya baris yang terisi lengkap yang akan dikirim.{' '}
+        <span className="font-bold">Tidak Cocok untuk input di handphone vertikal.</span></CardDescription>
       </CardHeader>
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
