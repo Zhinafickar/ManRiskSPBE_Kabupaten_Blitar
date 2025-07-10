@@ -1,115 +1,307 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Skeleton } from '@/components/ui/skeleton';
-import { getAllContinuityPlans, deleteContinuityPlan } from "@/services/continuity-service";
-import type { ContinuityPlan } from '@/types/continuity';
-import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Trash2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
+} from '@/components/ui/sidebar';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import { useAuth } from '@/hooks/use-auth';
+import {
+  LayoutDashboard,
+  FileText,
+  AreaChart,
+  Users,
+  ClipboardList,
+  ChevronDown,
+  Recycle,
+  FileCheck,
+  Info,
+  Database,
+  BookOpen,
+  FilePenLine,
+  TableProperties,
+  FilePlus2,
+  ClipboardCheck,
+  Printer,
+  Shield,
+} from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 
-function ResultsTableSkeleton() {
-  return (
-    <div className="space-y-2">
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
-      <Skeleton className="h-12 w-full" />
-    </div>
-  );
-}
+export function MainNav() {
+  const { userProfile } = useAuth();
+  const pathname = usePathname();
 
-export default function AdminContinuityResultsPage() {
-  const [plans, setPlans] = useState<ContinuityPlan[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const isActiveInfoMenu = pathname === '/user/data' || pathname === '/user/tutorial';
+  const [isInfoMenuOpen, setIsInfoMenuOpen] = useState(isActiveInfoMenu);
 
-  useEffect(() => {
-    getAllContinuityPlans()
-      .then(setPlans)
-      .finally(() => setLoading(false));
-  }, []);
+  const isActiveRiskMenu = pathname.startsWith('/user/survey') || pathname === '/user/results';
+  const [isRiskMenuOpen, setIsRiskMenuOpen] = useState(isActiveRiskMenu);
+  
+  const isActiveContinuityMenu = pathname.startsWith('/user/continuity');
+  const [isContinuityMenuOpen, setIsContinuityMenuOpen] = useState(isActiveContinuityMenu);
 
-  const handleDelete = async (planId: string) => {
-    const result = await deleteContinuityPlan(planId);
-    if (result.success) {
-        toast({ title: 'Success', description: result.message });
-        setPlans(plans.filter(p => p.id !== planId));
-    } else {
-        toast({ variant: 'destructive', title: 'Error', description: result.message });
+  const adminMenu = [
+    {
+      href: '/admuinma/dashboard',
+      label: 'Dashboard',
+      icon: LayoutDashboard,
+      active: pathname === '/admuinma/dashboard',
+    },
+    {
+      href: '/admuinma/results',
+      label: 'Survey Results',
+      icon: FileText,
+      active: pathname === '/admuinma/results',
+    },
+    {
+      href: '/admuinma/continuity-results',
+      label: 'Continuity Results',
+      icon: ClipboardCheck,
+      active: pathname === '/admuinma/continuity-results',
+    },
+    {
+      href: '/admuinma/visualization',
+      label: 'Visualization',
+      icon: AreaChart,
+      active: pathname === '/admuinma/visualization',
+    },
+  ];
+
+  const superAdminMenu = [
+    {
+      href: '/superadmin/dashboard',
+      label: 'Dashboard',
+      icon: LayoutDashboard,
+      active: pathname === '/superadmin/dashboard',
+    },
+    {
+      href: '/superadmin/users',
+      label: 'User Management',
+      icon: Users,
+      active: pathname.startsWith('/superadmin/users'),
+    },
+    {
+      href: '/superadmin/role-management',
+      label: 'Role Management',
+      icon: Shield,
+      active: pathname.startsWith('/superadmin/role-management'),
+    },
+    {
+      href: '/superadmin/results',
+      label: 'Survey Results',
+      icon: FileText,
+      active: pathname === '/superadmin/results',
+    },
+    {
+      href: '/superadmin/continuity-results',
+      label: 'Continuity Results',
+      icon: ClipboardCheck,
+      active: pathname === '/superadmin/continuity-results',
+    },
+    {
+      href: '/superadmin/visualization',
+      label: 'Visualization',
+      icon: AreaChart,
+      active: pathname === '/superadmin/visualization',
+    },
+  ];
+
+  const getMenuItems = () => {
+    switch (userProfile?.role) {
+      case 'admin':
+        return adminMenu;
+      case 'superadmin':
+        return superAdminMenu;
+      default:
+        return []; // User menu is rendered separately
     }
   };
+  
+  if (userProfile?.role === 'admin' || userProfile?.role === 'superadmin') {
+      const menuItems = getMenuItems();
+    return (
+        <SidebarMenu>
+            {menuItems.map((item: any) => (
+                <SidebarMenuItem key={item.label}>
+                {item.href ? (
+                    <SidebarMenuButton
+                    asChild
+                    isActive={item.active}
+                    tooltip={item.label}
+                    >
+                    <Link href={item.href}>
+                        <item.icon />
+                        <span>{item.label}</span>
+                    </Link>
+                    </SidebarMenuButton>
+                ) : (
+                    <SidebarMenuButton
+                    onClick={item.onClick}
+                    isActive={item.active}
+                    tooltip={item.label}
+                    >
+                    <item.icon />
+                    <span>{item.label}</span>
+                    </SidebarMenuButton>
+                )}
+                </SidebarMenuItem>
+            ))}
+        </SidebarMenu>
+    )
+  }
 
+  // User Menu
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>All Continuity Plans</CardTitle>
-        <CardDescription>A comprehensive list of all continuity plans submitted by all users.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {loading ? (
-          <ResultsTableSkeleton />
-        ) : plans.length > 0 ? (
-          <Table>
-            <TableHeader>
-              <TableRow className="border-b-primary/20 bg-primary hover:bg-primary/90">
-                <TableHead className="text-primary-foreground">User Role</TableHead>
-                <TableHead className="text-primary-foreground">Risiko</TableHead>
-                <TableHead className="text-primary-foreground">Aktivitas</TableHead>
-                <TableHead className="text-primary-foreground">Target Waktu</TableHead>
-                <TableHead className="text-primary-foreground">PIC</TableHead>
-                <TableHead className="text-primary-foreground">RTO</TableHead>
-                <TableHead className="text-primary-foreground">RPO</TableHead>
-                <TableHead className="text-right text-primary-foreground">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {plans.map((plan) => (
-                <TableRow key={plan.id}>
-                  <TableCell className="font-medium max-w-xs truncate">{plan.userRole || 'N/A'}</TableCell>
-                  <TableCell className="max-w-xs truncate">{plan.risiko}</TableCell>
-                  <TableCell className="max-w-xs truncate">{plan.aktivitas}</TableCell>
-                  <TableCell>{plan.targetWaktu}</TableCell>
-                  <TableCell>{plan.pic}</TableCell>
-                  <TableCell>{plan.rto}</TableCell>
-                  <TableCell>{plan.rpo}</TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          className="text-destructive"
-                          onSelect={() => handleDelete(plan.id)}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        ) : (
-          <div className="text-center py-10">
-            <p className="text-muted-foreground">No continuity plans have been submitted yet.</p>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive={pathname === '/user/dashboard'} tooltip="Dashboard">
+          <Link href="/user/dashboard">
+            <LayoutDashboard />
+            <span>Dashboard</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+
+      <SidebarMenuItem>
+        <Collapsible open={isInfoMenuOpen} onOpenChange={setIsInfoMenuOpen}>
+          <CollapsibleTrigger asChild>
+            <SidebarMenuButton
+              isActive={isActiveInfoMenu}
+              className="[&[data-state=open]>svg:last-of-type]:rotate-180"
+            >
+              <Info />
+              <span className="mr-auto group-data-[collapsible=icon]:hidden">Informasi Penting</span>
+              <ChevronDown className="size-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden" />
+            </SidebarMenuButton>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <SidebarMenuSub>
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton asChild isActive={pathname === '/user/data'}>
+                  <Link href="/user/data">
+                    <Database />
+                    <span>Referensi Perhitungan</span>
+                  </Link>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton asChild isActive={pathname === '/user/tutorial'}>
+                  <Link href="/user/tutorial">
+                    <BookOpen />
+                    <span>Tutorial</span>
+                  </Link>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+            </SidebarMenuSub>
+          </CollapsibleContent>
+        </Collapsible>
+      </SidebarMenuItem>
+
+      <SidebarMenuItem>
+        <Collapsible open={isRiskMenuOpen} onOpenChange={setIsRiskMenuOpen}>
+          <CollapsibleTrigger asChild>
+            <SidebarMenuButton
+              isActive={isActiveRiskMenu}
+              className="[&[data-state=open]>svg:last-of-type]:rotate-180"
+            >
+              <ClipboardList />
+              <span className="mr-auto group-data-[collapsible=icon]:hidden">Manajemen Risiko</span>
+              <ChevronDown className="size-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden" />
+            </SidebarMenuButton>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <SidebarMenuSub>
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton asChild isActive={pathname === '/user/survey-1'}>
+                  <Link href="/user/survey-1">
+                    <FilePenLine />
+                    <span>Input Form (Single)</span>
+                  </Link>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton asChild isActive={pathname === '/user/survey-2'}>
+                  <Link href="/user/survey-2">
+                    <TableProperties />
+                    <span>input Tabel (Multi)</span>
+                  </Link>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton asChild isActive={pathname === '/user/results'}>
+                  <Link href="/user/results">
+                    <FileText />
+                    <span>Hasil Survey Anda</span>
+                  </Link>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+            </SidebarMenuSub>
+          </CollapsibleContent>
+        </Collapsible>
+      </SidebarMenuItem>
+      
+      <SidebarMenuItem>
+        <Collapsible open={isContinuityMenuOpen} onOpenChange={setIsContinuityMenuOpen}>
+            <CollapsibleTrigger asChild>
+                <SidebarMenuButton
+                isActive={isActiveContinuityMenu}
+                className="[&[data-state=open]>svg:last-of-type]:rotate-180"
+                >
+                    <Recycle />
+                    <span className="mr-auto group-data-[collapsible=icon]:hidden">Kontinuitas</span>
+                    <ChevronDown className="size-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden" />
+                </SidebarMenuButton>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+                <SidebarMenuSub>
+                    <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={pathname === '/user/continuity'}>
+                            <Link href="/user/continuity">
+                                <FilePlus2 />
+                                <span>Input Rencana</span>
+                            </Link>
+                        </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={pathname === '/user/continuity-results'}>
+                            <Link href="/user/continuity-results">
+                                <ClipboardCheck />
+                                <span>Rencana Terinput</span>
+                            </Link>
+                        </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                </SidebarMenuSub>
+            </CollapsibleContent>
+        </Collapsible>
+      </SidebarMenuItem>
+
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive={pathname === '/user/grafik'} tooltip="Grafik Hasil">
+          <Link href="/user/grafik">
+            <AreaChart />
+            <span>Grafik</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive={pathname === '/user/conclusion'} tooltip="Laporan Akhir">
+          <Link href="/user/conclusion">
+            <Printer />
+            <span>Laporan Akhir</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    </SidebarMenu>
   );
 }

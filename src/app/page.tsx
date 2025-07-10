@@ -22,7 +22,7 @@ export default function Home() {
           router.replace('/superadmin/dashboard');
           break;
         case 'admin':
-          router.replace('/admin/dashboard');
+          router.replace('/admuinma/dashboard');
           break;
         default:
           // Assumes 'user' or any other role

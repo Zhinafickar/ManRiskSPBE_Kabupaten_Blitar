@@ -1,192 +1,307 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Skeleton } from '@/components/ui/skeleton';
-import { getAllSurveyData } from "@/services/survey-service";
-import type { Survey } from '@/types/survey';
-import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, type ChartConfig } from "@/components/ui/chart";
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { TrendingUp } from 'lucide-react';
+import {
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
+} from '@/components/ui/sidebar';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import { useAuth } from '@/hooks/use-auth';
+import {
+  LayoutDashboard,
+  FileText,
+  AreaChart,
+  Users,
+  ClipboardList,
+  ChevronDown,
+  Recycle,
+  FileCheck,
+  Info,
+  Database,
+  BookOpen,
+  FilePenLine,
+  TableProperties,
+  FilePlus2,
+  ClipboardCheck,
+  Printer,
+  Shield,
+} from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 
-// --- Chart Configs ---
-const riskLevelColors = {
-  Bahaya: 'hsl(var(--destructive))',
-  Sedang: 'hsl(48, 100%, 60%)',
-  Rendah: 'hsl(var(--chart-2))',
-  Minor: 'hsl(var(--chart-1))',
-};
+export function MainNav() {
+  const { userProfile } = useAuth();
+  const pathname = usePathname();
 
-const pieChartConfig = {
-  count: { label: 'Jumlah' },
-  Bahaya: { label: 'Bahaya', color: riskLevelColors.Bahaya },
-  Sedang: { label: 'Sedang', color: riskLevelColors.Sedang },
-  Rendah: { label: 'Rendah', color: riskLevelColors.Rendah },
-  Minor: { label: 'Minor', color: riskLevelColors.Minor },
-} satisfies ChartConfig;
+  const isActiveInfoMenu = pathname === '/user/data' || pathname === '/user/tutorial';
+  const [isInfoMenuOpen, setIsInfoMenuOpen] = useState(isActiveInfoMenu);
 
-const barChartConfig = {
-  risks: { label: 'Risiko Tinggi & Sedang', color: 'hsl(var(--primary))' },
-} satisfies ChartConfig;
+  const isActiveRiskMenu = pathname.startsWith('/user/survey') || pathname === '/user/results';
+  const [isRiskMenuOpen, setIsRiskMenuOpen] = useState(isActiveRiskMenu);
+  
+  const isActiveContinuityMenu = pathname.startsWith('/user/continuity');
+  const [isContinuityMenuOpen, setIsContinuityMenuOpen] = useState(isActiveContinuityMenu);
 
-// --- Skeleton Component ---
-function VisualizationSkeleton() {
-  return (
-    <div className="grid gap-6 md:grid-cols-2">
-      <Card>
-        <CardHeader>
-          <Skeleton className="h-6 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
-        </CardHeader>
-        <CardContent className="flex items-center justify-center">
-          <Skeleton className="size-64 rounded-full" />
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <Skeleton className="h-6 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Skeleton className="h-8 w-full" />
-          <Skeleton className="h-8 w-full" />
-          <Skeleton className="h-8 w-full" />
-          <Skeleton className="h-8 w-full" />
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
+  const adminMenu = [
+    {
+      href: '/admuinma/dashboard',
+      label: 'Dashboard',
+      icon: LayoutDashboard,
+      active: pathname === '/admuinma/dashboard',
+    },
+    {
+      href: '/admuinma/results',
+      label: 'Survey Results',
+      icon: FileText,
+      active: pathname === '/admuinma/results',
+    },
+    {
+      href: '/admuinma/continuity-results',
+      label: 'Continuity Results',
+      icon: ClipboardCheck,
+      active: pathname === '/admuinma/continuity-results',
+    },
+    {
+      href: '/admuinma/visualization',
+      label: 'Visualization',
+      icon: AreaChart,
+      active: pathname === '/admuinma/visualization',
+    },
+  ];
 
-// --- Main Visualization Component ---
-export default function VisualizationPage() {
-  const [surveys, setSurveys] = useState<Survey[]>([]);
-  const [loading, setLoading] = useState(true);
+  const superAdminMenu = [
+    {
+      href: '/superadmin/dashboard',
+      label: 'Dashboard',
+      icon: LayoutDashboard,
+      active: pathname === '/superadmin/dashboard',
+    },
+    {
+      href: '/superadmin/users',
+      label: 'User Management',
+      icon: Users,
+      active: pathname.startsWith('/superadmin/users'),
+    },
+    {
+      href: '/superadmin/role-management',
+      label: 'Role Management',
+      icon: Shield,
+      active: pathname.startsWith('/superadmin/role-management'),
+    },
+    {
+      href: '/superadmin/results',
+      label: 'Survey Results',
+      icon: FileText,
+      active: pathname === '/superadmin/results',
+    },
+    {
+      href: '/superadmin/continuity-results',
+      label: 'Continuity Results',
+      icon: ClipboardCheck,
+      active: pathname === '/superadmin/continuity-results',
+    },
+    {
+      href: '/superadmin/visualization',
+      label: 'Visualization',
+      icon: AreaChart,
+      active: pathname === '/superadmin/visualization',
+    },
+  ];
 
-  useEffect(() => {
-    getAllSurveyData()
-      .then(setSurveys)
-      .finally(() => setLoading(false));
-  }, []);
-
-  const chartData = useMemo(() => {
-    if (surveys.length === 0) return null;
-
-    // Data for Pie Chart
-    const riskCounts: { [key: string]: number } = { Bahaya: 0, Sedang: 0, Rendah: 0, Minor: 0 };
-    let totalValidSurveys = 0;
-    surveys.forEach(survey => {
-      if (survey.riskLevel && survey.riskLevel in riskCounts) {
-        riskCounts[survey.riskLevel]++;
-        totalValidSurveys++;
-      }
-    });
-
-    const pieData = Object.entries(riskCounts)
-      .filter(([, value]) => value > 0)
-      .map(([name, value]) => ({
-        name: name as keyof typeof riskLevelColors,
-        value,
-        fill: riskLevelColors[name as keyof typeof riskLevelColors],
-      }));
-
-    // Data for Bar Chart
-    const roleRiskCounts = surveys.reduce((acc, survey) => {
-      if ((survey.riskLevel === 'Bahaya' || survey.riskLevel === 'Sedang') && survey.userRole) {
-        acc[survey.userRole] = (acc[survey.userRole] || 0) + 1;
-      }
-      return acc;
-    }, {} as Record<string, number>);
-
-    const barData = Object.entries(roleRiskCounts)
-      .map(([name, risks]) => ({ name, risks }))
-      .sort((a, b) => b.risks - a.risks)
-      .slice(0, 10); // Show top 10 roles with most high/medium risks
-
-    return { pieData, totalValidSurveys, barData };
-  }, [surveys]);
-
-  if (loading) {
-    return <VisualizationSkeleton />;
-  }
-
-  if (!chartData || surveys.length === 0) {
+  const getMenuItems = () => {
+    switch (userProfile?.role) {
+      case 'admin':
+        return adminMenu;
+      case 'superadmin':
+        return superAdminMenu;
+      default:
+        return []; // User menu is rendered separately
+    }
+  };
+  
+  if (userProfile?.role === 'admin' || userProfile?.role === 'superadmin') {
+      const menuItems = getMenuItems();
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Data Visualization</CardTitle>
-          <CardDescription>Graphical insights from the collected survey data.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center h-96 border-2 border-dashed rounded-lg">
-            <p className="text-muted-foreground">No survey data available to display visualizations.</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
+        <SidebarMenu>
+            {menuItems.map((item: any) => (
+                <SidebarMenuItem key={item.label}>
+                {item.href ? (
+                    <SidebarMenuButton
+                    asChild
+                    isActive={item.active}
+                    tooltip={item.label}
+                    >
+                    <Link href={item.href}>
+                        <item.icon />
+                        <span>{item.label}</span>
+                    </Link>
+                    </SidebarMenuButton>
+                ) : (
+                    <SidebarMenuButton
+                    onClick={item.onClick}
+                    isActive={item.active}
+                    tooltip={item.label}
+                    >
+                    <item.icon />
+                    <span>{item.label}</span>
+                    </SidebarMenuButton>
+                )}
+                </SidebarMenuItem>
+            ))}
+        </SidebarMenu>
+    )
   }
 
+  // User Menu
   return (
-    <div className="space-y-6">
-      <div className="space-y-1">
-         <h1 className="text-3xl font-bold">Data Visualization</h1>
-         <p className="text-muted-foreground">
-            Graphical insights from all collected survey data.
-         </p>
-      </div>
-      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-5">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Distribusi Tingkat Risiko</CardTitle>
-            <CardDescription>Persentase tingkat risiko dari semua survei.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={pieChartConfig} className="mx-auto aspect-square max-h-[300px]">
-              <PieChart>
-                <ChartTooltip
-                  cursor={false}
-                  content={
-                    <ChartTooltipContent
-                        formatter={(value) => `${value} (${((Number(value) / chartData.totalValidSurveys) * 100).toFixed(0)}%)`}
-                        hideLabel
-                    />
-                  }
-                />
-                <Pie data={chartData.pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
-                   {chartData.pieData.map((entry) => (
-                    <Cell key={`cell-${entry.name}`} fill={entry.fill} />
-                  ))}
-                </Pie>
-                <ChartLegend content={<ChartLegendContent nameKey="name" />} className="-mt-4" />
-              </PieChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive={pathname === '/user/dashboard'} tooltip="Dashboard">
+          <Link href="/user/dashboard">
+            <LayoutDashboard />
+            <span>Dashboard</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
 
-        <Card className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Departemen dengan Risiko Tertinggi
-            </CardTitle>
-            <CardDescription>Jumlah risiko dengan tingkat 'Bahaya' dan 'Sedang' per departemen (Top 10).</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={barChartConfig} className="h-[300px] w-full">
-              <BarChart data={chartData.barData} layout="vertical" margin={{ left: 150, right: 20 }}>
-                <CartesianGrid horizontal={false} />
-                <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tick={{ fontSize: 12, width: 140 }} interval={0} />
-                <XAxis dataKey="risks" type="number" allowDecimals={false} />
-                <ChartTooltip
-                  cursor={{ fill: 'hsl(var(--muted))' }}
-                  content={<ChartTooltipContent indicator="line" />}
-                />
-                <Bar dataKey="risks" fill="var(--color-risks)" radius={4} />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+      <SidebarMenuItem>
+        <Collapsible open={isInfoMenuOpen} onOpenChange={setIsInfoMenuOpen}>
+          <CollapsibleTrigger asChild>
+            <SidebarMenuButton
+              isActive={isActiveInfoMenu}
+              className="[&[data-state=open]>svg:last-of-type]:rotate-180"
+            >
+              <Info />
+              <span className="mr-auto group-data-[collapsible=icon]:hidden">Informasi Penting</span>
+              <ChevronDown className="size-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden" />
+            </SidebarMenuButton>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <SidebarMenuSub>
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton asChild isActive={pathname === '/user/data'}>
+                  <Link href="/user/data">
+                    <Database />
+                    <span>Referensi Perhitungan</span>
+                  </Link>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton asChild isActive={pathname === '/user/tutorial'}>
+                  <Link href="/user/tutorial">
+                    <BookOpen />
+                    <span>Tutorial</span>
+                  </Link>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+            </SidebarMenuSub>
+          </CollapsibleContent>
+        </Collapsible>
+      </SidebarMenuItem>
+
+      <SidebarMenuItem>
+        <Collapsible open={isRiskMenuOpen} onOpenChange={setIsRiskMenuOpen}>
+          <CollapsibleTrigger asChild>
+            <SidebarMenuButton
+              isActive={isActiveRiskMenu}
+              className="[&[data-state=open]>svg:last-of-type]:rotate-180"
+            >
+              <ClipboardList />
+              <span className="mr-auto group-data-[collapsible=icon]:hidden">Manajemen Risiko</span>
+              <ChevronDown className="size-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden" />
+            </SidebarMenuButton>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <SidebarMenuSub>
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton asChild isActive={pathname === '/user/survey-1'}>
+                  <Link href="/user/survey-1">
+                    <FilePenLine />
+                    <span>Input Form (Single)</span>
+                  </Link>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton asChild isActive={pathname === '/user/survey-2'}>
+                  <Link href="/user/survey-2">
+                    <TableProperties />
+                    <span>input Tabel (Multi)</span>
+                  </Link>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton asChild isActive={pathname === '/user/results'}>
+                  <Link href="/user/results">
+                    <FileText />
+                    <span>Hasil Survey Anda</span>
+                  </Link>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+            </SidebarMenuSub>
+          </CollapsibleContent>
+        </Collapsible>
+      </SidebarMenuItem>
+      
+      <SidebarMenuItem>
+        <Collapsible open={isContinuityMenuOpen} onOpenChange={setIsContinuityMenuOpen}>
+            <CollapsibleTrigger asChild>
+                <SidebarMenuButton
+                isActive={isActiveContinuityMenu}
+                className="[&[data-state=open]>svg:last-of-type]:rotate-180"
+                >
+                    <Recycle />
+                    <span className="mr-auto group-data-[collapsible=icon]:hidden">Kontinuitas</span>
+                    <ChevronDown className="size-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden" />
+                </SidebarMenuButton>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+                <SidebarMenuSub>
+                    <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={pathname === '/user/continuity'}>
+                            <Link href="/user/continuity">
+                                <FilePlus2 />
+                                <span>Input Rencana</span>
+                            </Link>
+                        </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={pathname === '/user/continuity-results'}>
+                            <Link href="/user/continuity-results">
+                                <ClipboardCheck />
+                                <span>Rencana Terinput</span>
+                            </Link>
+                        </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                </SidebarMenuSub>
+            </CollapsibleContent>
+        </Collapsible>
+      </SidebarMenuItem>
+
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive={pathname === '/user/grafik'} tooltip="Grafik Hasil">
+          <Link href="/user/grafik">
+            <AreaChart />
+            <span>Grafik</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive={pathname === '/user/conclusion'} tooltip="Laporan Akhir">
+          <Link href="/user/conclusion">
+            <Printer />
+            <span>Laporan Akhir</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    </SidebarMenu>
   );
 }

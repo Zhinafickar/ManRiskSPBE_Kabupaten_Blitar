@@ -52,28 +52,28 @@ export function MainNav() {
 
   const adminMenu = [
     {
-      href: '/admin/dashboard',
+      href: '/admuinma/dashboard',
       label: 'Dashboard',
       icon: LayoutDashboard,
-      active: pathname === '/admin/dashboard',
+      active: pathname === '/admuinma/dashboard',
     },
     {
-      href: '/admin/results',
+      href: '/admuinma/results',
       label: 'Survey Results',
       icon: FileText,
-      active: pathname === '/admin/results',
+      active: pathname === '/admuinma/results',
     },
     {
-      href: '/admin/continuity-results',
+      href: '/admuinma/continuity-results',
       label: 'Continuity Results',
       icon: ClipboardCheck,
-      active: pathname === '/admin/continuity-results',
+      active: pathname === '/admuinma/continuity-results',
     },
     {
-      href: '/admin/visualization',
+      href: '/admuinma/visualization',
       label: 'Visualization',
       icon: AreaChart,
-      active: pathname === '/admin/visualization',
+      active: pathname === '/admuinma/visualization',
     },
   ];
 
