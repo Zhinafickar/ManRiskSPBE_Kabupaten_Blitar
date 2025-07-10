@@ -79,11 +79,9 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <SidebarHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <SidebarTrigger className="sm:hidden" />
               <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={96} height={96} />
               <h1 className="text-lg font-semibold group-data-[collapsible=icon]:hidden">Manajemen Risiko</h1>
             </div>
-             <SidebarTrigger className="hidden sm:flex" />
           </div>
         </SidebarHeader>
         <SidebarContent>
@@ -94,7 +92,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-        <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
+            <SidebarTrigger className="sm:hidden" />
             <div className="flex-1">
                 {/* Can add breadcrumbs or page title here */}
             </div>
