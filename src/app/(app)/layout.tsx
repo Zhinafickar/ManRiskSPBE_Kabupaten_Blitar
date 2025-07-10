@@ -1,27 +1,23 @@
+
 'use client';
 
-import {
-  Sidebar,
-  SidebarProvider,
-  SidebarHeader,
-  SidebarContent,
-  SidebarFooter,
-  SidebarTrigger,
-  SidebarInset,
-} from '@/components/ui/sidebar';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { MainNav } from '@/components/main-nav';
 import { UserNav } from '@/components/user-nav';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { PanelLeft, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 function AppLayoutSkeleton() {
   return (
     <div className="flex min-h-screen w-full">
       {/* Mock Sidebar */}
-      <div className="hidden md:flex flex-col w-56 border-r bg-muted/40 p-4 gap-4">
+      <div className="hidden md:flex flex-col w-64 border-r bg-muted/40 p-4 gap-4">
         <div className="flex items-center gap-2 h-10">
           <Skeleton className="size-8 rounded-md" />
           <Skeleton className="h-6 w-32" />
@@ -34,8 +30,9 @@ function AppLayoutSkeleton() {
       </div>
       {/* Mock Main Content */}
       <div className="flex-1 flex flex-col">
-        <header className="sticky top-0 z-10 flex h-14 items-center justify-end gap-4 border-b bg-background px-4 sm:px-6">
-          <Skeleton className="h-8 w-8 rounded-full" />
+        <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background px-4 sm:px-6">
+          <Skeleton className="h-8 w-8 rounded-md md:hidden" />
+          <Skeleton className="h-8 w-8 rounded-full ml-auto" />
         </header>
         <main className="flex-1 p-4 sm:p-6">
           <div className="space-y-4">
@@ -56,48 +53,83 @@ function AppLayoutSkeleton() {
 export default function AppLayout({ children }: { children: ReactNode }) {
   const { user, userProfile, loading } = useAuth();
   const router = useRouter();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    // This is a safety net. If auth is no longer loading and there's no user,
-    // redirect to login. The root page should handle most cases, but this
-    // prevents accessing protected routes directly.
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  useEffect(() => {
+    setSidebarOpen(!isMobile);
+  }, [isMobile]);
+
+  useEffect(() => {
     if (!loading && !user) {
       router.replace('/login');
     }
   }, [user, loading, router]);
 
-  // The AuthProvider shows a global loading screen, so we don't need another one here.
-  // However, if we land here and there's no user or profile, a redirect is imminent.
-  // We show the skeleton to avoid a blank screen flash before the redirect happens.
-  if (!user || !userProfile) {
+  if (loading || !user || !userProfile) {
     return <AppLayoutSkeleton />;
   }
+  
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   return (
-    <SidebarProvider>
-      <Sidebar>
-        <SidebarHeader>
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={96} height={96} className="group-data-[collapsible=icon]:hidden" />
-            <h1 className="text-lg font-semibold group-data-[collapsible=icon]:hidden min-w-0">Manajemen Risiko</h1>
+    <div className="min-h-screen w-full">
+      {/* Sidebar */}
+      <aside
+        className={cn(
+          "fixed left-0 top-0 z-40 h-screen w-64 bg-card border-r transition-transform duration-300 ease-in-out",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        <div className="flex h-full flex-col">
+          <div className="flex h-14 items-center border-b px-4">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+                <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={96} height={96} />
+                <h1 className="text-lg font-semibold">Manajemen Risiko</h1>
+            </div>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={toggleSidebar}>
+              <X className="h-4 w-4" />
+            </Button>
           </div>
-           <SidebarTrigger className="hidden md:flex ml-auto" />
-        </SidebarHeader>
-        <SidebarContent>
-          <MainNav />
-        </SidebarContent>
-        <SidebarFooter>
-          {/* Can add footer items here if needed */}
-        </SidebarFooter>
-      </Sidebar>
-      <div className="flex-1 flex flex-col">
+          <ScrollArea className="flex-1">
+            <div className="px-3 py-4">
+                 <MainNav />
+            </div>
+          </ScrollArea>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <div
+        className={cn(
+          "transition-all duration-300 ease-in-out",
+          sidebarOpen && !isMobile ? "md:pl-64" : "pl-0"
+        )}
+      >
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
-            <SidebarTrigger className="md:hidden" />
-            <div className="flex-1" />
-            <UserNav />
+          <Button variant="ghost" size="icon" className="h-8 w-8 md:hidden" onClick={toggleSidebar}>
+            <PanelLeft className="h-4 w-4" />
+          </Button>
+          {!sidebarOpen && (
+             <Button variant="ghost" size="icon" className="h-8 w-8 hidden md:flex" onClick={toggleSidebar}>
+                <PanelLeft className="h-4 w-4" />
+             </Button>
+          )}
+          <div className="flex-1" />
+          <UserNav />
         </header>
         <main className="flex-1 p-4 sm:p-6">{children}</main>
       </div>
-    </SidebarProvider>
+    </div>
   );
 }
+
+
+    
