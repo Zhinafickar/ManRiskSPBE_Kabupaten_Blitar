@@ -243,7 +243,7 @@ export default function UserDashboard() {
     <div className="space-y-6">
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">
-          Selamat Datang, {userProfile?.fullName}!
+          Selamat Datang, perwakilan dari {userProfile?.role}!
         </h1>
         <p className="text-muted-foreground">
           Dasboard ini memberikan ringkasan tentang profil dan aktivitas Anda.
