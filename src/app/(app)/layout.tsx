@@ -94,8 +94,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <SidebarInset>
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
             <SidebarTrigger className="sm:hidden" />
-            <div className="flex-1">
-                {/* Can add breadcrumbs or page title here */}
+            <div className="flex-1 flex items-center gap-2">
+               <SidebarTrigger className="hidden sm:flex" />
             </div>
             <UserNav />
         </header>
