@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { PanelLeft, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 function AppLayoutSkeleton() {
   return (
@@ -53,6 +54,25 @@ function AppLayoutSkeleton() {
 export default function AppLayout({ children }: { children: ReactNode }) {
   const { user, userProfile, loading } = useAuth();
   const router = useRouter();
+  
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace('/login');
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user || !userProfile) {
+    return <AppLayoutSkeleton />;
+  }
+
+  return (
+    <SidebarProvider>
+      <AppLayoutContent>{children}</AppLayoutContent>
+    </SidebarProvider>
+  );
+}
+
+function AppLayoutContent({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -67,16 +87,6 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     setSidebarOpen(!isMobile);
   }, [isMobile]);
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.replace('/login');
-    }
-  }, [user, loading, router]);
-
-  if (loading || !user || !userProfile) {
-    return <AppLayoutSkeleton />;
-  }
-  
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   return (
@@ -114,14 +124,9 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         )}
       >
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
-          <Button variant="ghost" size="icon" className="h-8 w-8 md:hidden" onClick={toggleSidebar}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={toggleSidebar}>
             <PanelLeft className="h-4 w-4" />
           </Button>
-          {!sidebarOpen && (
-             <Button variant="ghost" size="icon" className="h-8 w-8 hidden md:flex" onClick={toggleSidebar}>
-                <PanelLeft className="h-4 w-4" />
-             </Button>
-          )}
           <div className="flex-1" />
           <UserNav />
         </header>
@@ -130,6 +135,3 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     </div>
   );
 }
-
-
-    
