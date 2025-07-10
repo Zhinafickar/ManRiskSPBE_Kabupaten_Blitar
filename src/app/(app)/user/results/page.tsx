@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { getUserSurveys, deleteSurvey } from '@/services/survey-service';
+import { getUserContinuityPlans } from '@/services/continuity-service';
 import { Survey } from '@/types/survey';
+import { ContinuityPlan } from '@/types/continuity';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -50,15 +52,21 @@ function RiskIndicatorBadge({ level }: { level?: string }) {
 export default function UserResultsPage() {
   const { user, userProfile } = useAuth();
   const [surveys, setSurveys] = useState<Survey[]>([]);
+  const [continuityPlans, setContinuityPlans] = useState<ContinuityPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const router = useRouter();
 
   useEffect(() => {
     if (user) {
-      getUserSurveys(user.uid)
-        .then(setSurveys)
-        .finally(() => setLoading(false));
+      setLoading(true);
+      Promise.all([
+        getUserSurveys(user.uid),
+        getUserContinuityPlans(user.uid)
+      ]).then(([userSurveys, userPlans]) => {
+        setSurveys(userSurveys);
+        setContinuityPlans(userPlans);
+      }).finally(() => setLoading(false));
     }
   }, [user]);
 
@@ -75,8 +83,10 @@ export default function UserResultsPage() {
   const handleExport = () => {
     if (!userProfile) return;
     const fileName = `${userProfile.role}_Hasil_Management_Risiko`;
-    exportToExcel(surveys, fileName);
+    exportToExcel({ surveys, continuityPlans, fileName });
   };
+
+  const surveysAvailable = surveys.length > 0;
 
   return (
     <Card>
@@ -85,7 +95,7 @@ export default function UserResultsPage() {
             <CardTitle>My Survey Results</CardTitle>
             <CardDescription>Here are all the surveys you have submitted.</CardDescription>
         </div>
-        <Button onClick={handleExport} disabled={surveys.length === 0}>
+        <Button onClick={handleExport} disabled={!surveysAvailable}>
             <FileDown className="mr-2 h-4 w-4" />
             Download Excel
         </Button>
@@ -97,7 +107,7 @@ export default function UserResultsPage() {
                 <Skeleton className="h-10 w-full" />
                 <Skeleton className="h-10 w-full" />
             </div>
-        ) : surveys.length > 0 ? (
+        ) : surveysAvailable ? (
           <Table>
             <TableHeader>
               <TableRow className="border-b-primary/20 bg-primary hover:bg-primary/90">

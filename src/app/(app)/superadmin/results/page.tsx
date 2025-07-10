@@ -6,7 +6,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from '@/components/ui/skeleton';
 import { getAllSurveyData, deleteSurvey } from "@/services/survey-service";
+import { getAllContinuityPlans } from '@/services/continuity-service';
 import type { Survey } from '@/types/survey';
+import type { ContinuityPlan } from '@/types/continuity';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -60,18 +62,23 @@ function RiskIndicatorBadge({ level }: { level?: string }) {
 
 export default function SuperAdminResultsPage() {
   const [surveys, setSurveys] = useState<Survey[]>([]);
+  const [continuityPlans, setContinuityPlans] = useState<ContinuityPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const router = useRouter();
   const { userProfile } = useAuth();
 
   useEffect(() => {
-    getAllSurveyData()
-      .then(data => {
-        const filteredData = data.filter(survey => survey.userRole !== 'Penguji Coba');
-        setSurveys(filteredData);
-      })
-      .finally(() => setLoading(false));
+    setLoading(true);
+    Promise.all([
+        getAllSurveyData(),
+        getAllContinuityPlans()
+    ]).then(([surveyData, planData]) => {
+        const filteredSurveys = surveyData.filter(survey => survey.userRole !== 'Penguji Coba');
+        const filteredPlans = planData.filter(plan => plan.userRole !== 'Penguji Coba');
+        setSurveys(filteredSurveys);
+        setContinuityPlans(filteredPlans);
+    }).finally(() => setLoading(false));
   }, []);
 
   const handleDelete = async (surveyId: string) => {
@@ -87,8 +94,10 @@ export default function SuperAdminResultsPage() {
   const handleExport = () => {
     const roleName = userProfile?.role || 'SuperAdmin';
     const fileName = `${roleName}_Hasil_Management_Risiko`;
-    exportToExcel(surveys, fileName);
+    exportToExcel({ surveys, continuityPlans, fileName });
   };
+
+  const surveysAvailable = surveys.length > 0;
 
   return (
     <Card>
@@ -97,7 +106,7 @@ export default function SuperAdminResultsPage() {
           <CardTitle>All Survey Results</CardTitle>
           <CardDescription>A comprehensive list of all surveys submitted by all users.</CardDescription>
         </div>
-        <Button onClick={handleExport} disabled={surveys.length === 0}>
+        <Button onClick={handleExport} disabled={!surveysAvailable}>
             <FileDown className="mr-2 h-4 w-4" />
             Download Excel
         </Button>
@@ -105,7 +114,7 @@ export default function SuperAdminResultsPage() {
       <CardContent>
         {loading ? (
           <ResultsTableSkeleton />
-        ) : surveys.length > 0 ? (
+        ) : surveysAvailable ? (
           <Table>
             <TableHeader>
               <TableRow className="border-b-primary/20 bg-primary hover:bg-primary/90">
