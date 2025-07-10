@@ -18,13 +18,14 @@ import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword, sendEmailVerification, signOut } from 'firebase/auth';
 import { doc, writeBatch } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ROLES } from '@/constants/data';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { getAssignedRoles } from '@/services/user-service';
 
 const formSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
@@ -38,11 +39,22 @@ const formSchema = z.object({
 
 
 export default function RegisterPage({ params, searchParams }: { params: any, searchParams: any}) {
-  const availableRoles = ROLES;
+  const [availableRoles, setAvailableRoles] = useState<string[]>([]);
   const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    async function fetchAvailableRoles() {
+      const assignedRoles = await getAssignedRoles();
+      const unassignedRoles = ROLES.filter(role => 
+        !assignedRoles.includes(role) || role === 'Penguji Coba'
+      );
+      setAvailableRoles(unassignedRoles);
+    }
+    fetchAvailableRoles();
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -79,7 +91,6 @@ export default function RegisterPage({ params, searchParams }: { params: any, se
 
       const batch = writeBatch(db);
       
-      // Role is taken directly from the form values
       const userRole = values.role;
 
       const userRef = doc(db, 'users', user.uid);
@@ -91,8 +102,6 @@ export default function RegisterPage({ params, searchParams }: { params: any, se
         role: userRole,
       });
 
-      // Only create a role lock document if it's a standard departmental role
-      // This prevents 'admin' or 'superadmin' roles from being locked.
       if (userRole !== 'superadmin' && userRole !== 'admin') {
         const roleRef = doc(db, 'roles', userRole);
         batch.set(roleRef, { uid: user.uid, createdAt: new Date() });
@@ -100,7 +109,6 @@ export default function RegisterPage({ params, searchParams }: { params: any, se
 
       await batch.commit();
 
-      // Sign out immediately to force manual login after verification
       await signOut(auth);
 
       toast({
@@ -216,7 +224,7 @@ export default function RegisterPage({ params, searchParams }: { params: any, se
                         <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                           <Command>
                             <CommandInput placeholder="Search role..." />
-                            <CommandEmpty>No role found.</CommandEmpty>
+                            <CommandEmpty>No available roles found.</CommandEmpty>
                             <CommandList>
                               <CommandGroup>
                                 {availableRoles.map((role) => (
