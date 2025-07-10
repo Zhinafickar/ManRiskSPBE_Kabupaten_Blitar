@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -335,7 +336,7 @@ export default function ReportPage() {
                           <TableBody>
                               {surveys.map(s => (
                                   <TableRow key={s.id}>
-                                      <TableCell className="max-w-xs truncate">{s.riskEvent} - {s.impactArea}</TableCell>
+                                      <TableCell className="whitespace-normal">{s.riskEvent} - {s.impactArea}</TableCell>
                                       <TableCell>{s.kontrolOrganisasi?.length || 0} Terpilih</TableCell>
                                       <TableCell>{s.kontrolOrang?.length || 0} Terpilih</TableCell>
                                       <TableCell>{s.kontrolFisik?.length || 0} Terpilih</TableCell>
