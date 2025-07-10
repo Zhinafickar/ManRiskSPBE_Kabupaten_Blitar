@@ -78,7 +78,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={96} height={96} />
+            <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={96} height={96} className="group-data-[collapsible=icon]:hidden" />
             <h1 className="text-lg font-semibold group-data-[collapsible=icon]:hidden truncate">Manajemen Risiko</h1>
           </div>
         </SidebarHeader>
@@ -91,7 +91,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       </Sidebar>
       <SidebarInset>
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
-            <SidebarTrigger className="sm:hidden" />
+            <SidebarTrigger className="md:hidden" />
+            <SidebarTrigger className="hidden md:flex" />
             <div className="flex-1" />
             <UserNav />
         </header>
