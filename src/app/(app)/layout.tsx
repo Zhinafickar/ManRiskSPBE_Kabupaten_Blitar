@@ -99,7 +99,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
         )}
       >
         <div className="flex h-full flex-col">
-          <div className="flex h-14 items-center justify-between border-b px-4">
+          <div className="flex h-14 items-center border-b px-4">
             <div className="flex items-center gap-2 min-w-0">
                 <Image src="https://tse1.mm.bing.net/th/id/OIP.KqQitcG_zgUO3wAd4OG_JwHaDj?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Logo" width={40} height={40} />
                 <h1 className="text-lg font-semibold">Manajemen Risiko</h1>

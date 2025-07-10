@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -152,7 +153,7 @@ export default function Survey2Page() {
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent>
             <div ref={scrollContainerRef} className="overflow-x-auto border rounded-lg">
-              <Table className="min-w-max">
+              <Table className="min-w-[3200px]">
                 <TableHeader>
                   <TableRow className="border-b-primary/20 bg-primary hover:bg-primary/90">
                     <TableHead className="w-[300px] font-bold text-primary-foreground sticky left-0 bg-primary z-10">Kategori Risiko</TableHead>
