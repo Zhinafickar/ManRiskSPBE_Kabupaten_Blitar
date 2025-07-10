@@ -78,6 +78,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2">
+            <SidebarTrigger className="sm:hidden" />
             <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={96} height={96} />
             <h1 className="text-lg font-semibold">Manajemen Risiko</h1>
           </div>
@@ -91,7 +92,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       </Sidebar>
       <SidebarInset>
         <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
-            <SidebarTrigger />
+            <SidebarTrigger className="hidden sm:flex" />
             <div className="flex-1">
                 {/* Can add breadcrumbs or page title here */}
             </div>
