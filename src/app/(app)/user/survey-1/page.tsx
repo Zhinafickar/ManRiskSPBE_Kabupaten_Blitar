@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -36,7 +37,7 @@ import { addSurvey } from '@/services/survey-service';
 import { useAuth } from '@/hooks/use-auth';
 import { useEffect, useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon, Check, ChevronsUpDown } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, ChevronsUpDown, Info } from 'lucide-react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import { getRiskLevel, type RiskIndicator } from '@/lib/risk-matrix';
@@ -149,7 +150,26 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
               name="riskEvent"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Kategori Risiko (ISO 31000 dan Cobit 5 for risk)</FormLabel>
+                  <div className="flex items-center gap-2">
+                    <FormLabel>Kategori Risiko (ISO 31000 dan Cobit 5 for risk)</FormLabel>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-5 w-5 rounded-full">
+                                <Info className="h-4 w-4 text-muted-foreground" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80">
+                            <div className="space-y-2">
+                                <h4 className="font-medium leading-none">Penjelasan Standar</h4>
+                                <p className="text-sm text-muted-foreground">
+                                    <strong>ISO 31000:</strong> Standar internasional untuk manajemen risiko secara umum.
+                                    <br />
+                                    <strong>COBIT 5 for Risk:</strong> Kerangka kerja yang berfokus pada risiko terkait Teknologi Informasi (TI).
+                                </p>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
+                  </div>
                    <Popover open={riskEventOpen} onOpenChange={setRiskEventOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -617,3 +637,4 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
     </Card>
   );
 }
+
