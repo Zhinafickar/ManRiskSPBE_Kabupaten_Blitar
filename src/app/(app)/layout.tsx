@@ -99,12 +99,12 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
         )}
       >
         <div className="flex h-full flex-col">
-          <div className="flex h-14 items-center border-b px-4">
-            <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="flex h-14 items-center justify-between border-b px-4">
+            <div className="flex items-center gap-2 min-w-0">
                 <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={96} height={96} />
                 <h1 className="text-lg font-semibold">Manajemen Risiko</h1>
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={toggleSidebar}>
+            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={toggleSidebar}>
               <X className="h-4 w-4" />
             </Button>
           </div>
