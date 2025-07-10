@@ -78,10 +78,11 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
               <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={96} height={96} />
-              <h1 className="text-lg font-semibold group-data-[collapsible=icon]:hidden">Manajemen Risiko</h1>
+              <h1 className="text-lg font-semibold group-data-[collapsible=icon]:hidden truncate">Manajemen Risiko</h1>
             </div>
+            <SidebarTrigger className="hidden sm:flex" />
           </div>
         </SidebarHeader>
         <SidebarContent>
@@ -94,9 +95,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <SidebarInset>
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
             <SidebarTrigger className="sm:hidden" />
-            <div className="flex-1 flex items-center gap-2">
-               <SidebarTrigger className="hidden sm:flex" />
-            </div>
+            <div className="flex-1" />
             <UserNav />
         </header>
         <main className="flex-1 p-4 sm:p-6">{children}</main>
