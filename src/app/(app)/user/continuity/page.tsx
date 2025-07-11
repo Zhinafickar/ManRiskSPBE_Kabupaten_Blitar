@@ -90,29 +90,23 @@ export default function ContinuityPage() {
             allSurveyData: JSON.stringify(allSurveyData),
         });
         
-        // If the first plan is empty, fill it. Otherwise, append a new one.
-        const firstPlan = form.getValues('plans.0');
-        if (fields.length === 1 && !firstPlan.aktivitas && !firstPlan.targetWaktu && !firstPlan.pic && !firstPlan.sumberdaya) {
-             form.setValue('plans.0', {
-                aktivitas: suggestion.aktivitas,
-                targetWaktu: suggestion.targetWaktu,
-                pic: suggestion.pic,
-                sumberdaya: suggestion.sumberdaya,
-                rto: '',
-                rpo: '',
-             }, { shouldValidate: true });
-        } else {
-            append({
-                aktivitas: suggestion.aktivitas,
-                targetWaktu: suggestion.targetWaktu,
-                pic: suggestion.pic,
-                sumberdaya: suggestion.sumberdaya,
-                rto: '', 
-                rpo: '',
-            });
+        // Always set the first plan with the new suggestion
+        form.setValue('plans.0', {
+            aktivitas: suggestion.aktivitas,
+            targetWaktu: suggestion.targetWaktu,
+            pic: suggestion.pic,
+            sumberdaya: suggestion.sumberdaya,
+            rto: '',
+            rpo: '',
+         }, { shouldValidate: true });
+
+        // If there are more than one plans, remove the rest
+        if (fields.length > 1) {
+            const newPlans = form.getValues('plans').slice(0, 1);
+            replace(newPlans);
         }
         
-        toast({ title: 'Saran Dibuat', description: 'Saran rencana kontinuitas telah ditambahkan.' });
+        toast({ title: 'Saran Baru Dibuat', description: 'Saran baru telah diterapkan pada rencana pertama.' });
     } catch (error) {
         console.error("AI suggestion error:", error);
         toast({ variant: 'destructive', title: 'Error', description: 'Gagal mendapatkan saran dari AI.' });
