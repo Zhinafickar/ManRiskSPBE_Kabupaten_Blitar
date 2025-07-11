@@ -8,16 +8,18 @@ import { getAllUsers } from '@/services/user-service';
 import { ROLES } from '@/constants/data';
 import type { UserProfile } from '@/types/user';
 import { Building } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
-function OPDListSkeleton() {
+function OPDTableSkeleton() {
     return (
-        <div className="space-y-3">
-            {[...Array(10)].map((_, i) => (
-                <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                    <Skeleton className="h-5 w-3/4" />
-                    <Skeleton className="h-6 w-20" />
-                </div>
-            ))}
+        <div className="space-y-2">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
         </div>
     );
 }
@@ -55,20 +57,32 @@ export default function OPDPage() {
             </CardHeader>
             <CardContent>
                 {loading ? (
-                    <OPDListSkeleton />
+                    <OPDTableSkeleton />
                 ) : (
-                    <div className="space-y-2">
-                        {departmentStatus.map(dept => (
-                            <div key={dept.name} className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                                <p className="font-medium">{dept.name}</p>
-                                {dept.isTaken ? (
-                                    <Badge variant="secondary" className="border-green-300 text-green-800">Terisi</Badge>
-                                ) : (
-                                    <Badge variant="outline">Kosong</Badge>
-                                )}
-                            </div>
-                        ))}
-                    </div>
+                    <ScrollArea className="h-[350px] rounded-md border">
+                        <Table>
+                            <TableHeader className="sticky top-0 bg-muted">
+                                <TableRow>
+                                    <TableHead>Nama Departemen</TableHead>
+                                    <TableHead className="text-right">Status</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {departmentStatus.map(dept => (
+                                    <TableRow key={dept.name}>
+                                        <TableCell className="font-medium">{dept.name}</TableCell>
+                                        <TableCell className="text-right">
+                                            {dept.isTaken ? (
+                                                <Badge variant="secondary" className="border-green-300 text-green-800">Terisi</Badge>
+                                            ) : (
+                                                <Badge variant="outline">Kosong</Badge>
+                                            )}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </ScrollArea>
                 )}
             </CardContent>
         </Card>
