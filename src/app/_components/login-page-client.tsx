@@ -74,25 +74,10 @@ export function LoginPageClient() {
         return;
       }
       
-      const userDocRef = doc(db, 'users', user.uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (userDoc.exists()) {
-        const userProfile = userDoc.data();
-        switch (userProfile.role) {
-            case 'superadmin':
-                router.push('/superadmin/dashboard');
-                break;
-            case 'admin':
-                router.push('/admuinma/dashboard');
-                break;
-            default:
-                router.push('/user/dashboard');
-                break;
-        }
-      } else {
-        throw new Error("User profile not found.");
-      }
+      // Instead of redirecting based on role here,
+      // we just redirect to a generic dashboard route.
+      // The dashboard page will then handle role-based redirection.
+      router.push('/dashboard');
 
     } catch (error: any) {
       let description = 'An unknown error occurred.';

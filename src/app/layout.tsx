@@ -1,35 +1,30 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { cn } from "@/lib/utils";
-import { Toaster } from "@/components/ui/toaster";
-import { AuthProvider } from "@/hooks/use-auth";
-import { SidebarProvider } from "@/components/ui/sidebar";
+// src/app/layout.tsx
 
-const inter = Inter({ 
-  subsets: ["latin"],
-  variable: '--font-inter',
-});
+import type { Metadata } from 'next';
+import './globals.css';
+import { Inter } from 'next/font/google';
+import { AuthProvider } from '@/hooks/use-auth';
+import { Toaster } from '@/components/ui/toaster';
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: "Manajemen Risiko",
-  description: "Aplikasi untuk manajemen risiko SPBE",
+  title: 'MenRisk Kab Blitar',
+  description: 'A web application for risk assessment surveys.',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn("min-h-screen bg-background font-sans antialiased", inter.variable)}>
+      <body className={`${inter.variable} font-body antialiased`}>
         <AuthProvider>
-            <SidebarProvider>
-                {children}
-            </SidebarProvider>
+          {children}
+          <Toaster />
         </AuthProvider>
-        <Toaster />
       </body>
     </html>
   );
