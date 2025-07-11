@@ -76,6 +76,12 @@ export function MainNav() {
       icon: AreaChart,
       active: pathname === '/admuinma/visualization',
     },
+    {
+      href: '/admuinma/opd',
+      label: 'OPD/Departemen Lain',
+      icon: Building,
+      active: pathname === '/admuinma/opd',
+    },
   ];
 
   const superAdminMenu = [
@@ -114,6 +120,12 @@ export function MainNav() {
       label: 'Visualization',
       icon: AreaChart,
       active: pathname === '/superadmin/visualization',
+    },
+    {
+      href: '/superadmin/opd',
+      label: 'OPD/Departemen Lain',
+      icon: Building,
+      active: pathname === '/superadmin/opd',
     },
   ];
 
