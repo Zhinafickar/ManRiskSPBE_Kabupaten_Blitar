@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -153,10 +154,10 @@ export function SurveyTableRow({ index, riskEvent, handleClearRow }: SurveyTable
 
   return (
     <TableRow>
-      <TableCell className="font-medium align-top sticky left-0 bg-background z-10">
+      <TableCell className="font-medium align-top sticky left-0 bg-background z-10 p-2">
           <p className="whitespace-normal break-words">{riskEvent.name}</p>
       </TableCell>
-      <TableCell className="align-top">
+      <TableCell className="align-top p-2">
         <FormField
           control={control}
           name={`surveys.${index}.impactArea`}
@@ -200,7 +201,7 @@ export function SurveyTableRow({ index, riskEvent, handleClearRow }: SurveyTable
           )}
         />
       </TableCell>
-       <TableCell className="align-top">
+       <TableCell className="align-top p-2">
         <FormField
           control={control}
           name={`surveys.${index}.areaDampak`}
@@ -217,7 +218,7 @@ export function SurveyTableRow({ index, riskEvent, handleClearRow }: SurveyTable
           )}
         />
       </TableCell>
-      <TableCell className="align-top">
+      <TableCell className="align-top p-2">
         <FormField
           control={control}
           name={`surveys.${index}.eventDate`}
@@ -252,14 +253,14 @@ export function SurveyTableRow({ index, riskEvent, handleClearRow }: SurveyTable
           )}
         />
       </TableCell>
-      <TableCell className="align-top">
+      <TableCell className="align-top p-2">
         <div className="space-y-1">
           <FormField
             control={control}
             name={`surveys.${index}.cause`}
             render={({ field }) => (
               <FormItem>
-                <FormControl><Textarea placeholder="Penyebab..." {...field} /></FormControl>
+                <FormControl><Textarea placeholder="Penyebab..." {...field} className="min-h-[60px]" /></FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -277,19 +278,19 @@ export function SurveyTableRow({ index, riskEvent, handleClearRow }: SurveyTable
           </Button>
         </div>
       </TableCell>
-      <TableCell className="align-top">
+      <TableCell className="align-top p-2">
         <FormField
           control={control}
           name={`surveys.${index}.impact`}
           render={({ field }) => (
             <FormItem>
-              <FormControl><Textarea placeholder="Jelaskan dampak..." {...field} /></FormControl>
+              <FormControl><Textarea placeholder="Jelaskan dampak..." {...field} className="min-h-[60px]" /></FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
       </TableCell>
-      <TableCell className="align-top">
+      <TableCell className="align-top p-2">
         <FormField
           control={control}
           name={`surveys.${index}.frequency`}
@@ -304,7 +305,7 @@ export function SurveyTableRow({ index, riskEvent, handleClearRow }: SurveyTable
           )}
         />
       </TableCell>
-      <TableCell className="align-top">
+      <TableCell className="align-top p-2">
         <FormField
           control={control}
           name={`surveys.${index}.impactMagnitude`}
@@ -319,22 +320,22 @@ export function SurveyTableRow({ index, riskEvent, handleClearRow }: SurveyTable
           )}
         />
       </TableCell>
-      <TableCell className="text-center align-middle">
+      <TableCell className="text-center align-middle p-2">
         {level ? <Badge className={cn("text-base", color)}>{level}</Badge> : <span className="text-xs text-muted-foreground">-</span>}
       </TableCell>
-      <TableCell className="align-top">
+      <TableCell className="align-top p-2">
         {renderMultiSelect('kontrolOrganisasi', ORGANIZATIONAL_CONTROLS, "Pilih kontrol...", openKontrolOrganisasiPopover, setOpenKontrolOrganisasiPopover)}
       </TableCell>
-      <TableCell className="align-top">
+      <TableCell className="align-top p-2">
         {renderMultiSelect('kontrolOrang', PEOPLE_CONTROLS, "Pilih kontrol...", openKontrolOrangPopover, setOpenKontrolOrangPopover)}
       </TableCell>
-      <TableCell className="align-top">
+      <TableCell className="align-top p-2">
         {renderMultiSelect('kontrolFisik', PHYSICAL_CONTROLS, "Pilih kontrol...", openKontrolFisikPopover, setOpenKontrolFisikPopover)}
       </TableCell>
-      <TableCell className="align-top">
+      <TableCell className="align-top p-2">
         {renderMultiSelect('kontrolTeknologi', TECHNOLOGICAL_CONTROLS, "Pilih kontrol...", openKontrolTeknologiPopover, setOpenKontrolTeknologiPopover)}
       </TableCell>
-      <TableCell className="align-top">
+      <TableCell className="align-top p-2">
         <FormField
           control={control}
           name={`surveys.${index}.mitigasi`}
@@ -359,7 +360,7 @@ export function SurveyTableRow({ index, riskEvent, handleClearRow }: SurveyTable
           )}
         />
       </TableCell>
-      <TableCell className="text-center align-middle">
+      <TableCell className="text-center align-middle p-2">
         <Button
           type="button"
           variant="ghost"
