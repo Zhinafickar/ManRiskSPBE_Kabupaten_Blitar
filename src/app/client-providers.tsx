@@ -1,16 +1,14 @@
 "use client";
 
 import { AuthProvider } from "@/hooks/use-auth";
-import type { ReactNode } from "react";
-import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import type { ReactNode } from "react";
 
-export function Providers({ children }: { children: ReactNode }) {
+export function ClientProviders({ children }: { children: ReactNode }) {
     return (
         <AuthProvider>
             <SidebarProvider>
                 {children}
-                <Toaster />
             </SidebarProvider>
         </AuthProvider>
     );
