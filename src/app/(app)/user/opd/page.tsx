@@ -101,7 +101,7 @@ export default function OPDPage() {
                                                     <TableCell className="font-medium">
                                                         <Button 
                                                             variant="link" 
-                                                            className="p-0 h-auto text-left"
+                                                            className="p-0 h-auto text-left whitespace-normal"
                                                             onClick={() => setSelectedDepartment(dept.name)}
                                                             disabled={!dept.isTaken}
                                                         >
