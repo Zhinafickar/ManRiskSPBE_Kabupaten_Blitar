@@ -37,13 +37,14 @@ import { addSurvey } from '@/services/survey-service';
 import { useAuth } from '@/hooks/use-auth';
 import { useEffect, useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon, Check, ChevronsUpDown, Info } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, ChevronsUpDown, Info, Sparkles } from 'lucide-react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import { getRiskLevel, type RiskIndicator } from '@/lib/risk-matrix';
 import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
+import { suggestCauseImpact } from '@/ai/flows/suggest-cause-impact';
 
 const formSchema = z.object({
   riskEvent: z.string({ required_error: 'Silakan pilih kategori risiko.' }).min(1, { message: 'Kategori risiko harus diisi.' }),
@@ -65,6 +66,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
   const { toast } = useToast();
   const { user, userProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [isAiLoading, setIsAiLoading] = useState(false);
   const [riskEventOpen, setRiskEventOpen] = useState(false);
   const [impactAreaOpen, setImpactAreaOpen] = useState(false);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
@@ -95,6 +97,8 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
   });
 
   const selectedRiskEvent = form.watch('riskEvent');
+  const selectedImpactArea = form.watch('impactArea');
+  const selectedAreaDampak = form.watch('areaDampak');
   const frequency = form.watch('frequency');
   const impactMagnitude = form.watch('impactMagnitude');
 
@@ -135,6 +139,29 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
         setIsLoading(false);
     }
   }
+  
+  const handleCauseImpactSuggestion = async () => {
+    const { riskEvent, impactArea, areaDampak } = form.getValues();
+    if (!riskEvent || !impactArea || !areaDampak) {
+      toast({ variant: 'destructive', title: 'Data Kurang', description: 'Pilih Kategori Risiko, Risiko, dan Area Dampak terlebih dahulu.' });
+      return;
+    }
+    setIsAiLoading(true);
+    try {
+      const result = await suggestCauseImpact({
+        riskCategory: riskEvent,
+        risk: impactArea,
+        impactArea: areaDampak,
+      });
+      form.setValue('cause', result.cause, { shouldValidate: true });
+      form.setValue('impact', result.impact, { shouldValidate: true });
+      toast({ title: 'Saran Diterapkan', description: 'Kolom Penyebab dan Dampak telah diisi oleh AI.' });
+    } catch (error) {
+      toast({ variant: 'destructive', title: 'Gagal', description: 'Gagal mendapatkan saran dari AI.' });
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
 
   return (
     <Card>
@@ -335,28 +362,44 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="cause"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Penyebab</FormLabel>
-                  <FormControl><Textarea placeholder="Jelaskan penyebab kejadian risiko..." {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="impact"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Dampak</FormLabel>
-                  <FormControl><Textarea placeholder="Jelaskan potensi dampaknya..." {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+             <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <FormLabel>Penyebab & Dampak</FormLabel>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleCauseImpactSuggestion}
+                  disabled={isAiLoading || !selectedRiskEvent || !selectedImpactArea || !selectedAreaDampak}
+                  className="h-auto px-2 py-1 text-xs"
+                >
+                  <Sparkles className="mr-1 h-3 w-3" />
+                  Beri Saran (AI)
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="cause"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl><Textarea placeholder="Jelaskan penyebab kejadian risiko..." {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="impact"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl><Textarea placeholder="Jelaskan potensi dampaknya..." {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                 control={form.control}
@@ -654,5 +697,6 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
     </Card>
   );
 }
+
 
 

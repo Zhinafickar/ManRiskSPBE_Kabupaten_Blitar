@@ -12,11 +12,13 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon, Check, ChevronsUpDown, RotateCcw } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, ChevronsUpDown, RotateCcw, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { suggestCauseImpact } from '@/ai/flows/suggest-cause-impact';
 
 const singleSurveySchema = z.object({
   riskEvent: z.string(),
@@ -46,11 +48,18 @@ interface SurveyTableRowProps {
 }
 
 export function SurveyTableRow({ index, riskEvent, handleClearRow }: SurveyTableRowProps) {
-  const { control, setValue } = useFormContext();
+  const { control, setValue, getValues } = useFormContext();
+  const { toast } = useToast();
+  const [isAiLoading, setIsAiLoading] = useState(false);
 
-  const [frequency, impactMagnitude] = useWatch({
+  const [frequency, impactMagnitude, impactArea, areaDampak] = useWatch({
     control,
-    name: [`surveys.${index}.frequency`, `surveys.${index}.impactMagnitude`],
+    name: [
+      `surveys.${index}.frequency`,
+      `surveys.${index}.impactMagnitude`,
+      `surveys.${index}.impactArea`,
+      `surveys.${index}.areaDampak`,
+    ],
   });
   
   const { level, color } = getRiskLevel(frequency, impactMagnitude);
@@ -61,6 +70,29 @@ export function SurveyTableRow({ index, riskEvent, handleClearRow }: SurveyTable
   const [openKontrolOrangPopover, setOpenKontrolOrangPopover] = useState(false);
   const [openKontrolFisikPopover, setOpenKontrolFisikPopover] = useState(false);
   const [openKontrolTeknologiPopover, setOpenKontrolTeknologiPopover] = useState(false);
+  
+  const handleCauseImpactSuggestion = async () => {
+    if (!impactArea || !areaDampak) {
+      toast({ variant: 'destructive', title: 'Data Kurang', description: 'Pilih Risiko dan Area Dampak terlebih dahulu untuk baris ini.' });
+      return;
+    }
+    setIsAiLoading(true);
+    try {
+      const result = await suggestCauseImpact({
+        riskCategory: riskEvent.name,
+        risk: impactArea,
+        impactArea: areaDampak,
+      });
+      setValue(`surveys.${index}.cause`, result.cause, { shouldValidate: true });
+      setValue(`surveys.${index}.impact`, result.impact, { shouldValidate: true });
+      toast({ title: 'Saran Diterapkan', description: `Penyebab & Dampak untuk "${riskEvent.name}" telah diisi.` });
+    } catch (error) {
+       toast({ variant: 'destructive', title: 'Gagal', description: 'Gagal mendapatkan saran dari AI.' });
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
 
   const renderMultiSelect = (
     fieldName: keyof z.infer<typeof singleSurveySchema>,
@@ -221,16 +253,29 @@ export function SurveyTableRow({ index, riskEvent, handleClearRow }: SurveyTable
         />
       </TableCell>
       <TableCell className="align-top">
-        <FormField
-          control={control}
-          name={`surveys.${index}.cause`}
-          render={({ field }) => (
-            <FormItem>
-              <FormControl><Textarea placeholder="Jelaskan penyebab..." {...field} /></FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="space-y-1">
+          <FormField
+            control={control}
+            name={`surveys.${index}.cause`}
+            render={({ field }) => (
+              <FormItem>
+                <FormControl><Textarea placeholder="Penyebab..." {...field} /></FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+           <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleCauseImpactSuggestion}
+            disabled={isAiLoading || !impactArea || !areaDampak}
+            className="w-full h-auto px-2 py-1 text-xs"
+          >
+            <Sparkles className="mr-1 h-3 w-3" />
+            {isAiLoading ? "Memproses..." : "Saran AI"}
+          </Button>
+        </div>
       </TableCell>
       <TableCell className="align-top">
         <FormField
