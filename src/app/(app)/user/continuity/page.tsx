@@ -56,7 +56,7 @@ export default function ContinuityPage() {
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: "plans"
   });
@@ -141,12 +141,19 @@ export default function ContinuityPage() {
         toast({ title: 'Sukses', description: `${values.plans.length} rencana kontinuitas berhasil disimpan.` });
         form.reset();
          // After reset, the field array is empty. We need to add back the initial empty form.
-        form.setValue('plans', [{ aktivitas: '', targetWaktu: '', pic: '', sumberdaya: '', rto: '', rpo: '' }]);
+        replace([{ aktivitas: '', targetWaktu: '', pic: '', sumberdaya: '', rto: '', rpo: '' }]);
     } catch (error) {
         toast({ variant: 'destructive', title: 'Error', description: 'Gagal menyimpan satu atau lebih rencana.' });
     } finally {
         setIsLoading(false);
     }
+  }
+
+  const handleRiskChange = (value: string) => {
+    // Set the new risk value
+    form.setValue('risiko', value);
+    // Reset the plans array to its initial empty state
+    replace([{ aktivitas: '', targetWaktu: '', pic: '', sumberdaya: '', rto: '', rpo: '' }]);
   }
 
   return (
@@ -169,7 +176,7 @@ export default function ContinuityPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>RISIKO</FormLabel>
-                   <Select onValueChange={field.onChange} value={field.value}>
+                   <Select onValueChange={handleRiskChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Pilih risiko dari survei yang ada..." />
@@ -314,4 +321,3 @@ export default function ContinuityPage() {
     </Card>
   );
 }
-
