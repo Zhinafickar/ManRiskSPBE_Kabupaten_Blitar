@@ -3,26 +3,15 @@
  * @fileOverview This file defines a Genkit flow for suggesting a business continuity plan.
  *
  * - suggestContinuityPlan - A function that suggests a continuity plan based on a selected risk and historical survey data.
- * - SuggestContinuityPlanInput - The input type for the function.
- * - SuggestContinuityPlanOutput - The return type for the function.
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-
-export const SuggestContinuityPlanInputSchema = z.object({
-  risiko: z.string().describe('The specific risk event and impact area, formatted as "Risk Event - Impact Area".'),
-  allSurveyData: z.string().describe('A JSON string of all historical survey data for context.'),
-});
-export type SuggestContinuityPlanInput = z.infer<typeof SuggestContinuityPlanInputSchema>;
-
-export const SuggestContinuityPlanOutputSchema = z.object({
-  aktivitas: z.string().describe('A concise, actionable recovery activity suggestion.'),
-  targetWaktu: z.string().describe('A realistic target time for recovery (e.g., "4 Jam", "1 Hari Kerja").'),
-  pic: z.string().describe('The suggested Person in Charge (PIC), typically a role or department (e.g., "Tim IT", "Kepala Bagian Keuangan").'),
-  sumberdaya: z.string().describe('A brief list of required resources (e.g., "Server cadangan, teknisi jaringan").'),
-});
-export type SuggestContinuityPlanOutput = z.infer<typeof SuggestContinuityPlanOutputSchema>;
+import {
+    SuggestContinuityPlanInputSchema,
+    SuggestContinuityPlanOutputSchema,
+    type SuggestContinuityPlanInput,
+    type SuggestContinuityPlanOutput
+} from '@/types/continuity';
 
 export async function suggestContinuityPlan(input: SuggestContinuityPlanInput): Promise<SuggestContinuityPlanOutput> {
   return suggestContinuityPlanFlow(input);
