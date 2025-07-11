@@ -1,7 +1,8 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider, useFieldArray } from 'react-hook-form';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,65 +13,100 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Recycle } from 'lucide-react';
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Recycle, PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { addContinuityPlan } from '@/services/continuity-service';
 import { useAuth } from '@/hooks/use-auth';
 import { useEffect, useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getUserSurveys } from '@/services/survey-service';
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ContinuityPlanRow } from './_components/continuity-plan-row';
+import { suggestContinuityPlan } from '@/ai/flows/suggest-continuity-plan';
+import { getAllSurveyData } from '@/services/survey-service';
 import type { Survey } from '@/types/survey';
 
+const planSchema = z.object({
+  aktivitas: z.string().min(1, "Aktivitas harus diisi."),
+  targetWaktu: z.string().min(1, "Target waktu harus diisi."),
+  pic: z.string().min(1, "PIC harus diisi."),
+  sumberdaya: z.string().min(1, "Sumberdaya harus diisi."),
+  rto: z.string().min(1, "RTO harus diisi."),
+  rpo: z.string().min(1, "RPO harus diisi."),
+});
 
 const formSchema = z.object({
   risiko: z.string({ required_error: 'Risiko harus dipilih.' }).min(1, { message: 'Risiko harus dipilih.' }),
-  aktivitas: z.string().min(1, { message: 'Aktivitas harus diisi.' }),
-  targetWaktu: z.string().min(1, { message: 'Target waktu harus diisi.' }),
-  pic: z.string().min(1, { message: 'PIC harus diisi.' }),
-  sumberdaya: z.string().min(1, { message: 'Sumberdaya harus diisi.' }),
-  rto: z.string().min(1, { message: 'RTO harus diisi.' }),
-  rpo: z.string().min(1, { message: 'RPO harus diisi.' }),
+  plans: z.array(planSchema).min(1, "Harus ada setidaknya satu rencana."),
 });
 
-
-export default function ContinuityPage({}: {}) {
+export default function ContinuityPage() {
   const { toast } = useToast();
   const { user, userProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [isAiLoading, setIsAiLoading] = useState(false);
   const [availableRisks, setAvailableRisks] = useState<string[]>([]);
-  const [hasSurveys, setHasSurveys] = useState(false);
+  const [allSurveyData, setAllSurveyData] = useState<Survey[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       risiko: '',
-      aktivitas: '',
-      targetWaktu: '',
-      pic: '',
-      sumberdaya: '',
-      rto: '',
-      rpo: '',
+      plans: [{ aktivitas: '', targetWaktu: '', pic: '', sumberdaya: '', rto: '', rpo: '' }],
     },
   });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "plans"
+  });
+
+  const selectedRisk = form.watch('risiko');
 
   useEffect(() => {
     if (user) {
         getUserSurveys(user.uid).then(surveys => {
-        setHasSurveys(surveys.length > 0);
-
-        const uniqueRisks = new Set<string>();
-        surveys.forEach(survey => {
-          if (survey.riskEvent && survey.impactArea) {
-            uniqueRisks.add(`${survey.riskEvent} - ${survey.impactArea}`);
-          }
+          const uniqueRisks = new Set<string>();
+          surveys.forEach(survey => {
+            if (survey.riskEvent && survey.impactArea) {
+              uniqueRisks.add(`${survey.riskEvent} - ${survey.impactArea}`);
+            }
+          });
+          setAvailableRisks(Array.from(uniqueRisks));
         });
-        
-        setAvailableRisks(Array.from(uniqueRisks));
-      });
+        getAllSurveyData().then(setAllSurveyData);
     }
   }, [user]);
+
+  const handleAiSuggestion = async () => {
+    if (!selectedRisk) {
+        toast({ variant: 'destructive', title: 'Error', description: 'Silakan pilih risiko terlebih dahulu.' });
+        return;
+    }
+    setIsAiLoading(true);
+    try {
+        const suggestion = await suggestContinuityPlan({
+            risiko: selectedRisk,
+            allSurveyData: JSON.stringify(allSurveyData),
+        });
+        // Append a new row with the AI suggestion
+        append({
+            aktivitas: suggestion.aktivitas,
+            targetWaktu: suggestion.targetWaktu,
+            pic: suggestion.pic,
+            sumberdaya: suggestion.sumberdaya,
+            rto: '', // RTO and RPO are left blank for the user
+            rpo: '',
+        });
+        toast({ title: 'Saran Dibuat', description: 'Saran rencana kontinuitas telah ditambahkan sebagai baris baru.' });
+    } catch (error) {
+        console.error("AI suggestion error:", error);
+        toast({ variant: 'destructive', title: 'Error', description: 'Gagal mendapatkan saran dari AI.' });
+    } finally {
+        setIsAiLoading(false);
+    }
+  };
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!user || !userProfile) {
@@ -78,21 +114,27 @@ export default function ContinuityPage({}: {}) {
         return;
     }
     setIsLoading(true);
+
+    const submissionPromises = values.plans.map(plan => addContinuityPlan({
+        ...plan,
+        risiko: values.risiko,
+        userId: user.uid,
+        userRole: userProfile.role
+    }));
+
     try {
-        await addContinuityPlan({
-            ...values,
-            userId: user.uid,
-            userRole: userProfile.role
+        await Promise.all(submissionPromises);
+        toast({ title: 'Sukses', description: `${values.plans.length} rencana kontinuitas berhasil disimpan.` });
+        form.reset({
+            risiko: '',
+            plans: [{ aktivitas: '', targetWaktu: '', pic: '', sumberdaya: '', rto: '', rpo: '' }],
         });
-        toast({ title: 'Sukses', description: 'Rencana kontinuitas berhasil disimpan.' });
-        form.reset();
     } catch (error) {
-        toast({ variant: 'destructive', title: 'Error', description: 'Gagal menyimpan rencana.' });
+        toast({ variant: 'destructive', title: 'Error', description: 'Gagal menyimpan satu atau lebih rencana.' });
     } finally {
         setIsLoading(false);
     }
   }
-
 
   return (
     <Card>
@@ -102,7 +144,7 @@ export default function ContinuityPage({}: {}) {
           Kontinuitas/Keberlanjutan
         </CardTitle>
         <CardDescription>
-          Isi formulir untuk perencanaan keberlanjutan dan kontinuitas layanan. Pilih risiko dari survei yang telah Anda buat.
+          Isi formulir untuk perencanaan keberlanjutan. Pilih satu risiko, lalu tambahkan satu atau lebih rencana aktivitas untuk risiko tersebut.
         </CardDescription>
       </CardHeader>
       <FormProvider {...form}>
@@ -127,10 +169,7 @@ export default function ContinuityPage({}: {}) {
                             ))
                           ) : (
                             <SelectItem value="no-risks" disabled>
-                              {hasSurveys
-                                ? "Semua risiko yang teridentifikasi sudah memiliki rencana."
-                                : "Tidak ada risiko yang ditemukan dari survei Anda."
-                              }
+                              Tidak ada risiko yang ditemukan dari survei Anda.
                             </SelectItem>
                           )}
                         </SelectContent>
@@ -139,79 +178,54 @@ export default function ContinuityPage({}: {}) {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="aktivitas"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>AKTIVITAS</FormLabel>
-                  <FormControl><Textarea placeholder="Jelaskan aktivitas pemulihan yang akan dilakukan..." {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="targetWaktu"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>TARGET WAKTU</FormLabel>
-                    <FormControl><Input placeholder="Contoh: 24 Jam" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
+
+            <div className="space-y-4">
+                <div className="overflow-x-auto border rounded-lg">
+                   <Table className="min-w-[1200px]">
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-[200px]">Aktivitas</TableHead>
+                                <TableHead className="w-[150px]">Target Waktu</TableHead>
+                                <TableHead className="w-[150px]">PIC</TableHead>
+                                <TableHead className="w-[200px]">Sumberdaya</TableHead>
+                                <TableHead className="w-[120px]">RTO</TableHead>
+                                <TableHead className="w-[120px]">RPO</TableHead>
+                                <TableHead className="w-[80px]">Aksi</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {fields.map((field, index) => (
+                                <ContinuityPlanRow key={field.id} index={index} remove={remove} />
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+                 <div className="flex items-center gap-4">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => append({ aktivitas: '', targetWaktu: '', pic: '', sumberdaya: '', rto: '', rpo: '' })}
+                    >
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Tambah Rencana
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={handleAiSuggestion}
+                        disabled={isAiLoading || !selectedRisk}
+                    >
+                        {isAiLoading ? 'Memproses...' : '✨ Beri Saya Saran (AI)'}
+                    </Button>
+                </div>
+                 {form.formState.errors.plans?.root && (
+                    <p className="text-sm font-medium text-destructive">{form.formState.errors.plans.root.message}</p>
                 )}
-              />
-              <FormField
-                control={form.control}
-                name="pic"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>PIC</FormLabel>
-                    <FormControl><Input placeholder="Nama atau departemen penanggung jawab" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
-            <FormField
-              control={form.control}
-              name="sumberdaya"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Sumberdaya yang dibutuhkan</FormLabel>
-                  <FormControl><Textarea placeholder="Sebutkan semua sumber daya yang diperlukan (manusia, teknis, dll.)..." {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="rto"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Recovery Time Objective (RTO)</FormLabel>
-                    <FormControl><Input placeholder="Contoh: 4 Jam" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="rpo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Recovery Point Objective (RPO)</FormLabel>
-                    <FormControl><Input placeholder="Contoh: Data 1 jam terakhir" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isLoading}>{isLoading ? 'Menyimpan...' : 'Simpan Rencana'}</Button>
+            <Button type="submit" disabled={isLoading}>{isLoading ? 'Menyimpan...' : 'Simpan Semua Rencana'}</Button>
           </CardFooter>
         </form>
       </FormProvider>
