@@ -10,14 +10,14 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const SuggestCauseImpactInputSchema = z.object({
+const SuggestCauseImpactInputSchema = z.object({
   riskCategory: z.string().describe('The high-level category of the risk.'),
   risk: z.string().describe('The specific risk being analyzed.'),
   impactArea: z.string().describe('The specific area affected by the risk.'),
 });
 export type SuggestCauseImpactInput = z.infer<typeof SuggestCauseImpactInputSchema>;
 
-export const SuggestCauseImpactOutputSchema = z.object({
+const SuggestCauseImpactOutputSchema = z.object({
   cause: z.string().describe('A plausible cause for the specified risk event.'),
   impact: z.string().describe('A potential impact resulting from the specified risk event.'),
 });
