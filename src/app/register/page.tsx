@@ -27,6 +27,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { getAssignedRoles } from '@/services/user-service';
+import { Providers } from '../providers';
 
 const formSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
@@ -38,8 +39,7 @@ const formSchema = z.object({
   role: z.string({ required_error: 'Please select a role.' }).min(1, {message: "Please select a role."}),
 });
 
-
-export default function RegisterPage({ params, searchParams }: { params: any, searchParams: any}) {
+function RegisterPageContent() {
   const [availableRoles, setAvailableRoles] = useState<string[]>([]);
   const { toast } = useToast();
   const router = useRouter();
@@ -265,4 +265,13 @@ export default function RegisterPage({ params, searchParams }: { params: any, se
       </div>
     </div>
   );
+}
+
+
+export default function RegisterPage({ params, searchParams }: { params: any, searchParams: any}) {
+  return (
+    <Providers>
+      <RegisterPageContent />
+    </Providers>
+  )
 }
