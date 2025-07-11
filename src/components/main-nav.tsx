@@ -32,6 +32,7 @@ import {
   ClipboardCheck,
   Printer,
   Shield,
+  Building,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -41,7 +42,7 @@ export function MainNav() {
   const { userProfile } = useAuth();
   const pathname = usePathname();
 
-  const isActiveInfoMenu = pathname === '/user/data' || pathname === '/user/tutorial';
+  const isActiveInfoMenu = pathname === '/user/data' || pathname === '/user/tutorial' || pathname === '/user/opd';
   const [isInfoMenuOpen, setIsInfoMenuOpen] = useState(isActiveInfoMenu);
 
   const isActiveRiskMenu = pathname.startsWith('/user/survey') || pathname === '/user/results';
@@ -199,6 +200,14 @@ export function MainNav() {
                   <Link href="/user/tutorial">
                     <BookOpen />
                     <span>Tutorial</span>
+                  </Link>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton asChild isActive={pathname === '/user/opd'}>
+                  <Link href="/user/opd">
+                    <Building />
+                    <span>OPD/Departemen Lain</span>
                   </Link>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
