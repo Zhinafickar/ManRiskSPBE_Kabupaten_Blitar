@@ -16,7 +16,7 @@ import { Recycle } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from '@/hooks/use-toast';
-import { addContinuityPlan, getUserContinuityPlans } from '@/services/continuity-service';
+import { addContinuityPlan } from '@/services/continuity-service';
 import { useAuth } from '@/hooks/use-auth';
 import { useEffect, useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -57,10 +57,7 @@ export default function ContinuityPage({}: {}) {
 
   useEffect(() => {
     if (user) {
-      Promise.all([
-        getUserSurveys(user.uid),
-        getUserContinuityPlans(user.uid)
-      ]).then(([surveys, plans]) => {
+        getUserSurveys(user.uid).then(surveys => {
         setHasSurveys(surveys.length > 0);
 
         const uniqueRisks = new Set<string>();
@@ -69,12 +66,8 @@ export default function ContinuityPage({}: {}) {
             uniqueRisks.add(`${survey.riskEvent} - ${survey.impactArea}`);
           }
         });
-
-        const submittedRisks = new Set<string>(plans.map(plan => plan.risiko));
-
-        const unsubmittedRisks = Array.from(uniqueRisks).filter(risk => !submittedRisks.has(risk));
         
-        setAvailableRisks(unsubmittedRisks);
+        setAvailableRisks(Array.from(uniqueRisks));
       });
     }
   }, [user]);
@@ -92,8 +85,6 @@ export default function ContinuityPage({}: {}) {
             userRole: userProfile.role
         });
         toast({ title: 'Sukses', description: 'Rencana kontinuitas berhasil disimpan.' });
-        // Refresh the list of available risks after submission
-        setAvailableRisks(availableRisks.filter(risk => risk !== values.risiko));
         form.reset();
     } catch (error) {
         toast({ variant: 'destructive', title: 'Error', description: 'Gagal menyimpan rencana.' });
