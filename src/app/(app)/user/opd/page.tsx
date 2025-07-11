@@ -62,7 +62,7 @@ export default function OPDPage() {
                 ) : (
                     <ScrollArea className="h-[350px] rounded-md border">
                         <Table>
-                            <TableHeader className="sticky top-0 bg-muted z-10">
+                            <TableHeader className="sticky top-0 z-10 bg-muted">
                                 <TableRow>
                                     <TableHead>Nama Departemen</TableHead>
                                     <TableHead className="text-right">Status</TableHead>
