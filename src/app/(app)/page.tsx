@@ -29,7 +29,7 @@ export default function AppRootPage() {
     } else {
         // If profile is somehow not available (e.g., during logout transition),
         // redirect to login.
-        router.replace('/login');
+        router.replace('/');
     }
   }, [userProfile, loading, router]);
 

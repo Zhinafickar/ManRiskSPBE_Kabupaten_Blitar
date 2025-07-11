@@ -23,7 +23,7 @@ export function UserNav() {
 
   const handleLogout = async () => {
     await signOut(auth);
-    router.push('/login');
+    router.push('/');
   };
 
   if (!user || !userProfile) {
@@ -55,7 +55,7 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem onSelect={() => router.push('/')}>
+          <DropdownMenuItem onSelect={() => router.push('/user/dashboard')}>
             Dashboard
           </DropdownMenuItem>
         </DropdownMenuGroup>
