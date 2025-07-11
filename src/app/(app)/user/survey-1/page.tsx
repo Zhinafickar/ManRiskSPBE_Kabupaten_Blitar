@@ -120,6 +120,12 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
         setRiskIndicator({ level: null, color: '' });
     }
   }, [frequency, impactMagnitude]);
+  
+  useEffect(() => {
+    // Clear cause and impact fields when dependencies change
+    form.setValue('cause', '');
+    form.setValue('impact', '');
+  }, [selectedRiskEvent, selectedImpactArea, selectedAreaDampak, form]);
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -368,20 +374,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                   name="cause"
                   render={({ field }) => (
                     <FormItem>
-                       <div className="flex items-center gap-2">
-                        <FormLabel>Penyebab</FormLabel>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={handleCauseImpactSuggestion}
-                          disabled={isAiLoading || !selectedRiskEvent || !selectedImpactArea || !selectedAreaDampak}
-                          className="h-auto px-2 py-1 text-xs"
-                        >
-                          <Sparkles className="mr-1 h-3 w-3" />
-                          Beri Saran (AI)
-                        </Button>
-                      </div>
+                       <FormLabel>Penyebab</FormLabel>
                       <FormControl><Textarea placeholder="Jelaskan penyebab kejadian risiko..." {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
@@ -392,7 +385,20 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                   name="impact"
                   render={({ field }) => (
                     <FormItem>
-                       <FormLabel>Dampak</FormLabel>
+                       <div className='flex items-center justify-between'>
+                         <FormLabel>Dampak</FormLabel>
+                         <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleCauseImpactSuggestion}
+                            disabled={isAiLoading || !selectedRiskEvent || !selectedImpactArea || !selectedAreaDampak}
+                            className="h-auto px-2 py-1 text-xs -translate-y-1"
+                          >
+                            <Sparkles className="mr-1 h-3 w-3" />
+                            Beri Saran (AI)
+                          </Button>
+                       </div>
                       <FormControl><Textarea placeholder="Jelaskan potensi dampaknya..." {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
@@ -696,7 +702,3 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
     </Card>
   );
 }
-
-
-
-
