@@ -178,7 +178,7 @@ export default function VisualizationPage() {
             <ChartContainer config={barChartConfig} className="h-[300px] w-full">
               <BarChart data={chartData.barData} layout="vertical" margin={{ left: 150, right: 20 }}>
                 <CartesianGrid horizontal={false} />
-                <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tick={{ fontSize: 12, width: 140 }} interval={0} />
+                <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tick={{ fontSize: 12, width: 140, textAnchor: 'start' }} interval={0} />
                 <XAxis dataKey="risks" type="number" allowDecimals={false} />
                 <ChartTooltip
                   cursor={{ fill: 'hsl(var(--muted))' }}

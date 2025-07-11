@@ -1,14 +1,18 @@
-import type { Metadata } from 'next';
-import './globals.css';
-import { Inter } from 'next/font/google';
-import { AuthProvider } from '@/hooks/use-auth';
-import { Toaster } from '@/components/ui/toaster';
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { Toaster } from "@/components/ui/toaster";
+import { AuthProvider } from "@/hooks/use-auth";
+import { cn } from "@/lib/utils";
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const inter = Inter({ 
+  subsets: ["latin"],
+  variable: '--font-inter',
+});
 
 export const metadata: Metadata = {
-  title: 'MenRisk Kab Blitar',
-  description: 'A web application for risk assessment surveys.',
+  title: "Manajemen Risiko",
+  description: "Aplikasi untuk manajemen risiko SPBE",
 };
 
 export default function RootLayout({
@@ -17,11 +21,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} font-body antialiased`}>
+    <html lang="en">
+      <body className={cn("min-h-screen bg-background font-sans antialiased", inter.variable)}>
         <AuthProvider>
-          {children}
-          <Toaster />
+            {children}
+            <Toaster />
         </AuthProvider>
       </body>
     </html>

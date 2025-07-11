@@ -5,18 +5,16 @@ import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function Home() {
-  const { user, userProfile, loading } = useAuth();
+// This is a client-side component that handles redirection based on user role.
+// It's placed inside the (app) group to ensure it's part of the authenticated layout.
+export default function AppRootPage() {
+  const { userProfile, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (loading) return; // Wait until auth state is resolved
+    if (loading) return;
 
-    if (!user) {
-      // Not logged in, go to login page
-      router.replace('/login');
-    } else if (userProfile) {
-      // Logged in and profile exists, redirect based on role
+    if (userProfile) {
       switch (userProfile.role) {
         case 'superadmin':
           router.replace('/superadmin/dashboard');
@@ -25,19 +23,18 @@ export default function Home() {
           router.replace('/admuinma/dashboard');
           break;
         default:
-          // Assumes any other role is a general user
           router.replace('/user/dashboard');
           break;
       }
+    } else {
+        // If profile is somehow not available, redirect to login
+        router.replace('/login');
     }
-    // If user exists but userProfile is null, the AuthProvider handles the loading screen,
-    // so we just wait for the profile to load.
-  }, [user, userProfile, loading, router]);
+  }, [userProfile, loading, router]);
 
-  // Show a loading skeleton while the redirect is happening
-  // This prevents a flash of unstyled content or a blank page.
+  // Render a loading skeleton while redirecting
   return (
-      <div className="flex h-screen w-full items-center justify-center">
+    <div className="flex h-full w-full items-center justify-center">
         <div className="flex flex-col items-center gap-4">
             <Skeleton className="h-12 w-12 rounded-full" />
             <div className="space-y-2">
@@ -45,6 +42,6 @@ export default function Home() {
                 <Skeleton className="h-4 w-[200px]" />
             </div>
         </div>
-      </div>
+    </div>
   );
 }
