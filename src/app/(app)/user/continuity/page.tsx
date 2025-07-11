@@ -84,29 +84,37 @@ export default function ContinuityPage() {
         return;
     }
     setIsAiLoading(true);
+
     try {
         const suggestion = await suggestContinuityPlan({
             risiko: selectedRisk,
             allSurveyData: JSON.stringify(allSurveyData),
         });
-        
-        // Always set the first plan with the new suggestion
-        form.setValue('plans.0', {
-            aktivitas: suggestion.aktivitas,
-            targetWaktu: suggestion.targetWaktu,
-            pic: suggestion.pic,
-            sumberdaya: suggestion.sumberdaya,
-            rto: '',
-            rpo: '',
-         }, { shouldValidate: true });
 
-        // If there are more than one plans, remove the rest
-        if (fields.length > 1) {
-            const newPlans = form.getValues('plans').slice(0, 1);
-            replace(newPlans);
+        const currentPlans = form.getValues('plans');
+        const lastPlanIndex = currentPlans.length - 1;
+        const lastPlan = currentPlans[lastPlanIndex];
+
+        // If the last plan is already filled (indicated by RTO/RPO), add a new plan.
+        if (lastPlan && lastPlan.rto && lastPlan.rpo) {
+            append({
+                ...suggestion,
+                rto: '',
+                rpo: '',
+            });
+            toast({ title: 'Saran Baru Ditambahkan', description: 'Saran baru telah ditambahkan sebagai rencana di bawah.' });
+        } else {
+            // Otherwise, update the last (or current) plan.
+            form.setValue(`plans.${lastPlanIndex}.aktivitas`, suggestion.aktivitas, { shouldValidate: true });
+            form.setValue(`plans.${lastPlanIndex}.targetWaktu`, suggestion.targetWaktu, { shouldValidate: true });
+            form.setValue(`plans.${lastPlanIndex}.pic`, suggestion.pic, { shouldValidate: true });
+            form.setValue(`plans.${lastPlanIndex}.sumberdaya`, suggestion.sumberdaya, { shouldValidate: true });
+            // Clear RTO/RPO in case user is re-rolling AI on a partially filled form
+            form.setValue(`plans.${lastPlanIndex}.rto`, '', { shouldValidate: true });
+            form.setValue(`plans.${lastPlanIndex}.rpo`, '', { shouldValidate: true });
+            toast({ title: 'Saran Diperbarui', description: 'Saran telah diterapkan pada rencana saat ini.' });
         }
-        
-        toast({ title: 'Saran Baru Dibuat', description: 'Saran baru telah diterapkan pada rencana pertama.' });
+
     } catch (error) {
         console.error("AI suggestion error:", error);
         toast({ variant: 'destructive', title: 'Error', description: 'Gagal mendapatkan saran dari AI.' });
@@ -133,9 +141,10 @@ export default function ContinuityPage() {
     try {
         await Promise.all(submissionPromises);
         toast({ title: 'Sukses', description: `${values.plans.length} rencana kontinuitas berhasil disimpan.` });
-        form.reset();
-         // After reset, the field array is empty. We need to add back the initial empty form.
-        replace([{ aktivitas: '', targetWaktu: '', pic: '', sumberdaya: '', rto: '', rpo: '' }]);
+        form.reset({
+            risiko: values.risiko, // Keep the selected risk
+            plans: [{ aktivitas: '', targetWaktu: '', pic: '', sumberdaya: '', rto: '', rpo: '' }]
+        });
     } catch (error) {
         toast({ variant: 'destructive', title: 'Error', description: 'Gagal menyimpan satu atau lebih rencana.' });
     } finally {
@@ -144,10 +153,10 @@ export default function ContinuityPage() {
   }
 
   const handleRiskChange = (value: string) => {
-    // Set the new risk value
-    form.setValue('risiko', value);
-    // Reset the plans array to its initial empty state
-    replace([{ aktivitas: '', targetWaktu: '', pic: '', sumberdaya: '', rto: '', rpo: '' }]);
+    form.reset({
+        risiko: value,
+        plans: [{ aktivitas: '', targetWaktu: '', pic: '', sumberdaya: '', rto: '', rpo: '' }]
+    });
   }
 
   return (
