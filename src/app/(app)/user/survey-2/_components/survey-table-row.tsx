@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
@@ -63,6 +63,13 @@ export function SurveyTableRow({ index, riskEvent, handleClearRow }: SurveyTable
     ],
   });
   
+  useEffect(() => {
+    // When the risk or impact area changes, clear the cause and impact fields
+    setValue(`surveys.${index}.cause`, '', { shouldValidate: false });
+    setValue(`surveys.${index}.impact`, '', { shouldValidate: false });
+  }, [impactArea, areaDampak, index, setValue]);
+
+
   const { level, color } = getRiskLevel(frequency, impactMagnitude);
 
   const [openImpactAreaPopover, setOpenImpactAreaPopover] = useState(false);
