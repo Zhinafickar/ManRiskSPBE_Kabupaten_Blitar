@@ -362,27 +362,26 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                 </FormItem>
               )}
             />
-             <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <FormLabel>Penyebab & Dampak</FormLabel>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleCauseImpactSuggestion}
-                  disabled={isAiLoading || !selectedRiskEvent || !selectedImpactArea || !selectedAreaDampak}
-                  className="h-auto px-2 py-1 text-xs"
-                >
-                  <Sparkles className="mr-1 h-3 w-3" />
-                  Beri Saran (AI)
-                </Button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
                   name="cause"
                   render={({ field }) => (
                     <FormItem>
+                       <div className="flex items-center gap-2">
+                        <FormLabel>Penyebab</FormLabel>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleCauseImpactSuggestion}
+                          disabled={isAiLoading || !selectedRiskEvent || !selectedImpactArea || !selectedAreaDampak}
+                          className="h-auto px-2 py-1 text-xs"
+                        >
+                          <Sparkles className="mr-1 h-3 w-3" />
+                          Beri Saran (AI)
+                        </Button>
+                      </div>
                       <FormControl><Textarea placeholder="Jelaskan penyebab kejadian risiko..." {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
@@ -393,13 +392,13 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                   name="impact"
                   render={({ field }) => (
                     <FormItem>
+                       <FormLabel>Dampak</FormLabel>
                       <FormControl><Textarea placeholder="Jelaskan potensi dampaknya..." {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                 control={form.control}
@@ -697,6 +696,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
     </Card>
   );
 }
+
 
 
 
