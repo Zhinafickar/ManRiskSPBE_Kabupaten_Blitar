@@ -13,7 +13,6 @@ import { PanelLeft, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
-import { Providers } from '../providers';
 
 function AppLayoutSkeleton() {
   return (
@@ -71,11 +70,9 @@ function AuthenticatedLayout({ children }: { children: ReactNode }) {
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
-    <Providers>
-      <SidebarProvider>
-        <AuthenticatedLayout>{children}</AuthenticatedLayout>
-      </SidebarProvider>
-    </Providers>
+    <SidebarProvider>
+      <AuthenticatedLayout>{children}</AuthenticatedLayout>
+    </SidebarProvider>
   );
 }
 
