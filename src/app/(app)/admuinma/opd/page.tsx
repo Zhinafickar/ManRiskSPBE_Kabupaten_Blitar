@@ -47,9 +47,9 @@ export default function OPDPage() {
     const filteredDepartments = useMemo(() => {
         const assignedRoles = new Set(users.map(user => user.role));
         
-        const allDepartments = ROLES.map(role => ({
+        const allDepartments = ROLES.filter(role => role !== 'Penguji Coba').map(role => ({
             name: role,
-            isTaken: assignedRoles.has(role) && role !== 'Penguji Coba'
+            isTaken: assignedRoles.has(role)
         })).sort((a, b) => a.name.localeCompare(b.name));
 
         if (!searchTerm) {
