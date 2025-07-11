@@ -3,7 +3,7 @@
 
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { MainNav } from '@/components/main-nav';
 import { UserNav } from '@/components/user-nav';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { PanelLeft, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 
 function AppLayoutSkeleton() {
   return (
@@ -73,65 +73,78 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 }
 
 function AppLayoutContent({ children }: { children: ReactNode }) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
+    const { open: sidebarOpen, setOpen: setSidebarOpen, isMobile } = useSidebar();
 
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-  
-  useEffect(() => {
-    setSidebarOpen(!isMobile);
-  }, [isMobile]);
+    const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+    return (
+        <div className="min-h-screen w-full">
+            {/* Sidebar */}
+            <aside
+                className={cn(
+                    "fixed left-0 top-0 z-40 h-screen w-64 bg-card border-r transition-transform duration-300 ease-in-out",
+                    sidebarOpen ? "translate-x-0" : "-translate-x-full",
+                    // For mobile, the sidebar is handled by a Sheet component,
+                    // so we hide the fixed sidebar on mobile.
+                    isMobile ? "hidden" : "flex flex-col"
+                )}
+            >
+                 <div className="flex h-14 items-center border-b px-4">
+                    <div className="flex items-center gap-2 min-w-0">
+                        <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={40} height={40} />
+                        <h1 className="text-lg font-semibold truncate">Manajemen Risiko</h1>
+                    </div>
+                </div>
+                <ScrollArea className="flex-1">
+                    <div className="px-3 py-4">
+                        <MainNav />
+                    </div>
+                </ScrollArea>
+            </aside>
 
-  return (
-    <div className="min-h-screen w-full">
-      {/* Sidebar */}
-      <aside
-        className={cn(
-          "fixed left-0 top-0 z-40 h-screen w-64 bg-card border-r transition-transform duration-300 ease-in-out",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        )}
-      >
-        <div className="flex h-full flex-col">
-          <div className="flex h-14 items-center border-b px-4">
-            <div className="flex items-center gap-2 min-w-0">
-                <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={40} height={40} />
-                <h1 className="text-lg font-semibold">Manajemen Risiko</h1>
+             {/* Mobile Sidebar - Sheet */}
+            {isMobile && (
+                 <aside
+                    className={cn(
+                    "fixed left-0 top-0 z-40 h-screen w-64 bg-card border-r transition-transform duration-300 ease-in-out",
+                    sidebarOpen ? "translate-x-0" : "-translate-x-full"
+                    )}
+                >
+                    <div className="flex h-full flex-col">
+                    <div className="flex h-14 items-center border-b px-4 justify-between">
+                        <div className="flex items-center gap-2 min-w-0">
+                            <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={40} height={40} />
+                            <h1 className="text-lg font-semibold truncate">Manajemen Risiko</h1>
+                        </div>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={toggleSidebar}>
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </div>
+                    <ScrollArea className="flex-1">
+                        <div className="px-3 py-4">
+                            <MainNav />
+                        </div>
+                    </ScrollArea>
+                    </div>
+                </aside>
+            )}
+
+            {/* Main Content */}
+            <div
+                className={cn(
+                    "transition-all duration-300 ease-in-out",
+                    sidebarOpen && !isMobile ? "md:pl-64" : "pl-0"
+                )}
+            >
+                <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={toggleSidebar}>
+                        <PanelLeft className="h-4 w-4" />
+                    </Button>
+                    <div className="flex-1" />
+                    <UserNav />
+                </header>
+                <main className="flex-1 p-4 sm:p-6">{children}</main>
             </div>
-          </div>
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 self-end m-2" onClick={toggleSidebar}>
-              <X className="h-4 w-4" />
-          </Button>
-          <ScrollArea className="flex-1">
-            <div className="px-3 py-4">
-                 <MainNav />
-            </div>
-          </ScrollArea>
         </div>
-      </aside>
-
-      {/* Main Content */}
-      <div
-        className={cn(
-          "transition-all duration-300 ease-in-out",
-          sidebarOpen && !isMobile ? "md:pl-64" : "pl-0"
-        )}
-      >
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={toggleSidebar}>
-            <PanelLeft className="h-4 w-4" />
-          </Button>
-          <div className="flex-1" />
-          <UserNav />
-        </header>
-        <main className="flex-1 p-4 sm:p-6">{children}</main>
-      </div>
-    </div>
-  );
+    );
 }

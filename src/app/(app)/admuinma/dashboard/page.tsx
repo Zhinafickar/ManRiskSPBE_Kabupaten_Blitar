@@ -3,7 +3,7 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { FileText, AreaChart, HelpCircle } from "lucide-react";
+import { FileText, AreaChart, Building, ClipboardCheck } from "lucide-react";
 import { RiskAnalysisCard } from "@/app/(app)/_components/risk-analysis-card";
 
 export default function AdminDashboard() {
@@ -16,13 +16,9 @@ export default function AdminDashboard() {
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-3">
-            <RiskAnalysisCard />
-        </div>
-      </div>
+      <RiskAnalysisCard />
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader>
             <CardTitle>View All Survey Results</CardTitle>
@@ -34,7 +30,24 @@ export default function AdminDashboard() {
             <Button asChild>
               <Link href="/admuinma/results">
                 <FileText className="mr-2 h-4 w-4" />
-                View All Results
+                View Survey Results
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>View Continuity Plans</CardTitle>
+            <CardDescription>
+              See all business continuity plans submitted across the organization.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild>
+              <Link href="/admuinma/continuity-results">
+                <ClipboardCheck className="mr-2 h-4 w-4" />
+                View Continuity Plans
               </Link>
             </Button>
           </CardContent>
@@ -44,7 +57,7 @@ export default function AdminDashboard() {
           <CardHeader>
             <CardTitle>Data Visualization</CardTitle>
             <CardDescription>
-              Explore graphical representations of the survey data for better insights.
+              Explore graphical representations of survey data for better insights.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -56,6 +69,24 @@ export default function AdminDashboard() {
             </Button>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>OPD/Departemen Lain</CardTitle>
+            <CardDescription>
+              View the list of all registered departments and their data.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild>
+              <Link href="/admuinma/opd">
+                <Building className="mr-2 h-4 w-4" />
+                View Departments
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+
       </div>
     </div>
   );

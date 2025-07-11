@@ -22,7 +22,6 @@ import {
   ClipboardList,
   ChevronDown,
   Recycle,
-  FileCheck,
   Info,
   Database,
   BookOpen,

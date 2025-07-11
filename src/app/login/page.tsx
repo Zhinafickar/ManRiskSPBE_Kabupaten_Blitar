@@ -33,7 +33,7 @@ function LoginPageSkeleton() {
         <div className="flex min-h-screen items-center justify-center bg-background p-4">
             <div className="w-full max-w-md space-y-8">
                 <div className="flex flex-col items-center text-center space-y-4">
-                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <Skeleton className="h-20 w-20 rounded-md" />
                     <Skeleton className="h-6 w-48" />
                     <Skeleton className="h-4 w-64" />
                 </div>
@@ -100,9 +100,6 @@ export default function LoginPage() {
         return;
       }
 
-      // On successful login, useAuth hook will detect the change.
-      // We proactively redirect to the root page to avoid getting stuck.
-      // The root page will then handle the final redirection to the correct dashboard.
       router.replace('/');
     } catch (error: any) {
       let description = 'An unknown error occurred.';
@@ -118,11 +115,8 @@ export default function LoginPage() {
       });
       setIsLoading(false);
     }
-    // Do not set isLoading to false here on success, as a page transition is happening.
   }
   
-  // While the auth state is being checked, or if the user is already
-  // logged in (and about to be redirected), show a skeleton loader.
   if (authLoading || user) {
     return <LoginPageSkeleton />;
   }
@@ -132,7 +126,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center text-center">
-            <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={288} height={288} />
+            <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={100} height={100} />
             <h1 className="text-2xl font-bold mt-4">Manajemen Risiko SPBE</h1>
             <p className="text-muted-foreground">Proses sistematis yang digunakan untuk mengidentifikasi, menilai, mengendalikan, dan memantau risiko yang dapat mengganggu kelancaran penerapan SPBE di instansi pemerintah.</p>
         </div>

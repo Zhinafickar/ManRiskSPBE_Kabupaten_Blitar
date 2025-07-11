@@ -1,169 +1,195 @@
-
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
-import { getAllUsers } from '@/services/user-service';
-import { ROLES } from '@/constants/data';
-import type { UserProfile } from '@/types/user';
-import { Building, Search, FileDown } from 'lucide-react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { DepartmentDetailsDialog } from './_components/department-details-dialog';
-import * as XLSX from 'xlsx';
-import { useAuth } from '@/hooks/use-auth';
+import { getAllSurveyData } from "@/services/survey-service";
+import type { Survey } from '@/types/survey';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, type ChartConfig } from "@/components/ui/chart";
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { TrendingUp } from 'lucide-react';
 
-function OPDTableSkeleton() {
-    return (
-        <div className="space-y-2">
-            <Skeleton className="h-10 w-full mb-4" />
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-        </div>
-    );
+// --- Chart Configs ---
+const riskLevelColors = {
+  Bahaya: 'hsl(0, 72%, 51%)',     // bg-red-600
+  Sedang: 'hsl(45, 93%, 47%)',    // bg-yellow-500
+  Rendah: 'hsl(142, 69%, 31%)',   // bg-green-600
+  Minor: 'hsl(221, 83%, 53%)',    // bg-blue-600
+};
+
+const pieChartConfig = {
+  count: { label: 'Jumlah' },
+  Bahaya: { label: 'Bahaya', color: riskLevelColors.Bahaya },
+  Sedang: { label: 'Sedang', color: riskLevelColors.Sedang },
+  Rendah: { label: 'Rendah', color: riskLevelColors.Rendah },
+  Minor: { label: 'Minor', color: riskLevelColors.Minor },
+} satisfies ChartConfig;
+
+const barChartConfig = {
+  risks: { label: 'Risiko Tinggi & Sedang', color: 'hsl(var(--primary))' },
+} satisfies ChartConfig;
+
+// --- Skeleton Component ---
+function VisualizationSkeleton() {
+  return (
+    <div className="grid gap-6 md:grid-cols-2">
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </CardHeader>
+        <CardContent className="flex items-center justify-center">
+          <Skeleton className="size-64 rounded-full" />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
 
-export default function OPDPage() {
-    const { userProfile } = useAuth();
-    const [users, setUsers] = useState<UserProfile[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
+// --- Main Visualization Component ---
+export default function VisualizationPage() {
+  const [surveys, setSurveys] = useState<Survey[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        getAllUsers()
-            .then(setUsers)
-            .finally(() => setLoading(false));
-    }, []);
+  useEffect(() => {
+    getAllSurveyData()
+      .then(data => {
+        const filteredData = data.filter(survey => survey.userRole !== 'Penguji Coba');
+        setSurveys(filteredData);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
-    const filteredDepartments = useMemo(() => {
-        const assignedRoles = new Set(users.map(user => user.role));
-        
-        const allDepartments = ROLES.filter(role => role !== 'Penguji Coba').map(role => ({
-            name: role,
-            isTaken: assignedRoles.has(role)
-        })).sort((a, b) => a.name.localeCompare(b.name));
+  const chartData = useMemo(() => {
+    if (surveys.length === 0) return null;
 
-        if (!searchTerm) {
-            return allDepartments;
-        }
+    // Data for Pie Chart
+    const riskCounts: { [key: string]: number } = { Bahaya: 0, Sedang: 0, Rendah: 0, Minor: 0 };
+    let totalValidSurveys = 0;
+    surveys.forEach(survey => {
+      if (survey.riskLevel && survey.riskLevel in riskCounts) {
+        riskCounts[survey.riskLevel]++;
+        totalValidSurveys++;
+      }
+    });
 
-        return allDepartments.filter(dept =>
-            dept.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+    const pieData = Object.entries(riskCounts)
+      .filter(([, value]) => value > 0)
+      .map(([name, value]) => ({
+        name: name as keyof typeof riskLevelColors,
+        value,
+        fill: riskLevelColors[name as keyof typeof riskLevelColors],
+      }));
 
-    }, [users, searchTerm]);
-    
-    const handleExport = () => {
-        const dataForSheet = filteredDepartments.map(dept => ({
-            'OPD': dept.name,
-            'Status': dept.isTaken ? 'Terisi' : 'Kosong',
-        }));
+    // Data for Bar Chart
+    const roleRiskCounts = surveys.reduce((acc, survey) => {
+      if ((survey.riskLevel === 'Bahaya' || survey.riskLevel === 'Sedang') && survey.userRole) {
+        acc[survey.userRole] = (acc[survey.userRole] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
 
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.json_to_sheet(dataForSheet);
+    const barData = Object.entries(roleRiskCounts)
+      .map(([name, risks]) => ({ name, risks }))
+      .sort((a, b) => b.risks - a.risks)
+      .slice(0, 10); // Show top 10 roles with most high/medium risks
 
-        ws['!cols'] = [{ wch: 60 }, { wch: 15 }];
+    return { pieData, totalValidSurveys, barData };
+  }, [surveys]);
 
-        XLSX.utils.book_append_sheet(wb, ws, 'Status OPD');
-        XLSX.writeFile(wb, `${userProfile?.role}_Status_OPD.xlsx`);
-    };
+  if (loading) {
+    return <VisualizationSkeleton />;
+  }
 
+  if (!chartData || surveys.length === 0) {
     return (
-        <>
-            <Card>
-                <CardHeader className="flex flex-row items-start justify-between">
-                    <div>
-                        <CardTitle className="flex items-center gap-2">
-                            <Building className="h-6 w-6" />
-                            Daftar OPD/Departemen
-                        </CardTitle>
-                        <CardDescription>
-                            Berikut adalah daftar semua OPD/Departemen yang tersedia dalam sistem beserta status keterisiannya.
-                        </CardDescription>
-                    </div>
-                     <Button onClick={handleExport} disabled={loading}>
-                        <FileDown className="mr-2 h-4 w-4" />
-                        Download Excel
-                    </Button>
-                </CardHeader>
-                <CardContent>
-                    {loading ? (
-                        <OPDTableSkeleton />
-                    ) : (
-                        <>
-                            <div className="relative mb-4">
-                                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    type="search"
-                                    placeholder="Cari nama OPD..."
-                                    className="pl-8"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                            </div>
-                            <ScrollArea className="h-[350px] rounded-md border">
-                                <Table>
-                                    <TableHeader className="sticky top-0 z-10 bg-muted">
-                                        <TableRow>
-                                            <TableHead>OPD</TableHead>
-                                            <TableHead className="text-right">Status</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {filteredDepartments.length > 0 ? (
-                                            filteredDepartments.map(dept => (
-                                                <TableRow key={dept.name}>
-                                                    <TableCell className="font-medium">
-                                                        <Button 
-                                                            variant="link" 
-                                                            className="p-0 h-auto text-left whitespace-normal"
-                                                            onClick={() => setSelectedDepartment(dept.name)}
-                                                            disabled={!dept.isTaken}
-                                                        >
-                                                            {dept.name}
-                                                        </Button>
-                                                    </TableCell>
-                                                    <TableCell className="text-right">
-                                                        {dept.isTaken ? (
-                                                            <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200 hover:bg-green-200">Terisi</Badge>
-                                                        ) : (
-                                                            <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-200 hover:bg-red-200">Kosong</Badge>
-                                                        )}
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))
-                                        ) : (
-                                            <TableRow>
-                                                <TableCell colSpan={2} className="text-center text-muted-foreground">
-                                                    Tidak ada departemen yang cocok dengan pencarian Anda.
-                                                </TableCell>
-                                            </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </ScrollArea>
-                        </>
-                    )}
-                </CardContent>
-            </Card>
-            <DepartmentDetailsDialog 
-                departmentName={selectedDepartment}
-                isOpen={!!selectedDepartment}
-                onOpenChange={(isOpen) => {
-                    if (!isOpen) {
-                        setSelectedDepartment(null);
-                    }
-                }}
-            />
-        </>
+      <Card>
+        <CardHeader>
+          <CardTitle>Data Visualization</CardTitle>
+          <CardDescription>Graphical insights from the collected survey data.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center h-96 border-2 border-dashed rounded-lg">
+            <p className="text-muted-foreground">No survey data available to display visualizations.</p>
+          </div>
+        </CardContent>
+      </Card>
     );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="space-y-1">
+         <h1 className="text-3xl font-bold">Data Visualization</h1>
+         <p className="text-muted-foreground">
+            Graphical insights from all collected survey data.
+         </p>
+      </div>
+      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-5">
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Distribusi Tingkat Risiko</CardTitle>
+            <CardDescription>Persentase tingkat risiko dari semua survei.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={pieChartConfig} className="mx-auto aspect-square max-h-[300px]">
+              <PieChart>
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                        formatter={(value) => `${value} (${((Number(value) / chartData.totalValidSurveys) * 100).toFixed(0)}%)`}
+                        hideLabel
+                    />
+                  }
+                />
+                <Pie data={chartData.pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
+                   {chartData.pieData.map((entry) => (
+                    <Cell key={`cell-${entry.name}`} fill={entry.fill} />
+                  ))}
+                </Pie>
+                <ChartLegend content={<ChartLegendContent nameKey="name" />} className="-mt-4" />
+              </PieChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-3">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Departemen dengan Risiko Tertinggi
+            </CardTitle>
+            <CardDescription>Jumlah risiko dengan tingkat 'Bahaya' dan 'Sedang' per departemen (Top 10).</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={barChartConfig} className="h-[300px] w-full">
+              <BarChart data={chartData.barData} layout="vertical" margin={{ left: 20, right: 20 }}>
+                <CartesianGrid horizontal={false} />
+                <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tick={{ fontSize: 12, width: 180, textAnchor: 'start' }} interval={0} />
+                <XAxis dataKey="risks" type="number" allowDecimals={false} />
+                <ChartTooltip
+                  cursor={{ fill: 'hsl(var(--muted))' }}
+                  content={<ChartTooltipContent indicator="line" />}
+                />
+                <Bar dataKey="risks" fill="var(--color-risks)" radius={4} />
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
 }

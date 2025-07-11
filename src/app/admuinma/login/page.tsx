@@ -1,173 +1,194 @@
-
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, FormProvider } from 'react-hook-form';
-import * as z from 'zod';
-import { Button } from '@/components/ui/button';
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { auth, isFirebaseConfigured } from '@/lib/firebase';
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/hooks/use-auth';
+import { useEffect, useState, useMemo } from 'react';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Skeleton } from '@/components/ui/skeleton';
-import Image from 'next/image';
+import { getAllSurveyData } from "@/services/survey-service";
+import type { Survey } from '@/types/survey';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, type ChartConfig } from "@/components/ui/chart";
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { TrendingUp } from 'lucide-react';
 
-const formSchema = z.object({
-  email: z.string().email({ message: 'Please enter a valid email.' }),
-  password: z.string().min(1, { message: 'Password is required.' }),
-});
+// --- Chart Configs ---
+const riskLevelColors = {
+  Bahaya: 'hsl(0, 72%, 51%)',     // bg-red-600
+  Sedang: 'hsl(45, 93%, 47%)',    // bg-yellow-500
+  Rendah: 'hsl(142, 69%, 31%)',   // bg-green-600
+  Minor: 'hsl(221, 83%, 53%)',    // bg-blue-600
+};
 
-function LoginPageSkeleton() {
-    return (
-        <div className="flex min-h-screen items-center justify-center bg-background p-4">
-            <div className="w-full max-w-md space-y-8">
-                <div className="flex flex-col items-center text-center space-y-4">
-                    <Skeleton className="h-10 w-10 rounded-full" />
-                    <Skeleton className="h-6 w-48" />
-                    <Skeleton className="h-4 w-64" />
-                </div>
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <Skeleton className="h-4 w-16" />
-                        <Skeleton className="h-10 w-full" />
-                    </div>
-                    <div className="space-y-2">
-                        <Skeleton className="h-4 w-16" />
-                        <Skeleton className="h-10 w-full" />
-                    </div>
-                    <Skeleton className="h-10 w-full" />
-                </div>
-                 <Skeleton className="h-4 w-72 mx-auto" />
-            </div>
-        </div>
-    )
+const pieChartConfig = {
+  count: { label: 'Jumlah' },
+  Bahaya: { label: 'Bahaya', color: riskLevelColors.Bahaya },
+  Sedang: { label: 'Sedang', color: riskLevelColors.Sedang },
+  Rendah: { label: 'Rendah', color: riskLevelColors.Rendah },
+  Minor: { label: 'Minor', color: riskLevelColors.Minor },
+} satisfies ChartConfig;
+
+const barChartConfig = {
+  risks: { label: 'Risiko Tinggi & Sedang', color: 'hsl(var(--primary))' },
+} satisfies ChartConfig;
+
+// --- Skeleton Component ---
+function VisualizationSkeleton() {
+  return (
+    <div className="grid gap-6 md:grid-cols-2">
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </CardHeader>
+        <CardContent className="flex items-center justify-center">
+          <Skeleton className="size-64 rounded-full" />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
 
-export default function AdminLoginPage() {
-  const { toast } = useToast();
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const { user, loading: authLoading } = useAuth();
+// --- Main Visualization Component ---
+export default function VisualizationPage() {
+  const [surveys, setSurveys] = useState<Survey[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!authLoading && user) {
-      router.replace('/');
-    }
-  }, [user, authLoading, router]);
+    getAllSurveyData()
+      .then(data => {
+        const filteredData = data.filter(survey => survey.userRole !== 'Penguji Coba');
+        setSurveys(filteredData);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  });
+  const chartData = useMemo(() => {
+    if (surveys.length === 0) return null;
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!isFirebaseConfigured || !auth) {
-      toast({
-        variant: 'destructive',
-        title: 'Firebase Not Configured',
-        description:
-          'Please add your Firebase credentials to the .env file to enable login.',
-      });
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
-      
-      if (!userCredential.user.emailVerified) {
-        await signOut(auth);
-        toast({
-            variant: 'destructive',
-            title: 'Email Not Verified',
-            description: 'Please check your inbox and verify your email address before logging in.',
-        });
-        setIsLoading(false);
-        return;
+    // Data for Pie Chart
+    const riskCounts: { [key: string]: number } = { Bahaya: 0, Sedang: 0, Rendah: 0, Minor: 0 };
+    let totalValidSurveys = 0;
+    surveys.forEach(survey => {
+      if (survey.riskLevel && survey.riskLevel in riskCounts) {
+        riskCounts[survey.riskLevel]++;
+        totalValidSurveys++;
       }
+    });
 
-      router.replace('/');
-    } catch (error: any) {
-      let description = 'An unknown error occurred.';
-      if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-        description = 'Invalid email or password. Please try again.';
-      } else {
-        description = error.message;
+    const pieData = Object.entries(riskCounts)
+      .filter(([, value]) => value > 0)
+      .map(([name, value]) => ({
+        name: name as keyof typeof riskLevelColors,
+        value,
+        fill: riskLevelColors[name as keyof typeof riskLevelColors],
+      }));
+
+    // Data for Bar Chart
+    const roleRiskCounts = surveys.reduce((acc, survey) => {
+      if ((survey.riskLevel === 'Bahaya' || survey.riskLevel === 'Sedang') && survey.userRole) {
+        acc[survey.userRole] = (acc[survey.userRole] || 0) + 1;
       }
-      toast({
-        variant: 'destructive',
-        title: 'Login Failed',
-        description: description,
-      });
-      setIsLoading(false);
-    }
-  }
-  
-  if (authLoading || user) {
-    return <LoginPageSkeleton />;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const barData = Object.entries(roleRiskCounts)
+      .map(([name, risks]) => ({ name, risks }))
+      .sort((a, b) => b.risks - a.risks)
+      .slice(0, 10); // Show top 10 roles with most high/medium risks
+
+    return { pieData, totalValidSurveys, barData };
+  }, [surveys]);
+
+  if (loading) {
+    return <VisualizationSkeleton />;
   }
 
+  if (!chartData || surveys.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Data Visualization</CardTitle>
+          <CardDescription>Graphical insights from the collected survey data.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center h-96 border-2 border-dashed rounded-lg">
+            <p className="text-muted-foreground">No survey data available to display visualizations.</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md space-y-8">
-        <div className="flex flex-col items-center text-center">
-            <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={288} height={288} />
-            <h1 className="text-2xl font-bold mt-4">Admin & Superadmin Login</h1>
-            <p className="text-muted-foreground">Enter your credentials to access the administrative dashboard.</p>
-        </div>
-        <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="name@example.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Logging in...' : 'Login'}
-            </Button>
-          </form>
-        </FormProvider>
-        <p className="text-center text-sm text-muted-foreground">
-          Need an admin account?{' '}
-          <Link href="/admuinma/register" className="font-medium text-primary hover:underline">
-            Register here
-          </Link>
-        </p>
+    <div className="space-y-6">
+      <div className="space-y-1">
+         <h1 className="text-3xl font-bold">Data Visualization</h1>
+         <p className="text-muted-foreground">
+            Graphical insights from all collected survey data.
+         </p>
+      </div>
+      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-5">
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Distribusi Tingkat Risiko</CardTitle>
+            <CardDescription>Persentase tingkat risiko dari semua survei.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={pieChartConfig} className="mx-auto aspect-square max-h-[300px]">
+              <PieChart>
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                        formatter={(value) => `${value} (${((Number(value) / chartData.totalValidSurveys) * 100).toFixed(0)}%)`}
+                        hideLabel
+                    />
+                  }
+                />
+                <Pie data={chartData.pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
+                   {chartData.pieData.map((entry) => (
+                    <Cell key={`cell-${entry.name}`} fill={entry.fill} />
+                  ))}
+                </Pie>
+                <ChartLegend content={<ChartLegendContent nameKey="name" />} className="-mt-4" />
+              </PieChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-3">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Departemen dengan Risiko Tertinggi
+            </CardTitle>
+            <CardDescription>Jumlah risiko dengan tingkat 'Bahaya' dan 'Sedang' per departemen (Top 10).</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={barChartConfig} className="h-[300px] w-full">
+              <BarChart data={chartData.barData} layout="vertical" margin={{ left: 20, right: 20 }}>
+                <CartesianGrid horizontal={false} />
+                <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tick={{ fontSize: 12, width: 180, textAnchor: 'start' }} interval={0} />
+                <XAxis dataKey="risks" type="number" allowDecimals={false} />
+                <ChartTooltip
+                  cursor={{ fill: 'hsl(var(--muted))' }}
+                  content={<ChartTooltipContent indicator="line" />}
+                />
+                <Bar dataKey="risks" fill="var(--color-risks)" radius={4} />
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

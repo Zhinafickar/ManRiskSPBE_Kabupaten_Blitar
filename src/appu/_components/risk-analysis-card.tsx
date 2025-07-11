@@ -6,8 +6,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { getAllSurveyData } from "@/services/survey-service";
 import type { Survey } from '@/types/survey';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, type ChartConfig } from "@/components/ui/chart";
-import { PieChart as RechartsPieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { TrendingUp, PieChart as PieChartIcon } from 'lucide-react';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { TrendingUp } from 'lucide-react';
 
 // --- Chart Configs ---
 const riskLevelColors = {
@@ -30,29 +30,36 @@ const barChartConfig = {
 } satisfies ChartConfig;
 
 // --- Skeleton Component ---
-function DashboardChartsSkeleton() {
+function VisualizationSkeleton() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle><Skeleton className="h-6 w-3/4" /></CardTitle>
-        <CardDescription><Skeleton className="h-4 w-1/2" /></CardDescription>
-      </CardHeader>
-      <CardContent className="grid gap-6 md:grid-cols-2">
-        <div className="flex flex-col items-center">
-            <Skeleton className="size-48 rounded-full" />
-            <Skeleton className="h-4 w-32 mt-4" />
-        </div>
-        <div className="space-y-4">
-            <Skeleton className="h-8 w-full" />
-            <Skeleton className="h-8 w-full" />
-            <Skeleton className="h-8 w-full" />
-        </div>
-      </CardContent>
-    </Card>
+    <div className="grid gap-6 md:grid-cols-2">
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </CardHeader>
+        <CardContent className="flex items-center justify-center">
+          <Skeleton className="size-64 rounded-full" />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
-export function RiskAnalysisCard() { // Keep the exported name the same to avoid breaking imports
+// --- Main Visualization Component ---
+export default function VisualizationPage() {
   const [surveys, setSurveys] = useState<Survey[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -97,50 +104,48 @@ export function RiskAnalysisCard() { // Keep the exported name the same to avoid
     const barData = Object.entries(roleRiskCounts)
       .map(([name, risks]) => ({ name, risks }))
       .sort((a, b) => b.risks - a.risks)
-      .slice(0, 5); // Show top 5 for dashboard brevity
+      .slice(0, 10); // Show top 10 roles with most high/medium risks
 
     return { pieData, totalValidSurveys, barData };
   }, [surveys]);
 
-
   if (loading) {
-    return <DashboardChartsSkeleton />;
+    return <VisualizationSkeleton />;
   }
-  
+
   if (!chartData || surveys.length === 0) {
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Ringkasan Visual Risiko</CardTitle>
-                <CardDescription>Visualisasi data risiko dari semua pengguna.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="flex items-center justify-center h-64 border-2 border-dashed rounded-lg">
-                    <p className="text-muted-foreground text-center">
-                    Data survei belum tersedia untuk menampilkan visualisasi.
-                    </p>
-                </div>
-            </CardContent>
-        </Card>
-    )
+      <Card>
+        <CardHeader>
+          <CardTitle>Data Visualization</CardTitle>
+          <CardDescription>Graphical insights from the collected survey data.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center h-96 border-2 border-dashed rounded-lg">
+            <p className="text-muted-foreground">No survey data available to display visualizations.</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <CardTitle>Ringkasan Visual Risiko</CardTitle>
-        <CardDescription>
-          Distribusi tingkat risiko dan departemen dengan risiko tertinggi dari semua pengguna.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="grid gap-6 md:grid-cols-2">
-        <div>
-            <h3 className="text-lg font-semibold flex items-center gap-2 mb-2">
-                <PieChartIcon className="h-5 w-5" />
-                Distribusi Risiko
-            </h3>
-            <ChartContainer config={pieChartConfig} className="mx-auto aspect-square max-h-[250px]">
-              <RechartsPieChart>
+    <div className="space-y-6">
+      <div className="space-y-1">
+         <h1 className="text-3xl font-bold">Data Visualization</h1>
+         <p className="text-muted-foreground">
+            Graphical insights from all collected survey data.
+         </p>
+      </div>
+      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-5">
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Distribusi Tingkat Risiko</CardTitle>
+            <CardDescription>Persentase tingkat risiko dari semua survei.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={pieChartConfig} className="mx-auto aspect-square max-h-[300px]">
+              <PieChart>
                 <ChartTooltip
                   cursor={false}
                   content={
@@ -150,40 +155,41 @@ export function RiskAnalysisCard() { // Keep the exported name the same to avoid
                     />
                   }
                 />
-                <Pie data={chartData.pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+                <Pie data={chartData.pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
                    {chartData.pieData.map((entry) => (
                     <Cell key={`cell-${entry.name}`} fill={entry.fill} />
                   ))}
                 </Pie>
-                <ChartLegend content={<ChartLegendContent nameKey="name" />} className="mt-2" />
-              </RechartsPieChart>
+                <ChartLegend content={<ChartLegendContent nameKey="name" />} className="-mt-4" />
+              </PieChart>
             </ChartContainer>
-        </div>
-        <div>
-            <h3 className="text-lg font-semibold flex items-center gap-2 mb-2">
-                <TrendingUp className="h-5 w-5" />
-                Top 5 Risiko Departemen
-            </h3>
-             <ChartContainer config={barChartConfig} className="h-[250px] w-full">
-               {chartData.barData.length > 0 ? (
-                <BarChart data={chartData.barData} layout="vertical" margin={{ left: 20, right: 20 }}>
-                    <CartesianGrid horizontal={false} />
-                    <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tick={{ fontSize: 10, width: 150, textAnchor: 'start' }} interval={0} />
-                    <XAxis dataKey="risks" type="number" allowDecimals={false} />
-                    <ChartTooltip
-                    cursor={{ fill: 'hsl(var(--muted))' }}
-                    content={<ChartTooltipContent indicator="line" />}
-                    />
-                    <Bar dataKey="risks" fill="var(--color-risks)" radius={4} />
-                </BarChart>
-                ) : (
-                    <div className="flex items-center justify-center h-full">
-                        <p className="text-sm text-muted-foreground">Tidak ada risiko 'Bahaya' atau 'Sedang'.</p>
-                    </div>
-                )}
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-3">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Departemen dengan Risiko Tertinggi
+            </CardTitle>
+            <CardDescription>Jumlah risiko dengan tingkat 'Bahaya' dan 'Sedang' per departemen (Top 10).</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={barChartConfig} className="h-[300px] w-full">
+              <BarChart data={chartData.barData} layout="vertical" margin={{ left: 20, right: 20 }}>
+                <CartesianGrid horizontal={false} />
+                <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tick={{ fontSize: 12, width: 180, textAnchor: 'start' }} interval={0} />
+                <XAxis dataKey="risks" type="number" allowDecimals={false} />
+                <ChartTooltip
+                  cursor={{ fill: 'hsl(var(--muted))' }}
+                  content={<ChartTooltipContent indicator="line" />}
+                />
+                <Bar dataKey="risks" fill="var(--color-risks)" radius={4} />
+              </BarChart>
             </ChartContainer>
-        </div>
-      </CardContent>
-    </Card>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }

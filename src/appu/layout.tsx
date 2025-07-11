@@ -1,136 +1,194 @@
-
 'use client';
 
-import { useAuth } from '@/hooks/use-auth';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState, type ReactNode } from 'react';
-import { MainNav } from '@/components/main-nav';
-import { UserNav } from '@/components/user-nav';
+import { useEffect, useState, useMemo } from 'react';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Skeleton } from '@/components/ui/skeleton';
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { PanelLeft, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { getAllSurveyData } from "@/services/survey-service";
+import type { Survey } from '@/types/survey';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, type ChartConfig } from "@/components/ui/chart";
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { TrendingUp } from 'lucide-react';
 
-function AppLayoutSkeleton() {
+// --- Chart Configs ---
+const riskLevelColors = {
+  Bahaya: 'hsl(0, 72%, 51%)',     // bg-red-600
+  Sedang: 'hsl(45, 93%, 47%)',    // bg-yellow-500
+  Rendah: 'hsl(142, 69%, 31%)',   // bg-green-600
+  Minor: 'hsl(221, 83%, 53%)',    // bg-blue-600
+};
+
+const pieChartConfig = {
+  count: { label: 'Jumlah' },
+  Bahaya: { label: 'Bahaya', color: riskLevelColors.Bahaya },
+  Sedang: { label: 'Sedang', color: riskLevelColors.Sedang },
+  Rendah: { label: 'Rendah', color: riskLevelColors.Rendah },
+  Minor: { label: 'Minor', color: riskLevelColors.Minor },
+} satisfies ChartConfig;
+
+const barChartConfig = {
+  risks: { label: 'Risiko Tinggi & Sedang', color: 'hsl(var(--primary))' },
+} satisfies ChartConfig;
+
+// --- Skeleton Component ---
+function VisualizationSkeleton() {
   return (
-    <div className="flex min-h-screen w-full">
-      {/* Mock Sidebar */}
-      <div className="hidden md:flex flex-col w-64 border-r bg-muted/40 p-4 gap-4">
-        <div className="flex items-center gap-2 h-10">
-          <Skeleton className="size-8 rounded-md" />
-          <Skeleton className="h-6 w-32" />
-        </div>
-        <div className="flex flex-col gap-2 mt-4">
-          <Skeleton className="h-9 w-full" />
-          <Skeleton className="h-9 w-full" />
-          <Skeleton className="h-9 w-full" />
-        </div>
-      </div>
-      {/* Mock Main Content */}
-      <div className="flex-1 flex flex-col">
-        <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background px-4 sm:px-6">
-          <Skeleton className="h-8 w-8 rounded-md md:hidden" />
-          <Skeleton className="h-8 w-8 rounded-full ml-auto" />
-        </header>
-        <main className="flex-1 p-4 sm:p-6">
-          <div className="space-y-4">
-            <Skeleton className="h-8 w-1/4" />
-            <Skeleton className="h-4 w-1/2" />
-            <div className="grid gap-4 md:grid-cols-2">
-              <Skeleton className="h-48 w-full" />
-              <Skeleton className="h-48 w-full" />
-            </div>
-          </div>
-        </main>
-      </div>
+    <div className="grid gap-6 md:grid-cols-2">
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </CardHeader>
+        <CardContent className="flex items-center justify-center">
+          <Skeleton className="size-64 rounded-full" />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+        </CardContent>
+      </Card>
     </div>
   );
 }
 
+// --- Main Visualization Component ---
+export default function VisualizationPage() {
+  const [surveys, setSurveys] = useState<Survey[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default function AppLayout({ children }: { children: ReactNode }) {
-  const { user, userProfile, loading } = useAuth();
-  const router = useRouter();
-  
   useEffect(() => {
-    if (!loading && !user) {
-      router.replace('/login');
-    }
-  }, [user, loading, router]);
+    getAllSurveyData()
+      .then(data => {
+        const filteredData = data.filter(survey => survey.userRole !== 'Penguji Coba');
+        setSurveys(filteredData);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
-  if (loading || !user || !userProfile) {
-    return <AppLayoutSkeleton />;
+  const chartData = useMemo(() => {
+    if (surveys.length === 0) return null;
+
+    // Data for Pie Chart
+    const riskCounts: { [key: string]: number } = { Bahaya: 0, Sedang: 0, Rendah: 0, Minor: 0 };
+    let totalValidSurveys = 0;
+    surveys.forEach(survey => {
+      if (survey.riskLevel && survey.riskLevel in riskCounts) {
+        riskCounts[survey.riskLevel]++;
+        totalValidSurveys++;
+      }
+    });
+
+    const pieData = Object.entries(riskCounts)
+      .filter(([, value]) => value > 0)
+      .map(([name, value]) => ({
+        name: name as keyof typeof riskLevelColors,
+        value,
+        fill: riskLevelColors[name as keyof typeof riskLevelColors],
+      }));
+
+    // Data for Bar Chart
+    const roleRiskCounts = surveys.reduce((acc, survey) => {
+      if ((survey.riskLevel === 'Bahaya' || survey.riskLevel === 'Sedang') && survey.userRole) {
+        acc[survey.userRole] = (acc[survey.userRole] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+
+    const barData = Object.entries(roleRiskCounts)
+      .map(([name, risks]) => ({ name, risks }))
+      .sort((a, b) => b.risks - a.risks)
+      .slice(0, 10); // Show top 10 roles with most high/medium risks
+
+    return { pieData, totalValidSurveys, barData };
+  }, [surveys]);
+
+  if (loading) {
+    return <VisualizationSkeleton />;
+  }
+
+  if (!chartData || surveys.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Data Visualization</CardTitle>
+          <CardDescription>Graphical insights from the collected survey data.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center h-96 border-2 border-dashed rounded-lg">
+            <p className="text-muted-foreground">No survey data available to display visualizations.</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
-    <SidebarProvider>
-      <AppLayoutContent>{children}</AppLayoutContent>
-    </SidebarProvider>
-  );
-}
+    <div className="space-y-6">
+      <div className="space-y-1">
+         <h1 className="text-3xl font-bold">Data Visualization</h1>
+         <p className="text-muted-foreground">
+            Graphical insights from all collected survey data.
+         </p>
+      </div>
+      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-5">
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Distribusi Tingkat Risiko</CardTitle>
+            <CardDescription>Persentase tingkat risiko dari semua survei.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={pieChartConfig} className="mx-auto aspect-square max-h-[300px]">
+              <PieChart>
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                        formatter={(value) => `${value} (${((Number(value) / chartData.totalValidSurveys) * 100).toFixed(0)}%)`}
+                        hideLabel
+                    />
+                  }
+                />
+                <Pie data={chartData.pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
+                   {chartData.pieData.map((entry) => (
+                    <Cell key={`cell-${entry.name}`} fill={entry.fill} />
+                  ))}
+                </Pie>
+                <ChartLegend content={<ChartLegendContent nameKey="name" />} className="-mt-4" />
+              </PieChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
 
-function AppLayoutContent({ children }: { children: ReactNode }) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-  
-  useEffect(() => {
-    setSidebarOpen(!isMobile);
-  }, [isMobile]);
-
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
-
-  return (
-    <div className="min-h-screen w-full">
-      {/* Sidebar */}
-      <aside
-        className={cn(
-          "fixed left-0 top-0 z-40 h-screen w-64 bg-card border-r transition-transform duration-300 ease-in-out",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        )}
-      >
-        <div className="flex h-full flex-col">
-          <div className="flex h-14 items-center border-b px-4">
-            <div className="flex items-center gap-2 min-w-0">
-                <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={40} height={40} />
-                <h1 className="text-lg font-semibold">Manajemen Risiko</h1>
-            </div>
-          </div>
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 self-end m-2" onClick={toggleSidebar}>
-              <X className="h-4 w-4" />
-          </Button>
-          <ScrollArea className="flex-1">
-            <div className="px-3 py-4">
-                 <MainNav />
-            </div>
-          </ScrollArea>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <div
-        className={cn(
-          "transition-all duration-300 ease-in-out",
-          sidebarOpen && !isMobile ? "md:pl-64" : "pl-0"
-        )}
-      >
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={toggleSidebar}>
-            <PanelLeft className="h-4 w-4" />
-          </Button>
-          <div className="flex-1" />
-          <UserNav />
-        </header>
-        <main className="flex-1 p-4 sm:p-6">{children}</main>
+        <Card className="lg:col-span-3">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Departemen dengan Risiko Tertinggi
+            </CardTitle>
+            <CardDescription>Jumlah risiko dengan tingkat 'Bahaya' dan 'Sedang' per departemen (Top 10).</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={barChartConfig} className="h-[300px] w-full">
+              <BarChart data={chartData.barData} layout="vertical" margin={{ left: 20, right: 20 }}>
+                <CartesianGrid horizontal={false} />
+                <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tick={{ fontSize: 12, width: 180, textAnchor: 'start' }} interval={0} />
+                <XAxis dataKey="risks" type="number" allowDecimals={false} />
+                <ChartTooltip
+                  cursor={{ fill: 'hsl(var(--muted))' }}
+                  content={<ChartTooltipContent indicator="line" />}
+                />
+                <Bar dataKey="risks" fill="var(--color-risks)" radius={4} />
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
