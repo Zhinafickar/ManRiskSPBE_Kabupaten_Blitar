@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useAuth } from '@/hooks/use-auth';
@@ -95,7 +96,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
             >
                  <div className="flex h-14 items-center border-b px-4">
                     <div className="flex items-center gap-2 min-w-0">
-                        <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={40} height={40} />
+                        <Image src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png" alt="Logo" width={40} height={40} />
                         <h1 className="text-lg font-semibold truncate">Manajemen Risiko</h1>
                     </div>
                 </div>
@@ -117,7 +118,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
                     <div className="flex h-full flex-col">
                     <div className="flex h-14 items-center border-b px-4 justify-between">
                         <div className="flex items-center gap-2 min-w-0">
-                            <Image src="https://cdn.kibrispdr.org/data/753/logo-kab-blitar-png-5.png" alt="Logo" width={40} height={40} />
+                            <Image src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png" alt="Logo" width={40} height={40} />
                             <h1 className="text-lg font-semibold truncate">Manajemen Risiko</h1>
                         </div>
                         <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={toggleSidebar}>
