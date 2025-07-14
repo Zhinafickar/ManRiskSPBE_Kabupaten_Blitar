@@ -90,7 +90,7 @@ export default function DataPage({}: {}) {
                 <tbody>
                     <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Finansial</td>
-                        <td className="border border-black p-2 text-left">Positif</td>
+                        <td className="border border-black p-2 text-left bg-green-100 text-green-900 font-semibold">Positif</td>
                         <td className="border border-black p-2 text-left">Keuntungan 1 jt - 5 jt</td>
                         <td className="border border-black p-2 text-left">Keuntungan 6 jt - 20 jt</td>
                         <td className="border border-black p-2 text-left">Keuntungan 21 jt - 30 jt</td>
@@ -98,7 +98,7 @@ export default function DataPage({}: {}) {
                         <td className="border border-black p-2 text-left">Keuntungan &gt;50jt</td>
                     </tr>
                     <tr>
-                        <td className="border border-black p-2 text-left">Negatif</td>
+                        <td className="border border-black p-2 text-left bg-red-100 text-red-900 font-semibold">Negatif</td>
                         <td className="border border-black p-2 text-left">Kerugian 1 jt - 5 jt</td>
                         <td className="border border-black p-2 text-left">Kerugian 6 jt - 20 jt</td>
                         <td className="border border-black p-2 text-left">Kerugian 21 jt - 30 jt</td>
@@ -107,7 +107,7 @@ export default function DataPage({}: {}) {
                     </tr>
                      <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Reputasi</td>
-                        <td className="border border-black p-2 text-left">Positif</td>
+                        <td className="border border-black p-2 text-left bg-green-100 text-green-900 font-semibold">Positif</td>
                         <td className="border border-black p-2 text-left">Memberikan reputasi baik bagi seorang ASN Pemkab Kukar</td>
                         <td className="border border-black p-2 text-left">Memberikan reputasi baik bagi suatu Bidang di instansi</td>
                         <td className="border border-black p-2 text-left">Memberikan reputasi baik bagi suatu instansi Pemkab Kukar</td>
@@ -115,7 +115,7 @@ export default function DataPage({}: {}) {
                         <td className="border border-black p-2 text-left">Memberikan reputasi baik bagi Pemkab Kukar</td>
                     </tr>
                     <tr>
-                        <td className="border border-black p-2 text-left">Negatif</td>
+                        <td className="border border-black p-2 text-left bg-red-100 text-red-900 font-semibold">Negatif</td>
                         <td className="border border-black p-2 text-left">Berdampak memberikan reputasi buruk bagi seorang ASN Pemkab Kukar</td>
                         <td className="border border-black p-2 text-left">Berdampak memberikan reputasi buruk bagi suatu Bidang di instansi Pemkab Kukar</td>
                         <td className="border border-black p-2 text-left">Berdampak memberikan reputasi buruk bagi suatu instansi Pemkab Kukar</td>
@@ -124,15 +124,15 @@ export default function DataPage({}: {}) {
                     </tr>
                     <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Kinerja</td>
-                        <td className="border border-black p-2 text-left">Positif</td>
-                        <td className="border border-black p-2 text-left">Sangat signifikan berpengaruh dalam meningkatkan indeks kinerja</td>
-                        <td className="border border-black p-2 text-left">Signifikan berpengaruh dalam meningkatkan indeks kinerja</td>
-                        <td className="border border-black p-2 text-left">Cukup signifikan berpengaruh dalam meningkatkan indeks kinerja</td>
-                        <td className="border border-black p-2 text-left">Kurang signifikan berpengaruh dalam meningkatkan indeks kinerja</td>
+                        <td className="border border-black p-2 text-left bg-green-100 text-green-900 font-semibold">Positif</td>
                         <td className="border border-black p-2 text-left">Tidak berpengaruh dalam meningkatkan indeks kinerja</td>
+                        <td className="border border-black p-2 text-left">Kurang signifikan berpengaruh dalam meningkatkan indeks kinerja</td>
+                        <td className="border border-black p-2 text-left">Cukup signifikan berpengaruh dalam meningkatkan indeks kinerja</td>
+                        <td className="border border-black p-2 text-left">Signifikan berpengaruh dalam meningkatkan indeks kinerja</td>
+                        <td className="border border-black p-2 text-left">Sangat signifikan berpengaruh dalam meningkatkan indeks kinerja</td>
                     </tr>
                     <tr>
-                        <td className="border border-black p-2 text-left">Negatif</td>
+                        <td className="border border-black p-2 text-left bg-red-100 text-red-900 font-semibold">Negatif</td>
                         <td className="border border-black p-2 text-left">Tidak berpengaruh dalam mengurangi indeks kinerja</td>
                         <td className="border border-black p-2 text-left">Kurang signifikan berpengaruh dalam mengurangi indeks kinerja</td>
                         <td className="border border-black p-2 text-left">Cukup signifikan berpengaruh dalam mengurangi indeks kinerja</td>
@@ -141,15 +141,15 @@ export default function DataPage({}: {}) {
                     </tr>
                     <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Layanan Organisasi</td>
-                        <td className="border border-black p-2 text-left">Positif</td>
-                        <td className="border border-black p-2 text-left">Layanan dipercepat +- 10 menit dan meningkatkan kepuasan masyarakat</td>
-                        <td className="border border-black p-2 text-left">Layanan dipercepat +- 60 menit dan meningkatkan kepuasan masyarakat</td>
-                        <td className="border border-black p-2 text-left">Layanan dipercepat +- 5 jam dan meningkatkan kepuasan masyarakat</td>
+                        <td className="border border-black p-2 text-left bg-green-100 text-green-900 font-semibold">Positif</td>
+                        <td className="border border-black p-2 text-left">Layanan dipercepat +- 10 menit dan tidak berpengaruh pada indeks kepuasan masyarakat</td>
+                        <td className="border border-black p-2 text-left">Layanan dipercepat +- 60 menit dan tidak berpengaruh pada indeks kepuasan masyarakat</td>
+                        <td className="border border-black p-2 text-left">Layanan dipercepat +- 5 jam dan tidak berpengaruh pada indeks kepuasan masyarakat</td>
                         <td className="border border-black p-2 text-left">Layanan dipercepat +- 24 jam dan meningkatkan kepuasan masyarakat</td>
                         <td className="border border-black p-2 text-left">Layanan dipercepat +- 2 hari dan meningkatkan kepuasan masyarakat</td>
                     </tr>
                     <tr>
-                        <td className="border border-black p-2 text-left">Negatif</td>
+                        <td className="border border-black p-2 text-left bg-red-100 text-red-900 font-semibold">Negatif</td>
                         <td className="border border-black p-2 text-left">Layanan terganggu +- 10 menit namun tidak berpengaruh pada indeks kepuasan masyarakat</td>
                         <td className="border border-black p-2 text-left">Layanan terganggu +- 60 menit namun tidak berpengaruh pada indeks kepuasan masyarakat</td>
                         <td className="border border-black p-2 text-left">Layanan terganggu +- 5 jam namun tidak berpengaruh pada indeks kepuasan masyarakat</td>
@@ -158,15 +158,15 @@ export default function DataPage({}: {}) {
                     </tr>
                     <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Operasional dan Aset TIK</td>
-                        <td className="border border-black p-2 text-left">Positif</td>
-                        <td className="border border-black p-2 text-left">Layanan dioptimalkan +- 10 menit dan mendukung layanan pemerintah</td>
-                        <td className="border border-black p-2 text-left">Layanan dioptimalkan +- 60 menit dan mendukung layanan pemerintah</td>
+                        <td className="border border-black p-2 text-left bg-green-100 text-green-900 font-semibold">Positif</td>
+                        <td className="border border-black p-2 text-left">Layanan dioptimalkan +- 10 menit dan tidak berpengaruh pada layanan pemerintah</td>
+                        <td className="border border-black p-2 text-left">Layanan dioptimalkan +- 60 menit dan tidak berpengaruh pada layanan pemerintah</td>
                         <td className="border border-black p-2 text-left">Layanan dioptimalkan +- 5 jam dan mendukung layanan pemerintah</td>
                         <td className="border border-black p-2 text-left">Layanan dioptimalkan +- 24 jam dan mendukung layanan pemerintah</td>
                         <td className="border border-black p-2 text-left">Layanan dioptimalkan lebih dari 2 hari dan mendukung layanan pemerintah</td>
                     </tr>
                     <tr>
-                        <td className="border border-black p-2 text-left">Negatif</td>
+                        <td className="border border-black p-2 text-left bg-red-100 text-red-900 font-semibold">Negatif</td>
                         <td className="border border-black p-2 text-left">Layanan terganggu +- 10 menit namun tidak berpengaruh pada layanan pemerintah</td>
                         <td className="border border-black p-2 text-left">Layanan terganggu +- 60 menit namun tidak berpengaruh pada layanan pemerintah</td>
                         <td className="border border-black p-2 text-left">Layanan terganggu +- 5 jam dan berpengaruh pada layanan pemerintah</td>
@@ -175,15 +175,15 @@ export default function DataPage({}: {}) {
                     </tr>
                     <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Hukum dan Regulasi</td>
-                        <td className="border border-black p-2 text-left">Positif</td>
-                        <td className="border border-black p-2 text-left">Sangat signifikan berpengaruh dalam kepatuhan terhadap regulasi</td>
-                        <td className="border border-black p-2 text-left">Signifikan berpengaruh dalam kepatuhan terhadap regulasi</td>
-                        <td className="border border-black p-2 text-left">Cukup signifikan berpengaruh dalam kepatuhan terhadap regulasi</td>
-                        <td className="border border-black p-2 text-left">Kurang signifikan berpengaruh dalam kepatuhan terhadap regulasi</td>
+                        <td className="border border-black p-2 text-left bg-green-100 text-green-900 font-semibold">Positif</td>
                         <td className="border border-black p-2 text-left">Tidak berpengaruh dalam kepatuhan terhadap regulasi</td>
+                        <td className="border border-black p-2 text-left">Kurang signifikan berpengaruh dalam kepatuhan terhadap regulasi</td>
+                        <td className="border border-black p-2 text-left">Cukup signifikan berpengaruh dalam kepatuhan terhadap regulasi</td>
+                        <td className="border border-black p-2 text-left">Signifikan berpengaruh dalam kepatuhan terhadap regulasi</td>
+                        <td className="border border-black p-2 text-left">Sangat signifikan berpengaruh dalam kepatuhan terhadap regulasi</td>
                     </tr>
                     <tr>
-                        <td className="border border-black p-2 text-left">Negatif</td>
+                        <td className="border border-black p-2 text-left bg-red-100 text-red-900 font-semibold">Negatif</td>
                         <td className="border border-black p-2 text-left">Tidak berpengaruh dalam kepatuhan terhadap regulasi yang ada</td>
                         <td className="border border-black p-2 text-left">Kurang signifikan berpengaruh dalam kepatuhan terhadap regulasi yang ada</td>
                         <td className="border border-black p-2 text-left">Cukup signifikan berpengaruh dalam kepatuhan terhadap regulasi yang ada</td>
@@ -192,15 +192,15 @@ export default function DataPage({}: {}) {
                     </tr>
                     <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Sumber Daya Manusia</td>
-                        <td className="border border-black p-2 text-left">Positif</td>
-                        <td className="border border-black p-2 text-left">Berdampak pada peningkatan kesejahteraan SDM</td>
-                        <td className="border border-black p-2 text-left">Berdampak pada peningkatan kesehatan SDM</td>
-                        <td className="border border-black p-2 text-left">Berdampak pada peningkatan produktivitas SDM</td>
-                        <td className="border border-black p-2 text-left">Berdampak pada ketenangan SDM</td>
+                        <td className="border border-black p-2 text-left bg-green-100 text-green-900 font-semibold">Positif</td>
                         <td className="border border-black p-2 text-left">Tidak signifikan berdampak pada ketenangan SDM</td>
-                    </tr>
+                        <td className="border border-black p-2 text-left">Berdampak pada ketenangan SDM</td>
+                        <td className="border border-black p-2 text-left">Berdampak pada peningkatan produktivitas SDM</td>
+                        <td className="border border-black p-2 text-left">Berdampak pada peningkatan kesehatan SDM</td>
+                        <td className="border border-black p-2 text-left">Berdampak pada peningkatan kesejahteraan SDM</td>
+</tr>
                     <tr>
-                        <td className="border border-black p-2 text-left">Negatif</td>
+                        <td className="border border-black p-2 text-left bg-red-100 text-red-900 font-semibold">Negatif</td>
                         <td className="border border-black p-2 text-left">Tidak signifikan berdampak pada kecemasan SDM</td>
                         <td className="border border-black p-2 text-left">Berdampak pada kecemasan SDM</td>
                         <td className="border border-black p-2 text-left">Berdampak pada produktivitas SDM</td>
