@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -214,21 +215,25 @@ function QuickGuideCard() {
             Panduan Cepat
         </CardTitle>
         <CardDescription>
-            Langkah-langkah utama penggunaan aplikasi.
+            Langkah-langkah utama penggunaan aplikasi untuk manajemen risiko.
         </CardDescription>
       </CardHeader>
       <CardContent className="text-sm text-muted-foreground space-y-4">
         <div>
-            <h4 className="font-semibold text-foreground">1. Isi Survei Risiko</h4>
-            <p>Buka menu 'Manajemen Risiko' di bilah sisi untuk mulai mengisi data menggunakan formulir tunggal atau tabel.</p>
+            <h4 className="font-semibold text-foreground">1. Pelajari Referensi & Tutorial</h4>
+            <p>Buka menu 'Informasi Penting' untuk melihat 'Referensi Perhitungan' dan 'Tutorial' agar Anda memahami cara kerja aplikasi.</p>
         </div>
         <div>
-            <h4 className="font-semibold text-foreground">2. Buat Rencana Kontinuitas</h4>
-            <p>Setelah mengisi survei, Anda dapat membuat rencana keberlanjutan di menu 'Kontinuitas'.</p>
+            <h4 className="font-semibold text-foreground">2. Isi Survei Risiko</h4>
+            <p>Di menu 'Manajemen Risiko', gunakan 'Input Form' untuk satu risiko atau 'Input Tabel' untuk beberapa risiko sekaligus. Manfaatkan fitur saran AI untuk membantu pengisian.</p>
         </div>
         <div>
-            <h4 className="font-semibold text-foreground">3. Tinjau Hasil Anda</h4>
-            <p>Lihat semua data yang telah Anda kirimkan dalam bentuk tabel dan grafik di menu hasil masing-masing.</p>
+            <h4 className="font-semibold text-foreground">3. Buat Rencana Kontinuitas</h4>
+            <p>Setelah survei diisi, buka menu 'Kontinuitas' untuk membuat rencana pemulihan berdasarkan risiko yang telah Anda identifikasi.</p>
+        </div>
+         <div>
+            <h4 className="font-semibold text-foreground">4. Tinjau & Cetak Laporan</h4>
+            <p>Gunakan menu 'Grafik' untuk visualisasi dan 'Laporan Akhir' untuk melihat ringkasan lengkap yang siap untuk dicetak.</p>
         </div>
       </CardContent>
     </Card>
