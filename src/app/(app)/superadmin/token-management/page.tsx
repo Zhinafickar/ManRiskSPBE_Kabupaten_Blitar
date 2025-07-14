@@ -115,7 +115,7 @@ export default function TokenManagementPage() {
                         Buat Token Akses Admin Baru
                     </CardTitle>
                     <CardDescription>
-                        Buat token sekali pakai untuk admin baru. Admin harus memasukkan nama dan token ini untuk mengakses halaman login/register.
+                        Buat token yang dapat digunakan kembali untuk admin. Admin harus memasukkan nama dan token ini untuk mengakses halaman login/register.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">

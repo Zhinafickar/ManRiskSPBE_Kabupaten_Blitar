@@ -4,5 +4,5 @@ export interface AdminToken {
     token: string;
     createdBy: string;
     createdAt: string;
-    used: boolean;
+    used?: boolean; // Now optional as we don't track usage for reusable tokens
 }

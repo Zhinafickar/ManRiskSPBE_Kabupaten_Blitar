@@ -142,7 +142,6 @@ export async function createAdminToken(name: string, token: string, createdBy: s
         token,
         createdBy,
         createdAt: serverTimestamp(),
-        used: false,
     });
 }
 
@@ -150,8 +149,7 @@ export async function getAdminTokens(): Promise<AdminToken[]> {
     if (!isFirebaseConfigured || !db) return [];
 
     const tokensCollection = collection(db, 'adminTokens');
-    const q = query(tokensCollection, where("used", "==", false));
-    const tokenSnapshot = await getDocs(q);
+    const tokenSnapshot = await getDocs(tokensCollection);
     
     return tokenSnapshot.docs.map(doc => {
         const data = doc.data();
@@ -161,7 +159,6 @@ export async function getAdminTokens(): Promise<AdminToken[]> {
             token: data.token,
             createdBy: data.createdBy,
             createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : new Date().toISOString(),
-            used: data.used,
         };
     });
 }
@@ -178,33 +175,22 @@ export async function verifyAndConsumeToken(name: string, token: string): Promis
     }
 
     const tokensRef = collection(db, "adminTokens");
-    const q = query(tokensRef, where("name", "==", name), where("token", "==", token), where("used", "==", false));
+    // Query for a matching, active token.
+    const q = query(tokensRef, where("name", "==", name), where("token", "==", token));
     
     try {
         const querySnapshot = await getDocs(q);
 
         if (querySnapshot.empty) {
-            return { success: false, message: 'Nama atau token tidak valid, atau token telah digunakan.' };
+            return { success: false, message: 'Nama atau token tidak valid.' };
         }
 
-        const tokenDoc = querySnapshot.docs[0];
-
-        // Use a transaction to ensure atomicity
-        await runTransaction(db, async (transaction) => {
-            const freshDoc = await transaction.get(tokenDoc.ref);
-            if (!freshDoc.exists() || freshDoc.data().used) {
-                throw new Error("Token telah digunakan atau tidak ada.");
-            }
-            transaction.update(tokenDoc.ref, { used: true });
-        });
-
+        // Since the token is valid and reusable, we don't need to do anything else.
+        // We just confirm it exists.
         return { success: true, message: 'Token berhasil diverifikasi.' };
 
     } catch (error) {
         console.error("Error during token verification: ", error);
-        if (error instanceof Error && error.message.includes("Token telah digunakan")) {
-            return { success: false, message: 'Token ini baru saja digunakan oleh orang lain.' };
-        }
         return { success: false, message: 'Terjadi kesalahan saat verifikasi token.' };
     }
 }
