@@ -91,11 +91,7 @@ export default function DataPage({}: {}) {
                     <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Finansial</td>
                         <td className="border border-black p-2 text-left">Positif</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2" colSpan={5}>di isi kolom positif ini adalah kebalikan dari isi kolom negatif</td>
                     </tr>
                     <tr>
                         <td className="border border-black p-2 text-left">Negatif</td>
@@ -108,11 +104,7 @@ export default function DataPage({}: {}) {
                      <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Reputasi</td>
                         <td className="border border-black p-2 text-left">Positif</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2" colSpan={5}>di isi kolom positif ini adalah kebalikan dari isi kolom negatif</td>
                     </tr>
                     <tr>
                         <td className="border border-black p-2 text-left">Negatif</td>
@@ -125,11 +117,7 @@ export default function DataPage({}: {}) {
                     <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Kinerja</td>
                         <td className="border border-black p-2 text-left">Positif</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2" colSpan={5}>di isi kolom positif ini adalah kebalikan dari isi kolom negatif</td>
                     </tr>
                     <tr>
                         <td className="border border-black p-2 text-left">Negatif</td>
@@ -142,11 +130,7 @@ export default function DataPage({}: {}) {
                     <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Layanan Organisasi</td>
                         <td className="border border-black p-2 text-left">Positif</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2" colSpan={5}>di isi kolom positif ini adalah kebalikan dari isi kolom negatif</td>
                     </tr>
                     <tr>
                         <td className="border border-black p-2 text-left">Negatif</td>
@@ -159,11 +143,7 @@ export default function DataPage({}: {}) {
                     <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Operasional dan Aset TIK</td>
                         <td className="border border-black p-2 text-left">Positif</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2" colSpan={5}>di isi kolom positif ini adalah kebalikan dari isi kolom negatif</td>
                     </tr>
                     <tr>
                         <td className="border border-black p-2 text-left">Negatif</td>
@@ -176,11 +156,7 @@ export default function DataPage({}: {}) {
                     <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Hukum dan Regulasi</td>
                         <td className="border border-black p-2 text-left">Positif</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2" colSpan={5}>di isi kolom positif ini adalah kebalikan dari isi kolom negatif</td>
                     </tr>
                     <tr>
                         <td className="border border-black p-2 text-left">Negatif</td>
@@ -193,11 +169,7 @@ export default function DataPage({}: {}) {
                     <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Sumber Daya Manusia</td>
                         <td className="border border-black p-2 text-left">Positif</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
-                        <td className="border border-black p-2">x</td>
+                        <td className="border border-black p-2" colSpan={5}>di isi kolom positif ini adalah kebalikan dari isi kolom negatif</td>
                     </tr>
                     <tr>
                         <td className="border border-black p-2 text-left">Negatif</td>
