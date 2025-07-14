@@ -57,7 +57,7 @@ export function TokenVerification({ onVerified }: TokenVerificationProps) {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-pink-100 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-red-100 p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center text-center">
           <Image src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png" alt="Logo" width={130} height={130} />
