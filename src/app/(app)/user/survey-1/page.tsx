@@ -37,7 +37,7 @@ import { addSurvey } from '@/services/survey-service';
 import { useAuth } from '@/hooks/use-auth';
 import { useEffect, useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon, Check, ChevronsUpDown, Info, Sparkles } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, ChevronsUpDown, Info, Sparkles, TrendingDown, TrendingUp, Loader2 } from 'lucide-react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import { getRiskLevel, type RiskIndicator } from '@/lib/risk-matrix';
@@ -45,6 +45,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { suggestCauseImpact } from '@/ai/flows/suggest-cause-impact';
+import { determineRiskSentiment } from '@/ai/flows/determine-risk-sentiment';
 
 const formSchema = z.object({
   riskEvent: z.string({ required_error: 'Silakan pilih kategori risiko.' }).min(1, { message: 'Kategori risiko harus diisi.' }),
@@ -76,6 +77,9 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
   const [kontrolTeknologiOpen, setKontrolTeknologiOpen] = useState(false);
   const [availableImpactAreas, setAvailableImpactAreas] = useState<string[]>([]);
   const [riskIndicator, setRiskIndicator] = useState<RiskIndicator>({ level: null, color: '' });
+
+  const [riskSentiment, setRiskSentiment] = useState<'Positif' | 'Negatif' | 'Netral' | null>(null);
+  const [isSentimentLoading, setIsSentimentLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -126,6 +130,21 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
     form.setValue('cause', '');
     form.setValue('impact', '');
   }, [selectedRiskEvent, selectedImpactArea, selectedAreaDampak, form]);
+
+  useEffect(() => {
+    if (selectedRiskEvent && selectedImpactArea) {
+      setIsSentimentLoading(true);
+      determineRiskSentiment({
+        riskCategory: selectedRiskEvent,
+        risk: selectedImpactArea
+      })
+      .then(result => setRiskSentiment(result.sentiment))
+      .catch(() => setRiskSentiment(null)) // Handle error case
+      .finally(() => setIsSentimentLoading(false));
+    } else {
+      setRiskSentiment(null);
+    }
+  }, [selectedRiskEvent, selectedImpactArea]);
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -304,6 +323,24 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                       </Command>
                     </PopoverContent>
                   </Popover>
+                  <div className="h-5 mt-1.5">
+                    {isSentimentLoading ? (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Menganalisis...</span>
+                      </div>
+                    ) : riskSentiment === 'Positif' ? (
+                      <div className="flex items-center gap-2 text-sm text-green-600">
+                        <TrendingUp className="h-4 w-4" />
+                        <span>Risiko ini bersifat Positif (Peluang)</span>
+                      </div>
+                    ) : riskSentiment === 'Negatif' ? (
+                      <div className="flex items-center gap-2 text-sm text-red-600">
+                        <TrendingDown className="h-4 w-4" />
+                        <span>Risiko ini bersifat Negatif (Ancaman)</span>
+                      </div>
+                    ) : null}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
