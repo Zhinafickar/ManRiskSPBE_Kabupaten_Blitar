@@ -32,6 +32,7 @@ import {
   Printer,
   Shield,
   Building,
+  KeyRound,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -101,6 +102,12 @@ export function MainNav() {
       label: 'Role Management',
       icon: Shield,
       active: pathname.startsWith('/superadmin/role-management'),
+    },
+    {
+      href: '/superadmin/token-management',
+      label: 'Token Management',
+      icon: KeyRound,
+      active: pathname.startsWith('/superadmin/token-management'),
     },
     {
       href: '/superadmin/results',

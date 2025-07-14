@@ -3,7 +3,7 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Users, FileText, AreaChart, Shield, Building, ClipboardCheck } from "lucide-react";
+import { Users, FileText, AreaChart, Shield, Building, ClipboardCheck, KeyRound } from "lucide-react";
 import { RiskAnalysisCard } from "@/app/(app)/_components/risk-analysis-card";
 
 export default function SuperAdminDashboard() {
@@ -43,6 +43,20 @@ export default function SuperAdminDashboard() {
         </Card>
         <Card>
           <CardHeader>
+            <CardTitle>Token Management</CardTitle>
+            <CardDescription>Generate and manage access tokens for new admins.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild>
+              <Link href="/superadmin/token-management"><KeyRound className="mr-2 h-4 w-4" />Manage Tokens</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <Card>
+          <CardHeader>
             <CardTitle>OPD/Departemen Lain</CardTitle>
             <CardDescription>View the list of all registered departments and their data.</CardDescription>
           </CardHeader>
@@ -52,10 +66,7 @@ export default function SuperAdminDashboard() {
             </Button>
           </CardContent>
         </Card>
-      </div>
-
-       <div className="grid gap-6 md:grid-cols-3">
-         <Card className="md:col-span-2">
+         <Card>
             <CardHeader>
               <CardTitle>All Survey Results</CardTitle>
               <CardDescription>Access a complete list of all survey submissions, with options to view and export.</CardDescription>

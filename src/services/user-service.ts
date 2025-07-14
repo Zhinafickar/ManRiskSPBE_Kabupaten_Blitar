@@ -1,7 +1,8 @@
 import { db, isFirebaseConfigured } from '@/lib/firebase';
-import { collection, getDocs, doc, setDoc, deleteDoc, query, where, getDoc, writeBatch } from 'firebase/firestore';
+import { collection, getDocs, doc, setDoc, deleteDoc, query, where, getDoc, writeBatch, addDoc, serverTimestamp, runTransaction } from 'firebase/firestore';
 import type { UserProfile } from '@/types/user';
 import { ADMIN_ROLES } from '@/constants/admin-data';
+import type { AdminToken } from '@/types/token';
 
 export async function getAllUsers(): Promise<UserProfile[]> {
   if (!isFirebaseConfigured || !db) return [];
@@ -127,5 +128,83 @@ export async function deleteUserData(uid: string) {
     } catch (error) {
         console.error("Error deleting user: ", error);
         return { success: false, message: 'Failed to delete user data.' };
+    }
+}
+
+// --- Token Management Functions ---
+
+export async function createAdminToken(name: string, token: string, createdBy: string) {
+    if (!isFirebaseConfigured || !db) throw new Error("Firebase not configured");
+    
+    const tokenRef = collection(db, 'adminTokens');
+    await addDoc(tokenRef, {
+        name,
+        token,
+        createdBy,
+        createdAt: serverTimestamp(),
+        used: false,
+    });
+}
+
+export async function getAdminTokens(): Promise<AdminToken[]> {
+    if (!isFirebaseConfigured || !db) return [];
+
+    const tokensCollection = collection(db, 'adminTokens');
+    const q = query(tokensCollection, where("used", "==", false));
+    const tokenSnapshot = await getDocs(q);
+    
+    return tokenSnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+            id: doc.id,
+            name: data.name,
+            token: data.token,
+            createdBy: data.createdBy,
+            createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : new Date().toISOString(),
+            used: data.used,
+        };
+    });
+}
+
+export async function deleteAdminToken(tokenId: string) {
+    if (!isFirebaseConfigured || !db) throw new Error("Firebase not configured");
+    const tokenRef = doc(db, 'adminTokens', tokenId);
+    await deleteDoc(tokenRef);
+}
+
+export async function verifyAndConsumeToken(name: string, token: string): Promise<{ success: boolean; message: string }> {
+    if (!isFirebaseConfigured || !db) {
+        return { success: false, message: 'Layanan tidak tersedia. Silakan coba lagi nanti.' };
+    }
+
+    const tokensRef = collection(db, "adminTokens");
+    const q = query(tokensRef, where("name", "==", name), where("token", "==", token), where("used", "==", false));
+    
+    try {
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            return { success: false, message: 'Nama atau token tidak valid, atau token telah digunakan.' };
+        }
+
+        const tokenDoc = querySnapshot.docs[0];
+
+        // Use a transaction to ensure atomicity
+        await runTransaction(db, async (transaction) => {
+            const freshDoc = await transaction.get(tokenDoc.ref);
+            if (!freshDoc.exists() || freshDoc.data().used) {
+                throw new Error("Token telah digunakan atau tidak ada.");
+            }
+            transaction.update(tokenDoc.ref, { used: true });
+        });
+
+        return { success: true, message: 'Token berhasil diverifikasi.' };
+
+    } catch (error) {
+        console.error("Error during token verification: ", error);
+        if (error instanceof Error && error.message.includes("Token telah digunakan")) {
+            return { success: false, message: 'Token ini baru saja digunakan oleh orang lain.' };
+        }
+        return { success: false, message: 'Terjadi kesalahan saat verifikasi token.' };
     }
 }

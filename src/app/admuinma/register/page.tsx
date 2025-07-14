@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -25,9 +26,9 @@ import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword, sendEmailVerification, signOut } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
-import { useState } from 'react';
 import Image from 'next/image';
 import { ADMIN_ROLES } from '@/constants/admin-data';
+import { TokenVerification } from '../_components/token-verification';
 
 const formSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
@@ -38,8 +39,7 @@ const formSchema = z.object({
   role: z.string({ required_error: 'Please select an admin role.' }).min(1, {message: "Please select an admin role."}),
 });
 
-
-export default function AdminRegisterPage() {
+function RegisterForm() {
   const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -196,5 +196,15 @@ export default function AdminRegisterPage() {
         </p>
       </div>
     </div>
-  );
+  )
+}
+
+export default function AdminRegisterPage() {
+  const [isVerified, setIsVerified] = useState(false);
+
+  if (!isVerified) {
+    return <TokenVerification onVerified={() => setIsVerified(true)} />;
+  }
+
+  return <RegisterForm />;
 }
