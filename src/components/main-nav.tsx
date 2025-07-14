@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -33,148 +34,175 @@ import {
   Shield,
   Building,
   KeyRound,
+  Fingerprint,
+  BarChart,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function MainNav() {
   const { userProfile } = useAuth();
   const pathname = usePathname();
 
+  // User Menu States
   const isActiveInfoMenu = pathname === '/user/data' || pathname === '/user/tutorial' || pathname === '/user/opd';
-  const [isInfoMenuOpen, setIsInfoMenuOpen] = useState(isActiveInfoMenu);
+  const [isInfoMenuOpen, setIsInfoMenuOpen] = useState(false);
 
   const isActiveRiskMenu = pathname.startsWith('/user/survey') || pathname === '/user/results';
-  const [isRiskMenuOpen, setIsRiskMenuOpen] = useState(isActiveRiskMenu);
+  const [isRiskMenuOpen, setIsRiskMenuOpen] = useState(false);
   
   const isActiveContinuityMenu = pathname.startsWith('/user/continuity');
-  const [isContinuityMenuOpen, setIsContinuityMenuOpen] = useState(isActiveContinuityMenu);
+  const [isContinuityMenuOpen, setIsContinuityMenuOpen] = useState(false);
 
-  const adminMenu = [
-    {
-      href: '/admuinma/dashboard',
-      label: 'Dashboard',
-      icon: LayoutDashboard,
-      active: pathname === '/admuinma/dashboard',
-    },
-    {
-      href: '/admuinma/results',
-      label: 'Survey Results',
-      icon: FileText,
-      active: pathname === '/admuinma/results',
-    },
-    {
-      href: '/admuinma/continuity-results',
-      label: 'Continuity Results',
-      icon: ClipboardCheck,
-      active: pathname === '/admuinma/continuity-results',
-    },
-    {
-      href: '/admuinma/visualization',
-      label: 'Visualization',
-      icon: AreaChart,
-      active: pathname === '/admuinma/visualization',
-    },
-    {
-      href: '/admuinma/opd',
-      label: 'OPD/Departemen Lain',
-      icon: Building,
-      active: pathname === '/admuinma/opd',
-    },
-  ];
+  // Admin Menu States
+  const isActiveAdminDataMenu = ['/admuinma/results', '/admuinma/continuity-results', '/admuinma/visualization', '/admuinma/opd'].some(p => pathname === p);
+  const [isAdminDataMenuOpen, setIsAdminDataMenuOpen] = useState(false);
 
-  const superAdminMenu = [
-    {
-      href: '/superadmin/dashboard',
-      label: 'Dashboard',
-      icon: LayoutDashboard,
-      active: pathname === '/superadmin/dashboard',
-    },
-    {
-      href: '/superadmin/users',
-      label: 'User Management',
-      icon: Users,
-      active: pathname.startsWith('/superadmin/users'),
-    },
-    {
-      href: '/superadmin/role-management',
-      label: 'Role Management',
-      icon: Shield,
-      active: pathname.startsWith('/superadmin/role-management'),
-    },
-    {
-      href: '/superadmin/token-management',
-      label: 'Token Management',
-      icon: KeyRound,
-      active: pathname.startsWith('/superadmin/token-management'),
-    },
-    {
-      href: '/superadmin/results',
-      label: 'Survey Results',
-      icon: FileText,
-      active: pathname === '/superadmin/results',
-    },
-    {
-      href: '/superadmin/continuity-results',
-      label: 'Continuity Results',
-      icon: ClipboardCheck,
-      active: pathname === '/superadmin/continuity-results',
-    },
-    {
-      href: '/superadmin/visualization',
-      label: 'Visualization',
-      icon: AreaChart,
-      active: pathname === '/superadmin/visualization',
-    },
-    {
-      href: '/superadmin/opd',
-      label: 'OPD/Departemen Lain',
-      icon: Building,
-      active: pathname === '/superadmin/opd',
-    },
-  ];
+  // Super Admin Menu States
+  const isActiveSuperAdminAccessMenu = ['/superadmin/users', '/superadmin/role-management', '/superadmin/token-management'].some(p => pathname.startsWith(p));
+  const [isSuperAdminAccessMenuOpen, setIsSuperAdminAccessMenuOpen] = useState(false);
+  const isActiveSuperAdminDataMenu = ['/superadmin/results', '/superadmin/continuity-results', '/superadmin/visualization', '/superadmin/opd'].some(p => pathname === p);
+  const [isSuperAdminDataMenuOpen, setIsSuperAdminDataMenuOpen] = useState(false);
 
-  const getMenuItems = () => {
-    switch (userProfile?.role) {
-      case 'admin':
-        return adminMenu;
-      case 'superadmin':
-        return superAdminMenu;
-      default:
-        return []; // User menu is rendered separately
-    }
-  };
-  
-  if (userProfile?.role === 'admin' || userProfile?.role === 'superadmin') {
-      const menuItems = getMenuItems();
+  useEffect(() => {
+    setIsInfoMenuOpen(isActiveInfoMenu);
+    setIsRiskMenuOpen(isActiveRiskMenu);
+    setIsContinuityMenuOpen(isActiveContinuityMenu);
+    setIsAdminDataMenuOpen(isActiveAdminDataMenu);
+    setIsSuperAdminAccessMenuOpen(isActiveSuperAdminAccessMenu);
+    setIsSuperAdminDataMenuOpen(isActiveSuperAdminDataMenu);
+  }, [pathname, isActiveInfoMenu, isActiveRiskMenu, isActiveContinuityMenu, isActiveAdminDataMenu, isActiveSuperAdminAccessMenu, isActiveSuperAdminDataMenu]);
+
+  if (userProfile?.role === 'admin') {
     return (
         <SidebarMenu>
-            {menuItems.map((item: any) => (
-                <SidebarMenuItem key={item.label}>
-                {item.href ? (
-                    <SidebarMenuButton
-                    asChild
-                    isActive={item.active}
-                    tooltip={item.label}
-                    >
-                    <Link href={item.href}>
-                        <item.icon />
-                        <span>{item.label}</span>
-                    </Link>
-                    </SidebarMenuButton>
-                ) : (
-                    <SidebarMenuButton
-                    onClick={item.onClick}
-                    isActive={item.active}
-                    tooltip={item.label}
-                    >
-                    <item.icon />
-                    <span>{item.label}</span>
-                    </SidebarMenuButton>
-                )}
-                </SidebarMenuItem>
-            ))}
+            <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/admuinma/dashboard'} tooltip="Dashboard">
+                <Link href="/admuinma/dashboard">
+                    <LayoutDashboard />
+                    <span>Dashboard</span>
+                </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+                <Collapsible open={isAdminDataMenuOpen} onOpenChange={setIsAdminDataMenuOpen}>
+                    <CollapsibleTrigger asChild>
+                        <SidebarMenuButton isActive={isActiveAdminDataMenu} className="[&[data-state=open]>svg:last-of-type]:rotate-180">
+                            <BarChart />
+                            <span className="mr-auto group-data-[collapsible=icon]:hidden">Data & Laporan</span>
+                            <ChevronDown className="size-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden" />
+                        </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                        <SidebarMenuSub>
+                            <SidebarMenuSubItem>
+                                <SidebarMenuSubButton asChild isActive={pathname === '/admuinma/results'}>
+                                    <Link href="/admuinma/results"><FileText /><span>Survey Results</span></Link>
+                                </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                            <SidebarMenuSubItem>
+                                <SidebarMenuSubButton asChild isActive={pathname === '/admuinma/continuity-results'}>
+                                    <Link href="/admuinma/continuity-results"><ClipboardCheck /><span>Continuity Results</span></Link>
+                                </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                             <SidebarMenuSubItem>
+                                <SidebarMenuSubButton asChild isActive={pathname === '/admuinma/visualization'}>
+                                    <Link href="/admuinma/visualization"><AreaChart /><span>Visualization</span></Link>
+                                </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                             <SidebarMenuSubItem>
+                                <SidebarMenuSubButton asChild isActive={pathname === '/admuinma/opd'}>
+                                    <Link href="/admuinma/opd"><Building /><span>OPD/Departemen Lain</span></Link>
+                                </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                        </SidebarMenuSub>
+                    </CollapsibleContent>
+                </Collapsible>
+            </SidebarMenuItem>
+        </SidebarMenu>
+    )
+  }
+  
+  if (userProfile?.role === 'superadmin') {
+    return (
+        <SidebarMenu>
+            <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/superadmin/dashboard'} tooltip="Dashboard">
+                <Link href="/superadmin/dashboard">
+                    <LayoutDashboard />
+                    <span>Dashboard</span>
+                </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+                <Collapsible open={isSuperAdminAccessMenuOpen} onOpenChange={setIsSuperAdminAccessMenuOpen}>
+                    <CollapsibleTrigger asChild>
+                        <SidebarMenuButton isActive={isActiveSuperAdminAccessMenu} className="[&[data-state=open]>svg:last-of-type]:rotate-180">
+                            <Fingerprint />
+                            <span className="mr-auto group-data-[collapsible=icon]:hidden">Akses & Pengguna</span>
+                            <ChevronDown className="size-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden" />
+                        </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                        <SidebarMenuSub>
+                            <SidebarMenuSubItem>
+                                <SidebarMenuSubButton asChild isActive={pathname.startsWith('/superadmin/users')}>
+                                    <Link href="/superadmin/users"><Users /><span>User Management</span></Link>
+                                </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                            <SidebarMenuSubItem>
+                                <SidebarMenuSubButton asChild isActive={pathname.startsWith('/superadmin/role-management')}>
+                                    <Link href="/superadmin/role-management"><Shield /><span>Role Management</span></Link>
+                                </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                            <SidebarMenuSubItem>
+                                <SidebarMenuSubButton asChild isActive={pathname.startsWith('/superadmin/token-management')}>
+                                    <Link href="/superadmin/token-management"><KeyRound /><span>Token Management</span></Link>
+                                </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                        </SidebarMenuSub>
+                    </CollapsibleContent>
+                </Collapsible>
+            </SidebarMenuItem>
+            
+            <SidebarMenuItem>
+                <Collapsible open={isSuperAdminDataMenuOpen} onOpenChange={setIsSuperAdminDataMenuOpen}>
+                    <CollapsibleTrigger asChild>
+                        <SidebarMenuButton isActive={isActiveSuperAdminDataMenu} className="[&[data-state=open]>svg:last-of-type]:rotate-180">
+                            <BarChart />
+                            <span className="mr-auto group-data-[collapsible=icon]:hidden">Data & Laporan</span>
+                            <ChevronDown className="size-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden" />
+                        </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                        <SidebarMenuSub>
+                            <SidebarMenuSubItem>
+                                <SidebarMenuSubButton asChild isActive={pathname === '/superadmin/results'}>
+                                    <Link href="/superadmin/results"><FileText /><span>Survey Results</span></Link>
+                                </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                            <SidebarMenuSubItem>
+                                <SidebarMenuSubButton asChild isActive={pathname === '/superadmin/continuity-results'}>
+                                    <Link href="/superadmin/continuity-results"><ClipboardCheck /><span>Continuity Results</span></Link>
+                                </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                             <SidebarMenuSubItem>
+                                <SidebarMenuSubButton asChild isActive={pathname === '/superadmin/visualization'}>
+                                    <Link href="/superadmin/visualization"><AreaChart /><span>Visualization</span></Link>
+                                </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                             <SidebarMenuSubItem>
+                                <SidebarMenuSubButton asChild isActive={pathname === '/superadmin/opd'}>
+                                    <Link href="/superadmin/opd"><Building /><span>OPD/Departemen Lain</span></Link>
+                                </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                        </SidebarMenuSub>
+                    </CollapsibleContent>
+                </Collapsible>
+            </SidebarMenuItem>
         </SidebarMenu>
     )
   }
