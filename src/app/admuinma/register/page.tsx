@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -30,6 +31,7 @@ import Image from 'next/image';
 import { ADMIN_ROLES } from '@/constants/admin-data';
 import { TokenVerification } from '../_components/token-verification';
 import { useAdminVerification } from '../_components/admin-verification-context';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 const formSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
@@ -203,9 +205,18 @@ function RegisterForm() {
 export default function AdminRegisterPage() {
   const { isVerified, setIsVerified } = useAdminVerification();
 
-  if (!isVerified) {
-    return <TokenVerification onVerified={() => setIsVerified(true)} />;
-  }
-
-  return <RegisterForm />;
+  return (
+    <>
+      <Dialog open={!isVerified} onOpenChange={(open) => {
+        if (open === false && !isVerified) {
+          return;
+        }
+      }}>
+        <DialogContent className="sm:max-w-md" hideCloseButton={true}>
+          <TokenVerification onVerified={() => setIsVerified(true)} />
+        </DialogContent>
+      </Dialog>
+      <RegisterForm />
+    </>
+  );
 }

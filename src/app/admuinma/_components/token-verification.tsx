@@ -15,9 +15,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
 import { verifyAndConsumeToken } from '@/services/user-service';
+import { DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   name: z.string().min(1, { message: 'Nama harus diisi.' }),
@@ -57,55 +57,48 @@ export function TokenVerification({ onVerified }: TokenVerificationProps) {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-red-100 p-4">
-      <div className="w-full max-w-md space-y-8">
-        <div className="flex flex-col items-center text-center">
-          <Image src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png" alt="Logo" width={130} height={130} />
-          <h1 className="text-2xl font-bold mt-4">Verifikasi Akses Admin</h1>
-          <p className="text-muted-foreground">
-            Masukkan nama dan token yang diberikan oleh Superadmin untuk melanjutkan.
-          </p>
-        </div>
+    <>
+        <DialogHeader>
+            <DialogTitle>Verifikasi Akses Admin</DialogTitle>
+            <DialogDescription>
+                Masukkan nama dan token yang diberikan oleh Superadmin untuk melanjutkan.
+            </DialogDescription>
+        </DialogHeader>
         <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nama Orang Dalam</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Nama Lengkap Admin" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="token"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Token Akses</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Masukkan token..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Memverifikasi...' : 'Verifikasi'}
-            </Button>
-          </form>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+                <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Nama Orang Dalam</FormLabel>
+                        <FormControl>
+                            <Input placeholder="Nama Lengkap Admin" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="token"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Token Akses</FormLabel>
+                        <FormControl>
+                            <Input placeholder="Masukkan token..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <DialogFooter>
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Memverifikasi...</> : 'Verifikasi'}
+                    </Button>
+                </DialogFooter>
+            </form>
         </FormProvider>
-        <p className="text-center text-sm text-muted-foreground">
-            Bukan admin?{' '}
-            <Link href="/login" className="font-medium text-primary hover:underline">
-                Login sebagai user
-            </Link>
-        </p>
-      </div>
-    </div>
+    </>
   );
 }
