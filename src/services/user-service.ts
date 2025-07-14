@@ -175,22 +175,33 @@ export async function verifyAndConsumeToken(name: string, token: string): Promis
     }
 
     const tokensRef = collection(db, "adminTokens");
-    // Query for a matching, active token.
-    const q = query(tokensRef, where("name", "==", name), where("token", "==", token));
+    // Query only by token to avoid composite index requirement.
+    const q = query(tokensRef, where("token", "==", token));
     
     try {
         const querySnapshot = await getDocs(q);
 
         if (querySnapshot.empty) {
+            return { success: false, message: 'Token tidak valid.' };
+        }
+
+        // Token exists, now verify the name on the client-side.
+        const tokenDoc = querySnapshot.docs[0]; // There should only be one with a unique token.
+        const tokenData = tokenDoc.data();
+
+        if (tokenData.name === name) {
+            // Name and token match.
+            return { success: true, message: 'Token berhasil diverifikasi.' };
+        } else {
+            // Token is valid, but the name is incorrect.
             return { success: false, message: 'Nama atau token tidak valid.' };
         }
 
-        // Since the token is valid and reusable, we don't need to do anything else.
-        // We just confirm it exists.
-        return { success: true, message: 'Token berhasil diverifikasi.' };
-
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error during token verification: ", error);
+        if (error.code === 'permission-denied' || error.code === 'failed-precondition') {
+             return { success: false, message: 'Terjadi kesalahan: Izin ditolak. Silakan periksa aturan keamanan Firestore Anda dan pastikan ada indeks yang diperlukan.' };
+        }
         return { success: false, message: 'Terjadi kesalahan saat verifikasi token.' };
     }
 }
