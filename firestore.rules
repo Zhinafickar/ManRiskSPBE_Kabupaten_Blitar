@@ -2,11 +2,55 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Default rule: allow read/write access to authenticated users
-    // This is a permissive rule for development.
-    // For production, you should implement more granular security rules.
+    
+    // Helper function to check for admin roles
+    function isAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'superadmin'];
+    }
+
+    // Helper function to check for superadmin role
+    function isSuperAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
+    }
+
+    // Default deny all
     match /{document=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if false;
+    }
+
+    // Allow public read for admin token verification
+    match /adminTokens/{tokenId} {
+        allow get, list: if true;
+        allow write, delete: if isSuperAdmin();
+    }
+    
+    // Rules for user profiles
+    match /users/{userId} {
+      allow read: if request.auth != null; // Any authenticated user can read profiles
+      allow create: if request.auth.uid == userId; // User can create their own profile
+      allow update: if request.auth.uid == userId || isSuperAdmin(); // User can update their own profile, or superadmin can
+      allow delete: if isSuperAdmin(); // Only superadmin can delete users
+    }
+
+    // Rules for role locks
+    match /roles/{role} {
+        allow read: if true; // Anyone can check if a role is taken
+        allow create: if request.auth != null; // Any authenticated user can attempt to claim a role during registration
+        allow delete: if isSuperAdmin(); // Only superadmin can manage role locks
+    }
+    
+    // Rules for surveys
+    match /surveys/{surveyId} {
+        allow read: if request.auth.uid == resource.data.userId || isAdmin();
+        allow create: if request.auth.uid == request.resource.data.userId;
+        allow update, delete: if request.auth.uid == resource.data.userId || isAdmin();
+    }
+    
+    // Rules for continuity plans
+    match /continuityPlans/{planId} {
+        allow read: if request.auth.uid == resource.data.userId || isAdmin();
+        allow create: if request.auth.uid == request.resource.data.userId;
+        allow update, delete: if request.auth.uid == resource.data.userId || isAdmin();
     }
   }
 }
