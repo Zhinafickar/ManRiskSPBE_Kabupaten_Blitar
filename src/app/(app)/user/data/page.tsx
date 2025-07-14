@@ -91,7 +91,11 @@ export default function DataPage({}: {}) {
                     <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Finansial</td>
                         <td className="border border-black p-2 text-left">Positif</td>
-                        <td className="border border-black p-2" colSpan={5}>di isi kolom positif ini adalah kebalikan dari isi kolom negatif</td>
+                        <td className="border border-black p-2 text-left">Keuntungan 1 jt - 5 jt</td>
+                        <td className="border border-black p-2 text-left">Keuntungan 6 jt - 20 jt</td>
+                        <td className="border border-black p-2 text-left">Keuntungan 21 jt - 30 jt</td>
+                        <td className="border border-black p-2 text-left">Keuntungan 30jt - 50jt</td>
+                        <td className="border border-black p-2 text-left">Keuntungan &gt;50jt</td>
                     </tr>
                     <tr>
                         <td className="border border-black p-2 text-left">Negatif</td>
@@ -104,7 +108,11 @@ export default function DataPage({}: {}) {
                      <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Reputasi</td>
                         <td className="border border-black p-2 text-left">Positif</td>
-                        <td className="border border-black p-2" colSpan={5}>di isi kolom positif ini adalah kebalikan dari isi kolom negatif</td>
+                        <td className="border border-black p-2 text-left">Memberikan reputasi baik bagi seorang ASN Pemkab Kukar</td>
+                        <td className="border border-black p-2 text-left">Memberikan reputasi baik bagi suatu Bidang di instansi</td>
+                        <td className="border border-black p-2 text-left">Memberikan reputasi baik bagi suatu instansi Pemkab Kukar</td>
+                        <td className="border border-black p-2 text-left">Memberikan reputasi baik bagi beberapa instansi di Pemkab Kukar</td>
+                        <td className="border border-black p-2 text-left">Memberikan reputasi baik bagi Pemkab Kukar</td>
                     </tr>
                     <tr>
                         <td className="border border-black p-2 text-left">Negatif</td>
@@ -117,7 +125,11 @@ export default function DataPage({}: {}) {
                     <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Kinerja</td>
                         <td className="border border-black p-2 text-left">Positif</td>
-                        <td className="border border-black p-2" colSpan={5}>di isi kolom positif ini adalah kebalikan dari isi kolom negatif</td>
+                        <td className="border border-black p-2 text-left">Sangat signifikan berpengaruh dalam meningkatkan indeks kinerja</td>
+                        <td className="border border-black p-2 text-left">Signifikan berpengaruh dalam meningkatkan indeks kinerja</td>
+                        <td className="border border-black p-2 text-left">Cukup signifikan berpengaruh dalam meningkatkan indeks kinerja</td>
+                        <td className="border border-black p-2 text-left">Kurang signifikan berpengaruh dalam meningkatkan indeks kinerja</td>
+                        <td className="border border-black p-2 text-left">Tidak berpengaruh dalam meningkatkan indeks kinerja</td>
                     </tr>
                     <tr>
                         <td className="border border-black p-2 text-left">Negatif</td>
@@ -130,7 +142,11 @@ export default function DataPage({}: {}) {
                     <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Layanan Organisasi</td>
                         <td className="border border-black p-2 text-left">Positif</td>
-                        <td className="border border-black p-2" colSpan={5}>di isi kolom positif ini adalah kebalikan dari isi kolom negatif</td>
+                        <td className="border border-black p-2 text-left">Layanan dipercepat +- 10 menit dan meningkatkan kepuasan masyarakat</td>
+                        <td className="border border-black p-2 text-left">Layanan dipercepat +- 60 menit dan meningkatkan kepuasan masyarakat</td>
+                        <td className="border border-black p-2 text-left">Layanan dipercepat +- 5 jam dan meningkatkan kepuasan masyarakat</td>
+                        <td className="border border-black p-2 text-left">Layanan dipercepat +- 24 jam dan meningkatkan kepuasan masyarakat</td>
+                        <td className="border border-black p-2 text-left">Layanan dipercepat +- 2 hari dan meningkatkan kepuasan masyarakat</td>
                     </tr>
                     <tr>
                         <td className="border border-black p-2 text-left">Negatif</td>
@@ -143,7 +159,11 @@ export default function DataPage({}: {}) {
                     <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Operasional dan Aset TIK</td>
                         <td className="border border-black p-2 text-left">Positif</td>
-                        <td className="border border-black p-2" colSpan={5}>di isi kolom positif ini adalah kebalikan dari isi kolom negatif</td>
+                        <td className="border border-black p-2 text-left">Layanan dioptimalkan +- 10 menit dan mendukung layanan pemerintah</td>
+                        <td className="border border-black p-2 text-left">Layanan dioptimalkan +- 60 menit dan mendukung layanan pemerintah</td>
+                        <td className="border border-black p-2 text-left">Layanan dioptimalkan +- 5 jam dan mendukung layanan pemerintah</td>
+                        <td className="border border-black p-2 text-left">Layanan dioptimalkan +- 24 jam dan mendukung layanan pemerintah</td>
+                        <td className="border border-black p-2 text-left">Layanan dioptimalkan lebih dari 2 hari dan mendukung layanan pemerintah</td>
                     </tr>
                     <tr>
                         <td className="border border-black p-2 text-left">Negatif</td>
@@ -156,7 +176,11 @@ export default function DataPage({}: {}) {
                     <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Hukum dan Regulasi</td>
                         <td className="border border-black p-2 text-left">Positif</td>
-                        <td className="border border-black p-2" colSpan={5}>di isi kolom positif ini adalah kebalikan dari isi kolom negatif</td>
+                        <td className="border border-black p-2 text-left">Sangat signifikan berpengaruh dalam kepatuhan terhadap regulasi</td>
+                        <td className="border border-black p-2 text-left">Signifikan berpengaruh dalam kepatuhan terhadap regulasi</td>
+                        <td className="border border-black p-2 text-left">Cukup signifikan berpengaruh dalam kepatuhan terhadap regulasi</td>
+                        <td className="border border-black p-2 text-left">Kurang signifikan berpengaruh dalam kepatuhan terhadap regulasi</td>
+                        <td className="border border-black p-2 text-left">Tidak berpengaruh dalam kepatuhan terhadap regulasi</td>
                     </tr>
                     <tr>
                         <td className="border border-black p-2 text-left">Negatif</td>
@@ -169,7 +193,11 @@ export default function DataPage({}: {}) {
                     <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Sumber Daya Manusia</td>
                         <td className="border border-black p-2 text-left">Positif</td>
-                        <td className="border border-black p-2" colSpan={5}>di isi kolom positif ini adalah kebalikan dari isi kolom negatif</td>
+                        <td className="border border-black p-2 text-left">Berdampak pada peningkatan kesejahteraan SDM</td>
+                        <td className="border border-black p-2 text-left">Berdampak pada peningkatan kesehatan SDM</td>
+                        <td className="border border-black p-2 text-left">Berdampak pada peningkatan produktivitas SDM</td>
+                        <td className="border border-black p-2 text-left">Berdampak pada ketenangan SDM</td>
+                        <td className="border border-black p-2 text-left">Tidak signifikan berdampak pada ketenangan SDM</td>
                     </tr>
                     <tr>
                         <td className="border border-black p-2 text-left">Negatif</td>
