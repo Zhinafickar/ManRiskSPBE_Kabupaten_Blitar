@@ -141,7 +141,7 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
         </FormProvider>
         <p className="text-center text-sm text-muted-foreground">
             {isAdminLogin ? (
-                <span>Bukan admin? <Link href="/" className="font-medium text-primary hover:underline">Login sebagai user</Link></span>
+                <span>Belum punya akun admin? <Link href="/admuinma/register" className="font-medium text-primary hover:underline">Daftar disini</Link></span>
             ) : (
                 <>
                 Belum punya akun?{' '}
