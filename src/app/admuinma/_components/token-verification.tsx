@@ -72,7 +72,7 @@ export function TokenVerification({ onVerified }: TokenVerificationProps) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama Anda</FormLabel>
+                  <FormLabel>Nama Orang Dalam</FormLabel>
                   <FormControl>
                     <Input placeholder="Nama Lengkap Admin" {...field} />
                   </FormControl>
