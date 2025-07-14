@@ -108,19 +108,19 @@ export default function DataPage({}: {}) {
                      <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Reputasi</td>
                         <td className="border border-black p-2 text-left bg-green-100 text-green-900 font-semibold">Positif</td>
-                        <td className="border border-black p-2 text-left bg-green-100">Memberikan reputasi baik bagi seorang ASN Pemkab Kukar</td>
+                        <td className="border border-black p-2 text-left bg-green-100">Memberikan reputasi baik bagi seorang ASN Pemkab Blitar</td>
                         <td className="border border-black p-2 text-left bg-green-100">Memberikan reputasi baik bagi suatu Bidang di instansi</td>
-                        <td className="border border-black p-2 text-left bg-green-100">Memberikan reputasi baik bagi suatu instansi Pemkab Kukar</td>
-                        <td className="border border-black p-2 text-left bg-green-100">Memberikan reputasi baik bagi beberapa instansi di Pemkab Kukar</td>
-                        <td className="border border-black p-2 text-left bg-green-100">Memberikan reputasi baik bagi Pemkab Kukar</td>
+                        <td className="border border-black p-2 text-left bg-green-100">Memberikan reputasi baik bagi suatu instansi Pemkab Blitar</td>
+                        <td className="border border-black p-2 text-left bg-green-100">Memberikan reputasi baik bagi beberapa instansi di Pemkab Blitar</td>
+                        <td className="border border-black p-2 text-left bg-green-100">Memberikan reputasi baik bagi Pemkab Blitar</td>
                     </tr>
                     <tr>
                         <td className="border border-black p-2 text-left bg-red-100 text-red-900 font-semibold">Negatif</td>
-                        <td className="border border-black p-2 text-left bg-red-100">Berdampak memberikan reputasi buruk bagi seorang ASN Pemkab Kukar</td>
-                        <td className="border border-black p-2 text-left bg-red-100">Berdampak memberikan reputasi buruk bagi suatu Bidang di instansi Pemkab Kukar</td>
-                        <td className="border border-black p-2 text-left bg-red-100">Berdampak memberikan reputasi buruk bagi suatu instansi Pemkab Kukar</td>
-                        <td className="border border-black p-2 text-left bg-red-100">Berdampak memberikan reputasi buruk bagi beberapa instansi di Pemkab Kukar</td>
-                        <td className="border border-black p-2 text-left bg-red-100">Berdampak memberikan reputasi buruk bagi Pemkab Kukar</td>
+                        <td className="border border-black p-2 text-left bg-red-100">Berdampak memberikan reputasi buruk bagi seorang ASN Pemkab Blitar</td>
+                        <td className="border border-black p-2 text-left bg-red-100">Berdampak memberikan reputasi buruk bagi suatu Bidang di instansi Pemkab Blitar</td>
+                        <td className="border border-black p-2 text-left bg-red-100">Berdampak memberikan reputasi buruk bagi suatu instansi Pemkab Blitar</td>
+                        <td className="border border-black p-2 text-left bg-red-100">Berdampak memberikan reputasi buruk bagi beberapa instansi di Pemkab Blitar</td>
+                        <td className="border border-black p-2 text-left bg-red-100">Berdampak memberikan reputasi buruk bagi Pemkab Blitar</td>
                     </tr>
                     <tr>
                         <td className="border border-black p-2 font-bold" rowSpan={2}>Kinerja</td>
