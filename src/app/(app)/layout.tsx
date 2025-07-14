@@ -141,7 +141,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
                     sidebarOpen && !isMobile ? "md:pl-64" : "pl-0"
                 )}
             >
-                <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
+                <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-card px-4 sm:px-6">
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={toggleSidebar}>
                         <PanelLeft className="h-4 w-4" />
                     </Button>
