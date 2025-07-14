@@ -1,72 +1,75 @@
-
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
+    // 🔐 Helper functions
     function isAuth() {
       return request.auth != null;
     }
-    
+
     function isSuperAdmin() {
-      return isAuth() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
+      return isAuth() &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
     }
 
     function isAdmin() {
-      return isAuth() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'superadmin'];
+      let role = get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+      return isAuth() && (role == 'admin' || role == 'superadmin');
     }
 
     function isOwner(userId) {
       return isAuth() && request.auth.uid == userId;
     }
-    
-    // --- Public access for registration and token verification ---
+
+    // 👤 USERS COLLECTION
     match /users/{userId} {
-      // Allow user creation by anyone (for registration)
-      // Allow reading own profile
-      // Allow admins to read/write all profiles
-      allow read: if isAuth() || isAdmin();
-      allow create: if true;
-      allow update, delete: if isOwner(userId) || isSuperAdmin();
+      // Everyone authenticated can create their own user document (on sign up)
+      allow create: if isAuth() && isOwner(userId);
+      // Any authenticated user can list/get other users (for OPD page)
+      allow get, list: if isAuth();
+      // Owner or admin can update
+      allow update: if isOwner(userId) || isAdmin();
+      // Only admins can delete
+      allow delete: if isAdmin();
     }
 
+    // 🔐 ROLES COLLECTION
     match /roles/{roleId} {
-        // Allow anyone to create a role lock during registration.
-        // Allow admins to read/delete role locks.
-        allow create: if true;
-        allow read, delete: if isAdmin();
+      // Anyone authenticated can create (locks role on registration)
+      allow create: if isAuth();
+      // Only admins can read/delete locks
+      allow read, delete: if isAdmin();
+      // No one can update a role lock directly
+      allow update: if false;
     }
-    
+
+    // 🔑 ADMIN TOKENS COLLECTION
     match /adminTokens/{tokenId} {
-        // Allow anyone to read tokens for verification.
-        // Allow superadmins to create/delete.
-        allow read: if true;
-        allow create, delete: if isSuperAdmin();
+      // Anyone can read tokens (for admin verification page)
+      allow get, list: if true;
+      // Only superadmins can manage tokens
+      allow create, update, delete: if isSuperAdmin();
     }
 
-    // --- Authenticated user access ---
+    // 📋 SURVEYS COLLECTION
     match /surveys/{surveyId} {
-      // Allow creating for any authenticated user.
-      // Allow reading/updating/deleting only for the owner.
-      // Allow full access for admins.
+      // Any authenticated user can create a survey for themselves
       allow create: if isAuth();
-      allow read: if isAuth(); // Allow all auth users to read all surveys for OPD page
+      // Any authenticated user can list/get all surveys (for OPD details page)
+      allow get, list: if isAuth();
+      // Only the owner or an admin can update/delete
       allow update, delete: if isOwner(resource.data.userId) || isAdmin();
     }
 
+    // 📄 CONTINUITY PLANS COLLECTION
     match /continuityPlans/{planId} {
-      // Allow creating for any authenticated user.
-      // Allow reading/updating/deleting only for the owner.
-      // Allow full access for admins.
+      // Any authenticated user can create a plan for themselves
       allow create: if isAuth();
-      allow read: if isAuth(); // Allow all auth users to read all plans for OPD page
+      // Any authenticated user can list/get all plans (for OPD details page)
+      allow get, list: if isAuth();
+      // Only the owner or an admin can update/delete
       allow update, delete: if isOwner(resource.data.userId) || isAdmin();
-    }
-
-    // --- Default deny all ---
-    match /{document=**} {
-      allow read, write: if false;
     }
   }
 }
