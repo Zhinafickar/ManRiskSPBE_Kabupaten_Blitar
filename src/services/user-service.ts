@@ -22,6 +22,9 @@ export async function getAllUsers(): Promise<UserProfile[]> {
 
 export async function isRoleTaken(role: string): Promise<boolean> {
   if (!isFirebaseConfigured || !db) return false;
+  // Admin roles are not considered "taken" in the same way as unique departmental roles
+  if (ADMIN_ROLES.includes(role)) return false;
+
   const roleDocRef = doc(db, 'roles', role);
   const roleDoc = await getDoc(roleDocRef);
 

@@ -28,7 +28,11 @@ const formSchema = z.object({
     .min(1, { message: 'Password is required.' }),
 });
 
-export function LoginPageClient() {
+interface LoginPageClientProps {
+  isAdminLogin: boolean;
+}
+
+export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
   const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -74,9 +78,6 @@ export function LoginPageClient() {
         return;
       }
       
-      // Instead of redirecting based on role here,
-      // we just redirect to a generic dashboard route.
-      // The dashboard page will then handle role-based redirection.
       router.push('/dashboard');
 
     } catch (error: any) {
@@ -100,9 +101,9 @@ export function LoginPageClient() {
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center text-center">
           <Image src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png" alt="Logo" width={130} height={130} />
-          <h1 className="text-2xl font-bold mt-4">Selamat Datang!</h1>
+          <h1 className="text-2xl font-bold mt-4">{isAdminLogin ? 'Admin Login' : 'Selamat Datang!'}</h1>
           <p className="text-muted-foreground">
-            Silakan masuk untuk melanjutkan ke dasbor Manajemen Risiko.
+            {isAdminLogin ? 'Silakan masuk untuk melanjutkan ke dasbor admin.' : 'Silakan masuk untuk melanjutkan ke dasbor Manajemen Risiko.'}
           </p>
         </div>
         <FormProvider {...form}>
@@ -139,10 +140,16 @@ export function LoginPageClient() {
           </form>
         </FormProvider>
         <p className="text-center text-sm text-muted-foreground">
-          Belum punya akun?{' '}
-          <Link href="/register" className="font-medium text-primary hover:underline">
-            Register
-          </Link>
+            {isAdminLogin ? (
+                <span>Bukan admin? <Link href="/" className="font-medium text-primary hover:underline">Login sebagai user</Link></span>
+            ) : (
+                <>
+                Belum punya akun?{' '}
+                <Link href="/register" className="font-medium text-primary hover:underline">
+                    Register
+                </Link>
+                </>
+            )}
         </p>
       </div>
     </div>

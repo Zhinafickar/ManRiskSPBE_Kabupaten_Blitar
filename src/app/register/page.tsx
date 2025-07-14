@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Link from 'next/link';
@@ -27,6 +28,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { getAssignedRoles } from '@/services/user-service';
+import { ADMIN_ROLES } from '@/constants/admin-data';
 
 const formSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
@@ -48,8 +50,9 @@ export default function RegisterPageContent() {
   useEffect(() => {
     async function fetchAvailableRoles() {
       const assignedRoles = await getAssignedRoles();
+      // Filter out admin roles and roles that are already taken
       const unassignedRoles = ROLES.filter(role => 
-        !assignedRoles.includes(role) || role === 'Penguji Coba'
+        !ADMIN_ROLES.includes(role) && (!assignedRoles.includes(role) || role === 'Penguji Coba')
       );
       setAvailableRoles(unassignedRoles);
     }
@@ -102,7 +105,8 @@ export default function RegisterPageContent() {
         role: userRole,
       });
 
-      if (userRole !== 'superadmin' && userRole !== 'admin') {
+      // Only set a lock for non-admin, non-test-user roles
+      if (!ADMIN_ROLES.includes(userRole) && userRole !== 'Penguji Coba') {
         const roleRef = doc(db, 'roles', userRole);
         batch.set(roleRef, { uid: user.uid, createdAt: new Date() });
       }
@@ -142,7 +146,7 @@ export default function RegisterPageContent() {
           <Image src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png" alt="Logo" width={130} height={130} />
           <h1 className="text-2xl font-bold mt-4">Create an Account</h1>
           <p className="text-muted-foreground">
-            Fill in the details below to join the Survey. Use real account to get the verify mail to get Access.
+            Fill in the details below to join. Please use a real email to receive a verification link.
           </p>
         </div>
 
@@ -205,7 +209,7 @@ export default function RegisterPageContent() {
                   name="role"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Role</FormLabel>
+                      <FormLabel>Role/Department</FormLabel>
                       <Popover open={open} onOpenChange={setOpen}>
                         <PopoverTrigger asChild>
                           <FormControl>
