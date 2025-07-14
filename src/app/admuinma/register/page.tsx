@@ -29,6 +29,7 @@ import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import Image from 'next/image';
 import { ADMIN_ROLES } from '@/constants/admin-data';
 import { TokenVerification } from '../_components/token-verification';
+import { useAdminVerification } from '../_components/admin-verification-context';
 
 const formSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
@@ -200,7 +201,7 @@ function RegisterForm() {
 }
 
 export default function AdminRegisterPage() {
-  const [isVerified, setIsVerified] = useState(false);
+  const { isVerified, setIsVerified } = useAdminVerification();
 
   if (!isVerified) {
     return <TokenVerification onVerified={() => setIsVerified(true)} />;
