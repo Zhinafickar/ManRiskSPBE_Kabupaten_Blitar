@@ -18,6 +18,7 @@ import { useState } from 'react';
 import { verifyAndConsumeToken } from '@/services/user-service';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const formSchema = z.object({
   name: z.string().min(1, { message: 'Nama harus diisi.' }),
@@ -99,6 +100,11 @@ export function TokenVerification({ onVerified }: TokenVerificationProps) {
                 </Button>
             </form>
         </FormProvider>
+        <p className="text-center text-sm text-muted-foreground">
+          <Link href="/" className="font-medium text-primary hover:underline">
+            Kembali ke login user
+          </Link>
+        </p>
       </div>
     </div>
   );
