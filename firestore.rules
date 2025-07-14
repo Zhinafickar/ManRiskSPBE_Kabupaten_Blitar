@@ -1,70 +1,59 @@
-
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // --- Helper Functions ---
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-
-    function getUserRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
-    }
-
+    
+    // Helper function to check for admin roles
     function isAdmin() {
-      return isSignedIn() && getUserRole() in ['admin', 'superadmin'];
-    }
-    
-    function isSuperAdmin() {
-        return isSignedIn() && getUserRole() == 'superadmin';
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'superadmin'];
     }
 
-    // --- Collection Rules ---
-
-    // Anyone can create a user document (register).
-    // Authenticated users can read the list (e.g., to check for available roles).
-    // Only the owner or a superadmin can update/delete.
+    // --- Users Collection ---
+    // Allow anyone to create a user document (for registration).
+    // Allow authenticated users to list all users (for OPD page).
+    // Allow users to get/update their own document.
+    // Allow admins to get/update any user document.
     match /users/{userId} {
-      allow read: if isSignedIn();
-      allow create: if true;
-      allow update, delete: if isOwner(userId) || isSuperAdmin();
+      allow list: if request.auth != null;
+      allow get, update: if request.auth.uid == userId || isAdmin();
+      allow create: if request.auth.uid == userId;
+      // Admins should manage deletion through backend functions if needed, to ensure cleanup.
+      allow delete: if isAdmin();
     }
-    
-    // Anyone can create a role lock during registration.
-    // Admins can view role assignments.
-    // Superadmins can delete role locks (when deleting a user).
+
+    // --- Roles Collection ---
+    // Used to lock a role to a user upon registration.
+    // Allow anyone to create a role document (for registration).
+    // Allow admins to read/delete role locks.
     match /roles/{role} {
-      allow get: if isSignedIn();
-      allow list: if isAdmin();
-      allow create: if true;
-      allow delete: if isSuperAdmin();
+      allow read, delete: if isAdmin();
+      allow create: if request.auth != null;
     }
     
-    // Anyone can attempt to read tokens for verification.
-    // Only Superadmins can create or delete tokens.
-    match /adminTokens/{tokenId} {
-        allow get, list: if true;
-        allow create, delete: if isSuperAdmin();
-    }
-
-    // Surveys can only be managed by the user who created them or an admin.
+    // --- Surveys Collection ---
+    // Allow authenticated users to create surveys.
+    // Allow users to read/update/delete their own surveys.
+    // Allow admins to read/delete any survey.
     match /surveys/{surveyId} {
-      allow read: if isOwner(resource.data.userId) || isAdmin();
-      allow create: if isSignedIn();
-      allow update, delete: if isOwner(resource.data.userId) || isSuperAdmin();
+      allow create: if request.auth.uid == request.resource.data.userId;
+      allow read, update, delete: if request.auth.uid == resource.data.userId || isAdmin();
     }
-
-    // Continuity plans follow the same logic as surveys.
+    
+    // --- Continuity Plans Collection ---
+    // Allow authenticated users to create plans.
+    // Allow users to read/update/delete their own plans.
+    // Allow admins to read/delete any plan.
     match /continuityPlans/{planId} {
-       allow read: if isOwner(resource.data.userId) || isAdmin();
-       allow create: if isSignedIn();
-       allow update, delete: if isOwner(resource.data.userId) || isSuperAdmin();
+       allow create: if request.auth.uid == request.resource.data.userId;
+       allow read, update, delete: if request.auth.uid == resource.data.userId || isAdmin();
+    }
+    
+    // --- Admin Tokens Collection ---
+    // Allow anyone to read the tokens for verification before login.
+    // Allow admins (specifically superadmins) to manage tokens.
+    match /adminTokens/{tokenId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
     }
   }
 }
