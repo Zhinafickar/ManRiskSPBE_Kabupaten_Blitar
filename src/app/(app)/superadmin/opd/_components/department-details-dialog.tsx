@@ -101,7 +101,7 @@ export function DepartmentDetailsDialog({ departmentName, isOpen, onOpenChange }
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl h-[90vh]">
         <DialogHeader>
-          <DialogTitle>Detail OPD: {departmentName}</DialogTitle>
+          <DialogTitle className="text-xl font-bold">Detail OPD: {departmentName}</DialogTitle>
           <DialogDescription>
             Menampilkan data survei, kontinuitas, dan grafik risiko untuk OPD yang dipilih.
           </DialogDescription>
