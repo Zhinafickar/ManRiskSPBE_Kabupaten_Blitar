@@ -148,10 +148,12 @@ export default function ReportPage() {
         const uraian4 = isControlWeak ? "Banyak kontrol yang masih lemah terutama di sisi teknologi dan orang, maka disarankan peningkatan pelatihan dan pembaruan sistem keamanan." : "Kontrol yang ada secara umum sudah cukup memadai, namun peninjauan berkala tetap direkomendasikan.";
 
         // Uraian 5 Data
-        const highPrioRisks = surveys.filter(s => s.riskLevel === 'Bahaya' || s.riskLevel === 'Sedang');
-        const planMap = new Map<string, ContinuityPlan>(plans.map(p => [p.risiko, p]));
-        const allHighPrioHavePlans = highPrioRisks.length > 0 && highPrioRisks.every(risk => planMap.has(`${risk.riskEvent} - ${risk.impactArea}`));
-        const uraian5 = highPrioRisks.length > 0 && allHighPrioHavePlans ? "Seluruh strategi keberlanjutan untuk risiko prioritas telah diisi dan diterapkan, maka organisasi dinyatakan siap menghadapi risiko SPBE secara berkelanjutan." : "Beberapa risiko prioritas belum memiliki strategi keberlanjutan. Disarankan untuk segera melengkapi rencana kontinuitas untuk memastikan kesiapan organisasi.";
+        const allHighPrioHavePlans = surveys
+          .filter(s => s.riskLevel === 'Bahaya' || s.riskLevel === 'Sedang')
+          .every(risk => plans.some(plan => plan.risiko === `${risk.riskEvent} - ${risk.impactArea}`));
+        const highPrioRisksExist = surveys.some(s => s.riskLevel === 'Bahaya' || s.riskLevel === 'Sedang');
+
+        const uraian5 = highPrioRisksExist && allHighPrioHavePlans ? "Seluruh strategi keberlanjutan untuk risiko prioritas telah diisi dan diterapkan, maka organisasi dinyatakan siap menghadapi risiko SPBE secara berkelanjutan." : "Beberapa risiko prioritas belum memiliki strategi keberlanjutan. Disarankan untuk segera melengkapi rencana kontinuitas untuk memastikan kesiapan organisasi.";
 
 
         return {
