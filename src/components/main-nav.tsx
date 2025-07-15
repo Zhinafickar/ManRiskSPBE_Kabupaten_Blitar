@@ -36,6 +36,7 @@ import {
   KeyRound,
   Fingerprint,
   BarChart,
+  ListTree,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -46,7 +47,7 @@ export function MainNav() {
   const pathname = usePathname();
 
   // User Menu States
-  const isActiveInfoMenu = pathname === '/user/data' || pathname === '/user/tutorial' || pathname === '/user/opd';
+  const isActiveInfoMenu = ['/user/data', '/user/tutorial', '/user/opd', '/user/referensi-input'].some(p => pathname === p);
   const [isInfoMenuOpen, setIsInfoMenuOpen] = useState(false);
 
   const isActiveRiskMenu = pathname.startsWith('/user/survey') || pathname === '/user/results';
@@ -238,6 +239,14 @@ export function MainNav() {
                   <Link href="/user/data">
                     <Database />
                     <span>Referensi Perhitungan</span>
+                  </Link>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton asChild isActive={pathname === '/user/referensi-input'}>
+                  <Link href="/user/referensi-input">
+                    <ListTree />
+                    <span>Referensi Inputan</span>
                   </Link>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
