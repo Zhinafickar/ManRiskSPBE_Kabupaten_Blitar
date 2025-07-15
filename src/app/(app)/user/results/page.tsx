@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -92,8 +93,8 @@ export default function UserResultsPage() {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-            <CardTitle>My Survey Results</CardTitle>
-            <CardDescription>Here are all the surveys you have submitted.</CardDescription>
+            <CardTitle>Hasil Survei Saya</CardTitle>
+            <CardDescription>Berikut adalah semua survei yang telah Anda kirimkan.</CardDescription>
         </div>
         <Button onClick={handleExport} disabled={!surveysAvailable}>
             <FileDown className="mr-2 h-4 w-4" />
@@ -114,12 +115,12 @@ export default function UserResultsPage() {
                 <TableHead className="text-primary-foreground">Kategori Risiko</TableHead>
                 <TableHead className="text-primary-foreground">Risiko</TableHead>
                 <TableHead className="text-primary-foreground">Area Dampak</TableHead>
-                <TableHead className="text-primary-foreground">Frequency</TableHead>
-                <TableHead className="text-primary-foreground">Impact</TableHead>
-                <TableHead className="text-primary-foreground">Risk Level</TableHead>
+                <TableHead className="text-primary-foreground">Frekuensi</TableHead>
+                <TableHead className="text-primary-foreground">Dampak</TableHead>
+                <TableHead className="text-primary-foreground">Tingkat Risiko</TableHead>
                 <TableHead className="text-primary-foreground">Waktu Kejadian</TableHead>
                 <TableHead className="text-primary-foreground">Mitigasi</TableHead>
-                <TableHead className="text-right text-primary-foreground">Actions</TableHead>
+                <TableHead className="text-right text-primary-foreground">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -137,7 +138,7 @@ export default function UserResultsPage() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
+                          <span className="sr-only">Buka menu</span>
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -147,7 +148,7 @@ export default function UserResultsPage() {
                           onSelect={() => handleDelete(survey.id)}
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
+                          Hapus
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -158,7 +159,7 @@ export default function UserResultsPage() {
           </Table>
         ) : (
           <div className="text-center py-10">
-            <p className="text-muted-foreground">You haven't submitted any surveys yet.</p>
+            <p className="text-muted-foreground">Anda belum mengirimkan survei apa pun.</p>
           </div>
         )}
       </CardContent>
