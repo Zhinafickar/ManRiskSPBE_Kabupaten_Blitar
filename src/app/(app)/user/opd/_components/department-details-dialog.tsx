@@ -114,7 +114,7 @@ export function DepartmentDetailsDialog({ departmentName, isOpen, onOpenChange }
             </div>
         ) : (
           <Tabs defaultValue="surveys" className="flex flex-col h-full overflow-hidden">
-            <TabsList>
+            <TabsList className="bg-primary/10">
               <TabsTrigger value="surveys">Hasil Survei ({surveys.length})</TabsTrigger>
               <TabsTrigger value="plans">Rencana Kontinuitas ({plans.length})</TabsTrigger>
               <TabsTrigger value="graph">Grafik Risiko</TabsTrigger>
