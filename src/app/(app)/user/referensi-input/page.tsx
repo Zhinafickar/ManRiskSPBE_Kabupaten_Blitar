@@ -45,7 +45,7 @@ export default function ReferensiInputPage() {
           <ScrollArea className="h-[60vh] border rounded-md">
               <Table>
                   <TableHeader className="sticky top-0 bg-primary z-10">
-                      <TableRow>
+                      <TableRow className="border-b-primary/20 hover:bg-primary/90">
                           <TableHead className="w-[30%] text-primary-foreground">Kategori Risiko</TableHead>
                           <TableHead className="text-primary-foreground">Risiko</TableHead>
                       </TableRow>
@@ -84,17 +84,17 @@ export default function ReferensiInputPage() {
         </CardHeader>
         <CardContent>
             <Tabs defaultValue="organisasi">
-                <TabsList className="grid w-full grid-cols-4">
-                    <TabsTrigger value="organisasi">Organisasi</TabsTrigger>
-                    <TabsTrigger value="orang">Orang</TabsTrigger>
-                    <TabsTrigger value="fisik">Fisik</TabsTrigger>
-                    <TabsTrigger value="teknologi">Teknologi</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-4 bg-primary text-primary-foreground/70">
+                    <TabsTrigger value="organisasi" className="data-[state=active]:bg-primary-foreground data-[state=active]:text-primary">Organisasi</TabsTrigger>
+                    <TabsTrigger value="orang" className="data-[state=active]:bg-primary-foreground data-[state=active]:text-primary">Orang</TabsTrigger>
+                    <TabsTrigger value="fisik" className="data-[state=active]:bg-primary-foreground data-[state=active]:text-primary">Fisik</TabsTrigger>
+                    <TabsTrigger value="teknologi" className="data-[state=active]:bg-primary-foreground data-[state=active]:text-primary">Teknologi</TabsTrigger>
                 </TabsList>
 
                 <ScrollArea className="h-[60vh] mt-4 border rounded-md">
                     <TabsContent value="organisasi" className="m-0">
                         <Table>
-                            <TableHeader className="sticky top-0 bg-primary z-10"><TableRow><TableHead className="text-primary-foreground">Kontrol Organisasi</TableHead></TableRow></TableHeader>
+                            <TableHeader className="sticky top-0 bg-primary z-10"><TableRow className="border-b-primary/20 hover:bg-primary/90"><TableHead className="text-primary-foreground">Kontrol Organisasi</TableHead></TableRow></TableHeader>
                             <TableBody>
                                 {ORGANIZATIONAL_CONTROLS.map(control => (<TableRow key={control}><TableCell>{control}</TableCell></TableRow>))}
                             </TableBody>
@@ -102,7 +102,7 @@ export default function ReferensiInputPage() {
                     </TabsContent>
                     <TabsContent value="orang" className="m-0">
                         <Table>
-                            <TableHeader className="sticky top-0 bg-primary z-10"><TableRow><TableHead className="text-primary-foreground">Kontrol Orang</TableHead></TableRow></TableHeader>
+                            <TableHeader className="sticky top-0 bg-primary z-10"><TableRow className="border-b-primary/20 hover:bg-primary/90"><TableHead className="text-primary-foreground">Kontrol Orang</TableHead></TableRow></TableHeader>
                             <TableBody>
                                 {PEOPLE_CONTROLS.map(control => (<TableRow key={control}><TableCell>{control}</TableCell></TableRow>))}
                             </TableBody>
@@ -110,7 +110,7 @@ export default function ReferensiInputPage() {
                     </TabsContent>
                     <TabsContent value="fisik" className="m-0">
                         <Table>
-                            <TableHeader className="sticky top-0 bg-primary z-10"><TableRow><TableHead className="text-primary-foreground">Kontrol Fisik</TableHead></TableRow></TableHeader>
+                            <TableHeader className="sticky top-0 bg-primary z-10"><TableRow className="border-b-primary/20 hover:bg-primary/90"><TableHead className="text-primary-foreground">Kontrol Fisik</TableHead></TableRow></TableHeader>
                             <TableBody>
                                 {PHYSICAL_CONTROLS.map(control => (<TableRow key={control}><TableCell>{control}</TableCell></TableRow>))}
                             </TableBody>
@@ -118,7 +118,7 @@ export default function ReferensiInputPage() {
                     </TabsContent>
                     <TabsContent value="teknologi" className="m-0">
                         <Table>
-                            <TableHeader className="sticky top-0 bg-primary z-10"><TableRow><TableHead className="text-primary-foreground">Kontrol Teknologi</TableHead></TableRow></TableHeader>
+                            <TableHeader className="sticky top-0 bg-primary z-10"><TableRow className="border-b-primary/20 hover:bg-primary/90"><TableHead className="text-primary-foreground">Kontrol Teknologi</TableHead></TableRow></TableHeader>
                             <TableBody>
                                 {TECHNOLOGICAL_CONTROLS.map(control => (<TableRow key={control}><TableCell>{control}</TableCell></TableRow>))}
                             </TableBody>
