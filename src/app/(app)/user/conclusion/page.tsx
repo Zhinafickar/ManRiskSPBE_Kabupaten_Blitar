@@ -286,7 +286,8 @@ export default function ReportPage() {
              {/* --- Cover Page --- */}
             <div className="hidden print-cover-page">
               <div className="flex-grow flex flex-col items-center justify-center text-center">
-                  <h2 className="text-xl font-bold uppercase mb-4">
+                  <Image src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png" alt="Logo Kabupaten Blitar" width={150} height={150} />
+                  <h2 className="text-xl font-bold uppercase mb-4 mt-8">
                       Laporan Manajemen Risiko SPBE
                   </h2>
                   <h1 className="text-2xl font-bold uppercase mb-6">
@@ -294,7 +295,6 @@ export default function ReportPage() {
                       <br/>
                       Kabupaten Blitar
                   </h1>
-                  <Image src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png" alt="Logo Kabupaten Blitar" width={150} height={150} />
               </div>
               <div className="space-y-6">
                   <table className="print-table">
@@ -327,7 +327,6 @@ export default function ReportPage() {
                             <td>{userProfile.role}</td>
                             <td>Pembuatan dokumen awal</td>
                           </tr>
-                          <tr><td></td><td></td><td></td><td></td></tr>
                       </tbody>
                   </table>
               </div>
