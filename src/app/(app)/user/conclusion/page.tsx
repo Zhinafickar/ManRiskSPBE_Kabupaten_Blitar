@@ -310,7 +310,7 @@ export default function ReportPage() {
                   <table className="print-table">
                        <thead>
                            <tr>
-                               <th colSpan={4} className="text-center">Catatan Revisi</th>
+                               <th colSpan={4} className="text-center">Pembuatan Laporan</th>
                            </tr>
                           <tr>
                               <th className="w-1/6">Versi</th>
