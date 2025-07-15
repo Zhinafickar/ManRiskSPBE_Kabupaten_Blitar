@@ -229,7 +229,7 @@ export default function ReportPage() {
               .print-cover-page {
                 display: flex !important;
                 flex-direction: column;
-                justify-content: space-between;
+                justify-content: center;
                 height: 100vh;
                 page-break-after: always;
               }
