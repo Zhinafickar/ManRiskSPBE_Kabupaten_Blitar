@@ -90,10 +90,10 @@ export default function OPDPage() {
                             </div>
                             <ScrollArea className="h-[350px] rounded-md border">
                                 <Table>
-                                    <TableHeader className="sticky top-0 z-10 bg-muted">
-                                        <TableRow>
-                                            <TableHead>Nama OPD</TableHead>
-                                            <TableHead className="text-right">Status</TableHead>
+                                    <TableHeader>
+                                        <TableRow className="sticky top-0 z-10 bg-primary hover:bg-primary/90 border-b-primary/20">
+                                            <TableHead className="text-primary-foreground">Nama OPD</TableHead>
+                                            <TableHead className="text-right text-primary-foreground">Status</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
