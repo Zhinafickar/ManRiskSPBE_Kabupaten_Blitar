@@ -21,10 +21,11 @@ import {
     ORGANIZATIONAL_CONTROLS,
     PEOPLE_CONTROLS,
     PHYSICAL_CONTROLS,
-    TECHNOLOGICAL_CONTROLS
+    TECHNOLOGICAL_CONTROLS,
+    MITIGATION_OPTIONS
 } from "@/constants/data";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ListTree, ShieldCheck } from "lucide-react";
+import { ListTree, ShieldCheck, Zap } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 
@@ -128,6 +129,37 @@ export default function ReferensiInputPage() {
             </Tabs>
         </CardContent>
       </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+              <Zap className="h-6 w-6" />
+              Referensi Opsi Mitigasi
+          </CardTitle>
+          <CardDescription>
+            Gunakan tabel ini untuk memahami setiap opsi mitigasi yang dapat dipilih saat menangani risiko.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+            <Table>
+                <TableHeader>
+                    <TableRow className="border-b-primary/20 bg-primary hover:bg-primary/90">
+                        <TableHead className="w-[25%] text-primary-foreground">Nama Mitigasi</TableHead>
+                        <TableHead className="text-primary-foreground">Penjelasan</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {MITIGATION_OPTIONS.map((option) => (
+                        <TableRow key={option.name}>
+                            <TableCell className="font-medium">{option.name}</TableCell>
+                            <TableCell>{option.description}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </CardContent>
+      </Card>
+
     </div>
   );
 }

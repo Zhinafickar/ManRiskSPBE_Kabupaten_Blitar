@@ -356,8 +356,8 @@ export function SurveyTableRow({ index, riskEvent, handleClearRow }: SurveyTable
                 </FormControl>
                 <SelectContent>
                   {MITIGATION_OPTIONS.map((option) => (
-                    <SelectItem key={option} value={option}>
-                      {option}
+                    <SelectItem key={option.name} value={option.name}>
+                      {option.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

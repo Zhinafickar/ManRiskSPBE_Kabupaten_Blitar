@@ -720,8 +720,8 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                     </FormControl>
                     <SelectContent>
                       {MITIGATION_OPTIONS.map((option) => (
-                        <SelectItem key={option} value={option}>
-                          {option}
+                        <SelectItem key={option.name} value={option.name}>
+                          {option.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
