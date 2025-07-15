@@ -150,7 +150,7 @@ export default function ReportPage() {
         // Uraian 5 Data
         const allHighPrioHavePlans = surveys
           .filter(s => s.riskLevel === 'Bahaya' || s.riskLevel === 'Sedang')
-          .every(risk => plans.some(plan => plan.risiko === `${risk.riskEvent} - ${risk.impactArea}`));
+          .every(risk => plans.some(plan => plan.risiko === `${risk.riskEvent} - ${s.impactArea}`));
         const highPrioRisksExist = surveys.some(s => s.riskLevel === 'Bahaya' || s.riskLevel === 'Sedang');
 
         const uraian5 = highPrioRisksExist && allHighPrioHavePlans ? "Seluruh strategi keberlanjutan untuk risiko prioritas telah diisi dan diterapkan, maka organisasi dinyatakan siap menghadapi risiko SPBE secara berkelanjutan." : "Beberapa risiko prioritas belum memiliki strategi keberlanjutan. Disarankan untuk segera melengkapi rencana kontinuitas untuk memastikan kesiapan organisasi.";
