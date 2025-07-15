@@ -122,7 +122,7 @@ export default function VisualizationPage() {
     });
 
     const barData = Object.entries(roleRiskCounts)
-      .map(([name, risks], index) => ({ name, risks, fill: barColors[index % barColors.length] }))
+      .map(([name, risks]) => ({ name, risks }))
       .sort((a, b) => b.risks - a.risks)
       .slice(0, 10); // Show top 10 roles with most high/medium risks
 
@@ -212,8 +212,8 @@ export default function VisualizationPage() {
                     />
                     <Bar dataKey="risks" radius={4}>
                          <LabelList position="top" offset={5} className="fill-foreground" fontSize={12} />
-                         {chartData.barData.map((entry) => (
-                           <Cell key={`cell-${entry.name}`} fill={entry.fill} />
+                         {chartData.barData.map((entry, index) => (
+                           <Cell key={`cell-${entry.name}`} fill={barColors[index % barColors.length]} />
                         ))}
                     </Bar>
                 </BarChart>

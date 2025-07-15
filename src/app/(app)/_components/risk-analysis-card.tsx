@@ -197,8 +197,8 @@ export function RiskAnalysisCard() { // Keep the exported name the same to avoid
                     />
                     <Bar dataKey="risks" radius={4}>
                         <LabelList position="top" offset={5} className="fill-foreground" fontSize={10} />
-                         {chartData.barData.map((entry) => (
-                           <Cell key={`cell-${entry.name}`} fill={entry.fill} />
+                         {chartData.barData.map((entry, index) => (
+                           <Cell key={`cell-${entry.name}`} fill={barColors[index % barColors.length]} />
                         ))}
                     </Bar>
                 </BarChart>
