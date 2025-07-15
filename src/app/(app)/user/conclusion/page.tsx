@@ -438,10 +438,10 @@ export default function ReportPage() {
                               {surveys.map(s => (
                                   <TableRow key={s.id}>
                                       <TableCell className="whitespace-normal">{s.riskEvent} - {s.impactArea}</TableCell>
-                                      <TableCell>{s.kontrolOrganisasi?.length || 0} Terpilih</TableCell>
-                                      <TableCell>{s.kontrolOrang?.length || 0} Terpilih</TableCell>
-                                      <TableCell>{s.kontrolFisik?.length || 0} Terpilih</TableCell>
-                                      <TableCell>{s.kontrolTeknologi?.length || 0} Terpilih</TableCell>
+                                      <TableCell className="whitespace-normal">{(s.kontrolOrganisasi || []).join(', ') || 'N/A'}</TableCell>
+                                      <TableCell className="whitespace-normal">{(s.kontrolOrang || []).join(', ') || 'N/A'}</TableCell>
+                                      <TableCell className="whitespace-normal">{(s.kontrolFisik || []).join(', ') || 'N/A'}</TableCell>
+                                      <TableCell className="whitespace-normal">{(s.kontrolTeknologi || []).join(', ') || 'N/A'}</TableCell>
                                       <TableCell>{s.mitigasi}</TableCell>
                                   </TableRow>
                               ))}
