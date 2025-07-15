@@ -84,10 +84,10 @@ export default function OPDPage() {
                     <div>
                         <CardTitle className="flex items-center gap-2">
                             <Building className="h-6 w-6" />
-                            Daftar OPD/Departemen
+                            Daftar Organisasi Perangkat Daerah (OPD)
                         </CardTitle>
                         <CardDescription>
-                            Berikut adalah daftar semua OPD/Departemen yang tersedia dalam sistem beserta status keterisiannya.
+                            Berikut adalah daftar semua Organisasi Perangkat Daerah (OPD) yang tersedia dalam sistem beserta status keterisiannya.
                         </CardDescription>
                     </div>
                     <Button onClick={handleExport} disabled={loading}>
@@ -114,7 +114,7 @@ export default function OPDPage() {
                                 <Table>
                                     <TableHeader className="sticky top-0 z-10 bg-muted">
                                         <TableRow>
-                                            <TableHead>OPD</TableHead>
+                                            <TableHead>Nama OPD</TableHead>
                                             <TableHead className="text-right">Status</TableHead>
                                         </TableRow>
                                     </TableHeader>
@@ -144,7 +144,7 @@ export default function OPDPage() {
                                         ) : (
                                             <TableRow>
                                                 <TableCell colSpan={2} className="text-center text-muted-foreground">
-                                                    Tidak ada departemen yang cocok dengan pencarian Anda.
+                                                    Tidak ada OPD yang cocok dengan pencarian Anda.
                                                 </TableCell>
                                             </TableRow>
                                         )}

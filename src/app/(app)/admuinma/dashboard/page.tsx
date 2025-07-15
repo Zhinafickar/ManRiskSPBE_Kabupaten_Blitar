@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -72,16 +73,16 @@ export default function AdminDashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle>OPD/Departemen Lain</CardTitle>
+            <CardTitle>Organisasi Perangkat Daerah (OPD)</CardTitle>
             <CardDescription>
-              View the list of all registered departments and their data.
+              View the list of all registered OPD and their data.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button asChild>
               <Link href="/admuinma/opd">
                 <Building className="mr-2 h-4 w-4" />
-                View Departments
+                View OPD
               </Link>
             </Button>
           </CardContent>

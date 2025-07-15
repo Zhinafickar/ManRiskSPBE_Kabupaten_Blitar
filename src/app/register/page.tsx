@@ -209,7 +209,7 @@ export default function RegisterPageContent() {
                   name="role"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Role/Department</FormLabel>
+                      <FormLabel>Organisasi Perangkat Daerah (OPD)</FormLabel>
                       <Popover open={open} onOpenChange={setOpen}>
                         <PopoverTrigger asChild>
                           <FormControl>

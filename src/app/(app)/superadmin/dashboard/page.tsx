@@ -41,7 +41,7 @@ export default function SuperAdminDashboard() {
               </div>
               <div>
                   <h4 className="font-semibold text-foreground">3. Pantau Data Organisasi</h4>
-                  <p>Akses semua data survei, rencana kontinuitas, dan visualisasi data dari seluruh departemen melalui menu 'Data & Laporan'.</p>
+                  <p>Akses semua data survei, rencana kontinuitas, dan visualisasi data dari seluruh OPD melalui menu 'Data & Laporan'.</p>
               </div>
           </CardContent>
       </Card>
@@ -84,7 +84,7 @@ export default function SuperAdminDashboard() {
                 <h4 className="font-semibold">Organisasi</h4>
                 <div className="flex flex-col gap-2">
                      <Button asChild variant="outline" className="justify-start">
-                        <Link href="/superadmin/opd"><Building className="mr-2 h-4 w-4" />OPD/Departemen Lain</Link>
+                        <Link href="/superadmin/opd"><Building className="mr-2 h-4 w-4" />Organisasi Perangkat Daerah (OPD)</Link>
                     </Button>
                 </div>
             </div>

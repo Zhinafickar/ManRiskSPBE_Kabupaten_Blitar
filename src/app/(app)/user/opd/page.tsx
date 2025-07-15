@@ -67,10 +67,10 @@ export default function OPDPage() {
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Building className="h-6 w-6" />
-                        Daftar OPD/Departemen
+                        Daftar Organisasi Perangkat Daerah (OPD)
                     </CardTitle>
                     <CardDescription>
-                        Berikut adalah daftar semua OPD/Departemen yang tersedia dalam sistem beserta status keterisiannya.
+                        Berikut adalah daftar semua Organisasi Perangkat Daerah (OPD) yang tersedia dalam sistem beserta status keterisiannya.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -82,7 +82,7 @@ export default function OPDPage() {
                                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                                 <Input
                                     type="search"
-                                    placeholder="Cari nama departemen..."
+                                    placeholder="Cari nama OPD..."
                                     className="pl-8"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -92,7 +92,7 @@ export default function OPDPage() {
                                 <Table>
                                     <TableHeader className="sticky top-0 z-10 bg-muted">
                                         <TableRow>
-                                            <TableHead>Nama Departemen</TableHead>
+                                            <TableHead>Nama OPD</TableHead>
                                             <TableHead className="text-right">Status</TableHead>
                                         </TableRow>
                                     </TableHeader>
@@ -122,7 +122,7 @@ export default function OPDPage() {
                                         ) : (
                                             <TableRow>
                                                 <TableCell colSpan={2} className="text-center text-muted-foreground">
-                                                    Tidak ada departemen yang cocok dengan pencarian Anda.
+                                                    Tidak ada OPD yang cocok dengan pencarian Anda.
                                                 </TableCell>
                                             </TableRow>
                                         )}
