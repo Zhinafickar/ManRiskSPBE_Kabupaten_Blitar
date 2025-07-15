@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -176,9 +177,9 @@ export default function VisualizationPage() {
           </CardHeader>
           <CardContent>
             <ChartContainer config={barChartConfig} className="h-[300px] w-full">
-              <BarChart data={chartData.barData} layout="vertical" margin={{ left: 180, right: 20 }}>
+              <BarChart data={chartData.barData} layout="vertical" margin={{ left: 200, right: 20 }}>
                 <CartesianGrid horizontal={false} />
-                <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tick={{ fontSize: 12, width: 170, textAnchor: 'start' }} interval={0} />
+                <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tick={{ fontSize: 12, width: 190, textAnchor: 'start' }} interval={0} />
                 <XAxis dataKey="risks" type="number" allowDecimals={false} />
                 <ChartTooltip
                   cursor={{ fill: 'hsl(var(--muted))' }}
