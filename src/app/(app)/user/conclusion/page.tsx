@@ -198,6 +198,10 @@ export default function ReportPage() {
       <div className="space-y-6">
           <style jsx global>{`
             @media print {
+              @page {
+                size: A4;
+                margin: 1in;
+              }
               body * {
                 visibility: hidden;
               }
@@ -209,9 +213,10 @@ export default function ReportPage() {
                 left: 0;
                 top: 0;
                 width: 100%;
-                padding: 1rem;
+                padding: 0;
                 margin: 0;
                 color: black;
+                font-size: 12pt;
               }
               .no-print {
                 display: none;
@@ -222,18 +227,22 @@ export default function ReportPage() {
                 background-color: white;
                 break-inside: avoid;
               }
-              .printable-area table,
+              .printable-area table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 10pt; /* Smaller font for tables */
+              }
               .printable-area th,
               .printable-area td {
                 border: 1px solid black;
-                border-collapse: collapse;
-                padding: 8px;
+                padding: 6px;
                 text-align: left;
                 -webkit-print-color-adjust: exact; 
                 print-color-adjust: exact;
               }
               .printable-area th {
                 background-color: #f2f2f2;
+                font-weight: bold;
               }
               .printable-area .badge-print {
                 border: 1px solid #ccc;
