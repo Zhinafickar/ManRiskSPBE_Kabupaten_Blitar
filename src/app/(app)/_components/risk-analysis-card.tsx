@@ -166,9 +166,9 @@ export function RiskAnalysisCard() { // Keep the exported name the same to avoid
             </h3>
              <ChartContainer config={barChartConfig} className="h-[250px] w-full">
                {chartData.barData.length > 0 ? (
-                <BarChart data={chartData.barData} layout="vertical" margin={{ left: 20, right: 20 }}>
+                <BarChart data={chartData.barData} layout="vertical" margin={{ left: 150, right: 20 }}>
                     <CartesianGrid horizontal={false} />
-                    <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tick={{ fontSize: 10, width: 150, textAnchor: 'start' }} interval={0} />
+                    <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tick={{ fontSize: 10, width: 140, textAnchor: 'start' }} interval={0} />
                     <XAxis dataKey="risks" type="number" allowDecimals={false} />
                     <ChartTooltip
                     cursor={{ fill: 'hsl(var(--muted))' }}
