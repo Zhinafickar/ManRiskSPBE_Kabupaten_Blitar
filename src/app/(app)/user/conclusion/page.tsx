@@ -48,7 +48,7 @@ function RiskIndicatorBadge({ level }: { level?: string }) {
         case 'Rendah': colorClass = 'bg-green-600 text-white hover:bg-green-700'; break;
         case 'Minor': colorClass = 'bg-blue-600 text-white hover:bg-blue-700'; break;
     }
-    return <Badge className={cn(colorClass)}>{level}</Badge>;
+    return <Badge className={cn("badge-print", colorClass)}>{level}</Badge>;
 }
 
 function ReportSkeleton() {
@@ -89,6 +89,8 @@ export default function ReportPage() {
 
     const reportData = useMemo(() => {
         if (!surveys || surveys.length === 0) return null;
+        
+        const surveyMap = new Map<string, Survey>(surveys.map(s => [`${s.riskEvent} - ${s.impactArea}`, s]));
 
         // Uraian 1 Data
         const impactAreaCounts = surveys.reduce((acc, survey) => {
@@ -146,8 +148,8 @@ export default function ReportPage() {
         const uraian4 = isControlWeak ? "Banyak kontrol yang masih lemah terutama di sisi teknologi dan orang, maka disarankan peningkatan pelatihan dan pembaruan sistem keamanan." : "Kontrol yang ada secara umum sudah cukup memadai, namun peninjauan berkala tetap direkomendasikan.";
 
         // Uraian 5 Data
-        const planMap = new Map<string, ContinuityPlan>(plans.map(p => [p.risiko, p]));
         const highPrioRisks = surveys.filter(s => s.riskLevel === 'Bahaya' || s.riskLevel === 'Sedang');
+        const planMap = new Map<string, ContinuityPlan>(plans.map(p => [p.risiko, p]));
         const allHighPrioHavePlans = highPrioRisks.length > 0 && highPrioRisks.every(risk => planMap.has(`${risk.riskEvent} - ${risk.impactArea}`));
         const uraian5 = highPrioRisks.length > 0 && allHighPrioHavePlans ? "Seluruh strategi keberlanjutan untuk risiko prioritas telah diisi dan diterapkan, maka organisasi dinyatakan siap menghadapi risiko SPBE secara berkelanjutan." : "Beberapa risiko prioritas belum memiliki strategi keberlanjutan. Disarankan untuk segera melengkapi rencana kontinuitas untuk memastikan kesiapan organisasi.";
 
@@ -161,8 +163,7 @@ export default function ReportPage() {
             pieChartData,
             barChartData,
             totalSurveys: surveys.length,
-            highPrioRisks,
-            planMap,
+            surveyMap,
         };
     }, [surveys, plans]);
 
@@ -194,7 +195,7 @@ export default function ReportPage() {
         );
     }
 
-    const { uraian1, uraian2, uraian3, uraian4, uraian5, pieChartData, barChartData, totalSurveys, highPrioRisks, planMap } = reportData;
+    const { uraian1, uraian2, uraian3, uraian4, uraian5, pieChartData, barChartData, totalSurveys, surveyMap } = reportData;
 
     return (
       <div className="space-y-6">
@@ -250,7 +251,7 @@ export default function ReportPage() {
                 print-color-adjust: exact;
               }
               .printable-area th {
-                background-color: #f2f2f2;
+                background-color: #f2f2f2 !important;
                 font-weight: bold;
               }
               .printable-area .badge-print {
@@ -457,24 +458,32 @@ export default function ReportPage() {
                   </CardHeader>
                   <CardContent>
                        <Table>
-                          <TableHeader><TableRow><TableHead>Risiko Prioritas</TableHead><TableHead>Strategi Keberlanjutan</TableHead><TableHead>Status Implementasi</TableHead></TableRow></TableHeader>
+                          <TableHeader><TableRow><TableHead>Risiko</TableHead><TableHead>Tingkat Risiko</TableHead><TableHead>Strategi Keberlanjutan</TableHead></TableRow></TableHeader>
                           <TableBody>
-                              {highPrioRisks.map(risk => {
-                                  const riskIdentifier = `${risk.riskEvent} - ${risk.impactArea}`;
-                                  const plan = planMap.get(riskIdentifier);
+                              {plans.length > 0 ? (
+                                plans.map(plan => {
+                                  const survey = surveyMap.get(plan.risiko);
                                   return (
-                                    <TableRow key={risk.id}>
-                                      <TableCell>{riskIdentifier}</TableCell>
-                                      <TableCell>{plan?.aktivitas || "Belum Dibuat"}</TableCell>
+                                    <TableRow key={plan.id}>
+                                      <TableCell>{plan.risiko}</TableCell>
                                       <TableCell>
-                                          {plan ? <Badge variant="secondary" className="badge-print">Telah Dibuat</Badge> : <Badge variant="destructive" className="badge-print">Belum Ada</Badge>}
+                                          {survey?.riskLevel ? (
+                                              <RiskIndicatorBadge level={survey.riskLevel} />
+                                          ) : (
+                                              <Badge variant="outline" className="badge-print">N/A</Badge>
+                                          )}
                                       </TableCell>
+                                      <TableCell>{plan.aktivitas}</TableCell>
                                     </TableRow>
                                   );
-                              })}
+                                })
+                              ) : (
+                                  <TableRow>
+                                      <TableCell colSpan={3} className="text-center text-muted-foreground">Tidak ada rencana kontinuitas yang dibuat.</TableCell>
+                                  </TableRow>
+                              )}
                           </TableBody>
                       </Table>
-                      {highPrioRisks.length === 0 && <p className="text-center text-muted-foreground py-4">Tidak ada risiko prioritas (Bahaya/Sedang) yang teridentifikasi.</p>}
                   </CardContent>
                   <CardFooter><p className="text-sm text-muted-foreground italic">{uraian5}</p></CardFooter>
               </Card>
