@@ -190,18 +190,14 @@ export default function VisualizationPage() {
           </CardHeader>
           <CardContent>
             <ChartContainer config={barChartConfig} className="h-[400px] w-full">
-               <BarChart data={chartData.barData} margin={{ top: 20, right: 20, left: 0, bottom: 120 }}>
+               <BarChart data={chartData.barData} margin={{ top: 20, right: 20, left: 0, bottom: 5 }}>
                     <CartesianGrid vertical={false} />
                     <XAxis 
                         dataKey="name" 
                         tickLine={false} 
-                        axisLine={false} 
-                        tickMargin={10} 
-                        angle={-45}
-                        textAnchor="end"
-                        interval={0}
-                        height={130} // Adjust height to prevent label cutoff
-                        tick={{ fontSize: 12 }}
+                        axisLine={false}
+                        tick={false}
+                        height={1}
                     />
                     <YAxis allowDecimals={false} />
                     <ChartTooltip

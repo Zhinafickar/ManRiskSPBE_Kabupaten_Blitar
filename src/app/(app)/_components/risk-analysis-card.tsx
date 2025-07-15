@@ -180,18 +180,14 @@ export function RiskAnalysisCard() { // Keep the exported name the same to avoid
             </h3>
              <ChartContainer config={barChartConfig} className="h-[250px] w-full">
                {chartData.barData.length > 0 ? (
-                <BarChart data={chartData.barData} margin={{ top: 20, right: 20, left: 0, bottom: 60 }}>
+                <BarChart data={chartData.barData} margin={{ top: 20, right: 20, left: 0, bottom: 5 }}>
                     <CartesianGrid vertical={false} />
                     <XAxis 
                         dataKey="name" 
                         tickLine={false} 
-                        axisLine={false} 
-                        tickMargin={10} 
-                        angle={-45}
-                        textAnchor="end"
-                        interval={0}
-                        height={100} // Adjust height to prevent label cutoff
-                        tick={{ fontSize: 10 }}
+                        axisLine={false}
+                        tick={false}
+                        height={1}
                     />
                     <YAxis allowDecimals={false} />
                     <ChartTooltip
