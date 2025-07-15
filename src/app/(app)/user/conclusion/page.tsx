@@ -205,7 +205,7 @@ export default function ReportPage() {
             @media print {
               @page {
                 size: A4;
-                margin: 1in;
+                margin: 0.8in;
               }
               body * {
                 visibility: hidden;
@@ -221,7 +221,7 @@ export default function ReportPage() {
                 padding: 0;
                 margin: 0;
                 color: black;
-                font-size: 12pt;
+                font-size: 11pt;
               }
               .no-print {
                 display: none;
@@ -229,9 +229,10 @@ export default function ReportPage() {
               .print-cover-page {
                 display: flex !important;
                 flex-direction: column;
-                justify-content: center;
+                justify-content: space-between;
                 height: 100vh;
                 page-break-after: always;
+                padding-top: 2rem;
               }
               .card-print {
                 border: none;
