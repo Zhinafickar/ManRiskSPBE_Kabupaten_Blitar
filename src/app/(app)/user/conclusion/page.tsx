@@ -71,6 +71,7 @@ export default function ReportPage() {
     const [surveys, setSurveys] = useState<Survey[]>([]);
     const [plans, setPlans] = useState<ContinuityPlan[]>([]);
     const [loading, setLoading] = useState(true);
+    const today = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
 
     useEffect(() => {
         if (user) {
@@ -222,6 +223,13 @@ export default function ReportPage() {
               .no-print {
                 display: none;
               }
+              .print-cover-page {
+                display: flex !important;
+                flex-direction: column;
+                justify-content: space-between;
+                height: 100vh;
+                page-break-after: always;
+              }
               .card-print {
                 border: none;
                 box-shadow: none;
@@ -231,7 +239,7 @@ export default function ReportPage() {
               .printable-area table {
                 width: 100%;
                 border-collapse: collapse;
-                font-size: 10pt; /* Smaller font for tables */
+                font-size: 10pt;
               }
               .printable-area th,
               .printable-area td {
@@ -250,6 +258,18 @@ export default function ReportPage() {
                 padding: 2px 6px;
                 border-radius: 9999px;
               }
+              .print-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 10pt;
+              }
+              .print-table th, .print-table td {
+                border: 1px solid black;
+                padding: 6px;
+                text-align: left;
+                vertical-align: top;
+                height: 2.5em; /* Give some height to cells */
+              }
             }
           `}</style>
           
@@ -261,7 +281,59 @@ export default function ReportPage() {
               </Button>
           </div>
 
-          <div className="printable-area space-y-8">
+          <div className="printable-area">
+             {/* --- Cover Page --- */}
+            <div className="print-cover-page">
+              <div className="flex-grow flex flex-col items-center justify-center text-center">
+                  <h2 className="text-xl font-bold uppercase mb-4">
+                      Laporan Manajemen Risiko SPBE
+                  </h2>
+                  <h1 className="text-2xl font-bold uppercase mb-6">
+                      OPD {userProfile.role}
+                      <br/>
+                      Kabupaten Blitar
+                  </h1>
+                  <Image src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png" alt="Logo Kabupaten Blitar" width={150} height={150} />
+              </div>
+              <div className="space-y-6">
+                  <table className="print-table">
+                      <thead>
+                          <tr>
+                              <th className="w-1/2 text-center">Disusun oleh</th>
+                              <th className="w-1/2 text-center">Disahkan oleh</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr><td></td><td></td></tr>
+                      </tbody>
+                  </table>
+                  <table className="print-table">
+                       <thead>
+                           <tr>
+                               <th colSpan={4} className="text-center">Catatan Revisi</th>
+                           </tr>
+                          <tr>
+                              <th className="w-1/6">Versi</th>
+                              <th className="w-1/4">Tanggal</th>
+                              <th className="w-1/4">Diusulkan Oleh</th>
+                              <th>Deskripsi dan Riwayat Perubahan</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr>
+                            <td>1.0</td>
+                            <td>{today}</td>
+                            <td>{userProfile.role}</td>
+                            <td>Pembuatan dokumen awal</td>
+                          </tr>
+                          <tr><td></td><td></td><td></td><td></td></tr>
+                      </tbody>
+                  </table>
+              </div>
+            </div>
+
+            {/* --- Main Content --- */}
+            <div className="space-y-8">
               <div className="text-center space-y-2 mb-8">
                 <div className="flex justify-center">
                     <Image src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png" alt="Logo Kabupaten Blitar" width={100} height={100} />
@@ -276,7 +348,7 @@ export default function ReportPage() {
                       <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-sm">
                           <div><span className="font-semibold block text-muted-foreground">Nama:</span> {userProfile.fullName}</div>
                           <div><span className="font-semibold block text-muted-foreground">Jabatan/Departemen:</span> {userProfile.role}</div>
-                          <div><span className="font-semibold block text-muted-foreground">Tanggal Laporan:</span> {new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                          <div><span className="font-semibold block text-muted-foreground">Tanggal Laporan:</span> {today}</div>
                           <div><span className="font-semibold block text-muted-foreground">Email:</span> {userProfile.email}</div>
                       </div>
                   </CardContent>
@@ -406,6 +478,7 @@ export default function ReportPage() {
                   </CardContent>
                   <CardFooter><p className="text-sm text-muted-foreground italic">{uraian5}</p></CardFooter>
               </Card>
+            </div>
           </div>
       </div>
     );
