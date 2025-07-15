@@ -60,10 +60,10 @@ function VisualizationSkeleton() {
 }
 
 const barColors = [
-    'hsl(var(--chart-1))',
-    'hsl(var(--chart-2))',
-    'hsl(var(--chart-3))',
-    'hsl(var(--chart-4))',
+    riskLevelColors.Bahaya,
+    riskLevelColors.Sedang,
+    riskLevelColors.Rendah,
+    riskLevelColors.Minor,
     'hsl(var(--chart-5))',
     'hsl(262, 80%, 55%)',
     'hsl(310, 80%, 55%)',

@@ -28,10 +28,10 @@ const pieChartConfig = {
 
 const barChartConfig = {
   risks: { label: 'Risiko Tinggi & Sedang' },
-  'Dinas Kependudukan dan Pencatatan Sipil': { color: 'hsl(var(--chart-1))' },
-  'Dinas Kesehatan': { color: 'hsl(var(--chart-2))' },
-  'Dinas Pendidikan': { color: 'hsl(var(--chart-3))' },
-  'Dinas Komunikasi, Informatika, Statistik Dan Persandian': { color: 'hsl(var(--chart-4))' },
+  'Dinas Kependudukan dan Pencatatan Sipil': { color: riskLevelColors.Bahaya },
+  'Dinas Kesehatan': { color: riskLevelColors.Sedang },
+  'Dinas Pendidikan': { color: riskLevelColors.Rendah },
+  'Dinas Komunikasi, Informatika, Statistik Dan Persandian': { color: riskLevelColors.Minor },
   'Badan Pengelolaan Keuangan Dan Aset Daerah': { color: 'hsl(var(--chart-5))' },
 } satisfies ChartConfig;
 
@@ -59,10 +59,10 @@ function DashboardChartsSkeleton() {
 }
 
 const barColors = [
-    'hsl(var(--chart-1))',
-    'hsl(var(--chart-2))',
-    'hsl(var(--chart-3))',
-    'hsl(var(--chart-4))',
+    riskLevelColors.Bahaya,
+    riskLevelColors.Sedang,
+    riskLevelColors.Rendah,
+    riskLevelColors.Minor,
     'hsl(var(--chart-5))',
 ];
 
