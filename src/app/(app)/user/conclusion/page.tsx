@@ -147,12 +147,19 @@ export default function ReportPage() {
         const isControlWeak = surveys.length > 0 && (weakControls / surveys.length) > 0.5;
         const uraian4 = isControlWeak ? "Banyak kontrol yang masih lemah terutama di sisi teknologi dan orang, maka disarankan peningkatan pelatihan dan pembaruan sistem keamanan." : "Kontrol yang ada secara umum sudah cukup memadai, namun peninjauan berkala tetap direkomendasikan.";
 
-        // Uraian 5 Data
-        const allHighPrioHavePlans = surveys
-          .filter(s => s.riskLevel === 'Bahaya' || s.riskLevel === 'Sedang')
-          .every(risk => plans.some(plan => plan.risiko === `${risk.riskEvent} - ${risk.impactArea}`));
-        const highPrioRisksExist = surveys.some(s => s.riskLevel === 'Bahaya' || s.riskLevel === 'Sedang');
+        // Uraian 5 & Risks without plans data
+        const risksWithPlans = new Set(plans.map(p => p.risiko));
+        const highPriorityRisks = surveys.filter(s => s.riskLevel === 'Bahaya' || s.riskLevel === 'Sedang');
+        
+        const allHighPrioHavePlans = highPriorityRisks.every(risk => 
+            risksWithPlans.has(`${risk.riskEvent} - ${risk.impactArea}`)
+        );
 
+        const highPriorityRisksWithoutPlans = highPriorityRisks.filter(risk => 
+            !risksWithPlans.has(`${risk.riskEvent} - ${risk.impactArea}`)
+        );
+        
+        const highPrioRisksExist = highPriorityRisks.length > 0;
         const uraian5 = highPrioRisksExist && allHighPrioHavePlans ? "Seluruh strategi keberlanjutan untuk risiko prioritas telah diisi dan diterapkan, maka organisasi dinyatakan siap menghadapi risiko SPBE secara berkelanjutan." : "Beberapa risiko prioritas belum memiliki strategi keberlanjutan. Disarankan untuk segera melengkapi rencana kontinuitas untuk memastikan kesiapan organisasi.";
 
 
@@ -166,6 +173,7 @@ export default function ReportPage() {
             barChartData,
             totalSurveys: surveys.length,
             surveyMap,
+            highPriorityRisksWithoutPlans
         };
     }, [surveys, plans]);
 
@@ -197,12 +205,16 @@ export default function ReportPage() {
         );
     }
 
-    const { uraian1, uraian2, uraian3, uraian4, uraian5, pieChartData, barChartData, totalSurveys, surveyMap } = reportData;
+    const { uraian1, uraian2, uraian3, uraian4, uraian5, pieChartData, barChartData, totalSurveys, surveyMap, highPriorityRisksWithoutPlans } = reportData;
 
     return (
       <div className="space-y-6">
           <style jsx global>{`
             @media print {
+              body {
+                 -webkit-print-color-adjust: exact !important;
+                 print-color-adjust: exact !important;
+              }
               @page {
                 size: A4;
                 margin: 0.8in;
@@ -227,9 +239,9 @@ export default function ReportPage() {
                 display: none;
               }
               .card-print {
-                border: none;
-                box-shadow: none;
-                background-color: white;
+                border: none !important;
+                box-shadow: none !important;
+                background-color: white !important;
                 break-inside: avoid;
               }
               .printable-area table {
@@ -239,18 +251,16 @@ export default function ReportPage() {
               }
               .printable-area th,
               .printable-area td {
-                border: 1px solid black;
+                border: 1px solid black !important;
                 padding: 6px;
                 text-align: left;
-                -webkit-print-color-adjust: exact; 
-                print-color-adjust: exact;
               }
               .printable-area th {
                 background-color: #f2f2f2 !important;
                 font-weight: bold;
               }
               .printable-area .badge-print {
-                border: 1px solid #ccc;
+                border: 1px solid #ccc !important;
                 padding: 2px 6px;
                 border-radius: 9999px;
               }
@@ -260,7 +270,7 @@ export default function ReportPage() {
                 font-size: 10pt;
               }
               .print-table th, .print-table td {
-                border: 1px solid black;
+                border: 1px solid black !important;
                 padding: 6px;
                 text-align: left;
                 vertical-align: top;
@@ -384,10 +394,10 @@ export default function ReportPage() {
                               {surveys.map(s => (
                                   <TableRow key={s.id}>
                                       <TableCell className="whitespace-normal">{s.riskEvent} - {s.impactArea}</TableCell>
-                                      <TableCell className="whitespace-normal">{(s.kontrolOrganisasi || []).join(', ') || 'N/A'}</TableCell>
-                                      <TableCell className="whitespace-normal">{(s.kontrolOrang || []).join(', ') || 'N/A'}</TableCell>
-                                      <TableCell className="whitespace-normal">{(s.kontrolFisik || []).join(', ') || 'N/A'}</TableCell>
-                                      <TableCell className="whitespace-normal">{(s.kontrolTeknologi || []).join(', ') || 'N/A'}</TableCell>
+                                      <TableCell className="whitespace-normal">{(s.kontrolOrganisasi || []).join(',\n') || 'N/A'}</TableCell>
+                                      <TableCell className="whitespace-normal">{(s.kontrolOrang || []).join(',\n') || 'N/A'}</TableCell>
+                                      <TableCell className="whitespace-normal">{(s.kontrolFisik || []).join(',\n') || 'N/A'}</TableCell>
+                                      <TableCell className="whitespace-normal">{(s.kontrolTeknologi || []).join(',\n') || 'N/A'}</TableCell>
                                       <TableCell>{s.mitigasi}</TableCell>
                                   </TableRow>
                               ))}
@@ -432,6 +442,37 @@ export default function ReportPage() {
                   </CardContent>
                   <CardFooter><p className="text-sm text-muted-foreground italic">{uraian5}</p></CardFooter>
               </Card>
+
+              {highPriorityRisksWithoutPlans.length > 0 && (
+                <Card className="card-print">
+                    <CardHeader>
+                        <CardTitle>Risiko Prioritas Tanpa Rencana Keberlanjutan</CardTitle>
+                        <CardDescription>Risiko berikut memiliki tingkat 'Bahaya' atau 'Sedang' tetapi belum memiliki rencana keberlanjutan.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Risiko</TableHead>
+                                    <TableHead>Tingkat Risiko</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {highPriorityRisksWithoutPlans.map(risk => (
+                                    <TableRow key={risk.id}>
+                                        <TableCell>{risk.riskEvent} - {risk.impactArea}</TableCell>
+                                        <TableCell><RiskIndicatorBadge level={risk.riskLevel} /></TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                    <CardFooter>
+                        <p className="text-sm text-muted-foreground italic">Disarankan untuk segera membuat rencana keberlanjutan untuk risiko-risiko di atas.</p>
+                    </CardFooter>
+                </Card>
+              )}
+
             </div>
           </div>
       </div>
