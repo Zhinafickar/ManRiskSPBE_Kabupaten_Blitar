@@ -283,7 +283,7 @@ export default function ReportPage() {
 
           <div className="printable-area">
              {/* --- Cover Page --- */}
-            <div className="print-cover-page">
+            <div className="hidden print-cover-page">
               <div className="flex-grow flex flex-col items-center justify-center text-center">
                   <h2 className="text-xl font-bold uppercase mb-4">
                       Laporan Manajemen Risiko SPBE
