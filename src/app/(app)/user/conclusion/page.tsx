@@ -211,13 +211,34 @@ export default function ReportPage() {
                 width: 100%;
                 padding: 1rem;
                 margin: 0;
+                color: black;
               }
               .no-print {
                 display: none;
               }
-               .card-print {
-                border: 1px solid #e5e7eb;
+              .card-print {
+                border: none;
+                box-shadow: none;
+                background-color: white;
                 break-inside: avoid;
+              }
+              .printable-area table,
+              .printable-area th,
+              .printable-area td {
+                border: 1px solid black;
+                border-collapse: collapse;
+                padding: 8px;
+                text-align: left;
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact;
+              }
+              .printable-area th {
+                background-color: #f2f2f2;
+              }
+              .printable-area .badge-print {
+                border: 1px solid #ccc;
+                padding: 2px 6px;
+                border-radius: 9999px;
               }
             }
           `}</style>
@@ -236,7 +257,6 @@ export default function ReportPage() {
                 <p className="text-muted-foreground">{userProfile.role}</p>
               </div>
               
-              {/* Biografi Pengguna */}
               <Card className="card-print">
                   <CardHeader><CardTitle>Biografi Pengguna</CardTitle></CardHeader>
                   <CardContent>
@@ -249,7 +269,6 @@ export default function ReportPage() {
                   </CardContent>
               </Card>
 
-              {/* Tabel 1 */}
               <Card className="card-print">
                   <CardHeader>
                       <CardTitle>Klasifikasi Risiko dan Area Terdampak</CardTitle>
@@ -267,7 +286,6 @@ export default function ReportPage() {
                   <CardFooter><p className="text-sm text-muted-foreground italic">{uraian1}</p></CardFooter>
               </Card>
 
-              {/* Tabel 2 */}
               <Card className="card-print">
                   <CardHeader>
                       <CardTitle>Analisis Kuantitatif Risiko</CardTitle>
@@ -291,7 +309,6 @@ export default function ReportPage() {
                    <CardFooter><p className="text-sm text-muted-foreground italic">{uraian2}</p></CardFooter>
               </Card>
 
-              {/* Grafik */}
               <Card className="card-print">
                   <CardHeader>
                       <CardTitle>Grafik Analisis Risiko</CardTitle>
@@ -325,7 +342,6 @@ export default function ReportPage() {
                   <CardFooter><p className="text-sm text-muted-foreground italic">{uraian3}</p></CardFooter>
               </Card>
 
-              {/* Tabel 3 */}
                <Card className="card-print">
                   <CardHeader>
                       <CardTitle>Evaluasi Kontrol dan Mitigasi</CardTitle>
@@ -350,7 +366,6 @@ export default function ReportPage() {
                   <CardFooter><p className="text-sm text-muted-foreground italic">{uraian4}</p></CardFooter>
               </Card>
 
-              {/* Tabel 4 */}
               <Card className="card-print">
                   <CardHeader>
                       <CardTitle>Keberlanjutan</CardTitle>
@@ -367,7 +382,7 @@ export default function ReportPage() {
                                       <TableCell>{riskIdentifier}</TableCell>
                                       <TableCell>{plan?.aktivitas || "Belum Dibuat"}</TableCell>
                                       <TableCell>
-                                          {plan ? <Badge variant="secondary" className="text-green-700 border-green-300">Telah Dibuat</Badge> : <Badge variant="destructive">Belum Ada</Badge>}
+                                          {plan ? <Badge variant="secondary" className="badge-print">Telah Dibuat</Badge> : <Badge variant="destructive" className="badge-print">Belum Ada</Badge>}
                                       </TableCell>
                                     </TableRow>
                                   );
