@@ -9,11 +9,13 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { RISK_EVENTS } from "@/constants/data";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ListTree } from "lucide-react";
@@ -31,23 +33,32 @@ export default function ReferensiInputPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-[60vh]">
-            <Accordion type="single" collapsible className="w-full">
-            {RISK_EVENTS.map((event) => (
-                <AccordionItem value={event.name} key={event.name}>
-                <AccordionTrigger>
-                    <span className="font-semibold text-left">{event.name}</span>
-                </AccordionTrigger>
-                <AccordionContent>
-                    <ul className="list-disc space-y-2 pl-6 text-muted-foreground">
-                    {event.impactAreas.map((area, index) => (
-                        <li key={index}>{area}</li>
-                    ))}
-                    </ul>
-                </AccordionContent>
-                </AccordionItem>
-            ))}
-            </Accordion>
+        <ScrollArea className="h-[60vh] border rounded-md">
+            <Table>
+                <TableHeader className="sticky top-0 bg-muted z-10">
+                    <TableRow>
+                        <TableHead className="w-[30%]">Kategori Risiko</TableHead>
+                        <TableHead>Risiko</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {RISK_EVENTS.flatMap((event, eventIndex) =>
+                        event.impactAreas.map((area, areaIndex) => (
+                            <TableRow key={`${event.name}-${areaIndex}`}>
+                                {areaIndex === 0 && (
+                                    <TableCell 
+                                        rowSpan={event.impactAreas.length} 
+                                        className="font-medium align-top bg-muted/50"
+                                    >
+                                        {event.name}
+                                    </TableCell>
+                                )}
+                                <TableCell>{area}</TableCell>
+                            </TableRow>
+                        ))
+                    )}
+                </TableBody>
+            </Table>
         </ScrollArea>
       </CardContent>
     </Card>
