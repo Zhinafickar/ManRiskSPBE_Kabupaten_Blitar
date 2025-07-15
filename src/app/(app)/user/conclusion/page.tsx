@@ -226,14 +226,6 @@ export default function ReportPage() {
               .no-print {
                 display: none;
               }
-              .print-cover-page {
-                display: flex !important;
-                flex-direction: column;
-                justify-content: space-between;
-                height: 100vh;
-                page-break-after: always;
-                padding-top: 2rem;
-              }
               .card-print {
                 border: none;
                 box-shadow: none;
@@ -286,55 +278,6 @@ export default function ReportPage() {
           </div>
 
           <div className="printable-area">
-             {/* --- Cover Page --- */}
-            <div className="hidden print-cover-page">
-              <div className="flex-grow flex flex-col items-center justify-center text-center">
-                  <Image src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png" alt="Logo Kabupaten Blitar" width={150} height={150} />
-                  <h2 className="text-xl font-bold uppercase mb-4 mt-8">
-                      Laporan Manajemen Risiko SPBE
-                  </h2>
-                  <h1 className="text-2xl font-bold uppercase mb-6">
-                      OPD {userProfile.role}
-                      <br/>
-                      Kabupaten Blitar
-                  </h1>
-              </div>
-              <div className="space-y-6">
-                  <table className="print-table">
-                      <thead>
-                          <tr>
-                              <th className="w-1/2 text-center">Disusun oleh</th>
-                              <th className="w-1/2 text-center">Disahkan oleh</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          <tr><td></td><td></td></tr>
-                      </tbody>
-                  </table>
-                  <table className="print-table">
-                       <thead>
-                           <tr>
-                               <th colSpan={4} className="text-center">Pembuatan Laporan</th>
-                           </tr>
-                          <tr>
-                              <th className="w-1/6">Versi</th>
-                              <th className="w-1/4">Tanggal</th>
-                              <th className="w-1/4">Diusulkan Oleh</th>
-                              <th>Deskripsi dan Riwayat Perubahan</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          <tr>
-                            <td>1.0</td>
-                            <td>{today}</td>
-                            <td>{userProfile.role}</td>
-                            <td>Pembuatan dokumen awal</td>
-                          </tr>
-                      </tbody>
-                  </table>
-              </div>
-            </div>
-
             {/* --- Main Content --- */}
             <div className="space-y-8">
               <div className="text-center space-y-2 mb-8">
