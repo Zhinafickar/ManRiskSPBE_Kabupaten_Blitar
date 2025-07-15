@@ -5,7 +5,7 @@
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
-import { MainNav } from '@/components/main-nav';
+import { MainNav } from '@/app/(app)/main-nav';
 import { UserNav } from '@/components/user-nav';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
