@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { getAllSurveyData } from "@/services/survey-service";
 import type { Survey } from '@/types/survey';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, type ChartConfig } from "@/components/ui/chart";
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, LabelList } from 'recharts';
 import { TrendingUp } from 'lucide-react';
 
 // --- Chart Configs ---
@@ -27,7 +27,7 @@ const pieChartConfig = {
 } satisfies ChartConfig;
 
 const barChartConfig = {
-  risks: { label: 'Risiko Tinggi & Sedang', color: 'hsl(var(--primary))' },
+  risks: { label: 'Risiko Tinggi & Sedang' },
 } satisfies ChartConfig;
 
 // --- Skeleton Component ---
@@ -58,6 +58,19 @@ function VisualizationSkeleton() {
     </div>
   );
 }
+
+const barColors = [
+    'hsl(var(--chart-1))',
+    'hsl(var(--chart-2))',
+    'hsl(var(--chart-3))',
+    'hsl(var(--chart-4))',
+    'hsl(var(--chart-5))',
+    'hsl(262, 80%, 55%)',
+    'hsl(310, 80%, 55%)',
+    'hsl(350, 80%, 55%)',
+    'hsl(30, 80%, 55%)',
+    'hsl(60, 80%, 55%)',
+];
 
 // --- Main Visualization Component ---
 export default function VisualizationPage() {
@@ -103,7 +116,7 @@ export default function VisualizationPage() {
     }, {} as Record<string, number>);
 
     const barData = Object.entries(roleRiskCounts)
-      .map(([name, risks]) => ({ name, risks }))
+      .map(([name, risks], index) => ({ name, risks, fill: barColors[index % barColors.length] }))
       .sort((a, b) => b.risks - a.risks)
       .slice(0, 10); // Show top 10 roles with most high/medium risks
 
@@ -176,17 +189,32 @@ export default function VisualizationPage() {
             <CardDescription>Jumlah risiko dengan tingkat 'Bahaya' dan 'Sedang' per departemen (Top 10).</CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={barChartConfig} className="h-[300px] w-full">
-              <BarChart data={chartData.barData} layout="vertical" margin={{ left: 160, right: 20 }}>
-                <CartesianGrid horizontal={false} />
-                <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tick={{ fontSize: 12, width: 150, textAnchor: 'start' }} interval={0} />
-                <XAxis dataKey="risks" type="number" allowDecimals={false} />
-                <ChartTooltip
-                  cursor={{ fill: 'hsl(var(--muted))' }}
-                  content={<ChartTooltipContent indicator="line" />}
-                />
-                <Bar dataKey="risks" fill="var(--color-risks)" radius={4} />
-              </BarChart>
+            <ChartContainer config={barChartConfig} className="h-[400px] w-full">
+              <BarChart data={chartData.barData} margin={{ top: 20, right: 20, left: 0, bottom: 120 }}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis 
+                        dataKey="name" 
+                        tickLine={false} 
+                        axisLine={false} 
+                        tickMargin={10} 
+                        angle={-45}
+                        textAnchor="end"
+                        interval={0}
+                        height={130} // Adjust height to prevent label cutoff
+                        tick={{ fontSize: 12 }}
+                    />
+                    <YAxis allowDecimals={false} />
+                    <ChartTooltip
+                        cursor={{ fill: 'hsl(var(--muted))' }}
+                        content={<ChartTooltipContent indicator="line" />}
+                    />
+                    <Bar dataKey="risks" radius={4}>
+                         <LabelList position="top" offset={5} className="fill-foreground" fontSize={12} />
+                         {chartData.barData.map((entry) => (
+                           <Cell key={`cell-${entry.name}`} fill={entry.fill} />
+                        ))}
+                    </Bar>
+                </BarChart>
             </ChartContainer>
           </CardContent>
         </Card>

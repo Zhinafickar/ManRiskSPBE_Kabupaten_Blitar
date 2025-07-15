@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { getAllSurveyData } from "@/services/survey-service";
 import type { Survey } from '@/types/survey';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, type ChartConfig } from "@/components/ui/chart";
-import { PieChart as RechartsPieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { PieChart as RechartsPieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, LabelList } from 'recharts';
 import { TrendingUp, PieChart as PieChartIcon } from 'lucide-react';
 
 // --- Chart Configs ---
@@ -27,7 +27,12 @@ const pieChartConfig = {
 } satisfies ChartConfig;
 
 const barChartConfig = {
-  risks: { label: 'Risiko Tinggi & Sedang', color: 'hsl(var(--primary))' },
+  risks: { label: 'Risiko Tinggi & Sedang' },
+  'Dinas Kependudukan dan Pencatatan Sipil': { color: 'hsl(var(--chart-1))' },
+  'Dinas Kesehatan': { color: 'hsl(var(--chart-2))' },
+  'Dinas Pendidikan': { color: 'hsl(var(--chart-3))' },
+  'Dinas Komunikasi, Informatika, Statistik Dan Persandian': { color: 'hsl(var(--chart-4))' },
+  'Badan Pengelolaan Keuangan Dan Aset Daerah': { color: 'hsl(var(--chart-5))' },
 } satisfies ChartConfig;
 
 // --- Skeleton Component ---
@@ -52,6 +57,14 @@ function DashboardChartsSkeleton() {
     </Card>
   );
 }
+
+const barColors = [
+    'hsl(var(--chart-1))',
+    'hsl(var(--chart-2))',
+    'hsl(var(--chart-3))',
+    'hsl(var(--chart-4))',
+    'hsl(var(--chart-5))',
+];
 
 export function RiskAnalysisCard() { // Keep the exported name the same to avoid breaking imports
   const [surveys, setSurveys] = useState<Survey[]>([]);
@@ -96,7 +109,7 @@ export function RiskAnalysisCard() { // Keep the exported name the same to avoid
     }, {} as Record<string, number>);
 
     const barData = Object.entries(roleRiskCounts)
-      .map(([name, risks]) => ({ name, risks }))
+      .map(([name, risks], index) => ({ name, risks, fill: barColors[index % barColors.length] }))
       .sort((a, b) => b.risks - a.risks)
       .slice(0, 5); // Show top 5 for dashboard brevity
 
@@ -167,15 +180,30 @@ export function RiskAnalysisCard() { // Keep the exported name the same to avoid
             </h3>
              <ChartContainer config={barChartConfig} className="h-[250px] w-full">
                {chartData.barData.length > 0 ? (
-                <BarChart data={chartData.barData} layout="vertical" margin={{ left: 160, right: 20 }}>
-                    <CartesianGrid horizontal={false} />
-                    <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tick={{ fontSize: 10, width: 150, textAnchor: 'start' }} interval={0} />
-                    <XAxis dataKey="risks" type="number" allowDecimals={false} />
-                    <ChartTooltip
-                    cursor={{ fill: 'hsl(var(--muted))' }}
-                    content={<ChartTooltipContent indicator="line" />}
+                <BarChart data={chartData.barData} margin={{ top: 20, right: 20, left: 0, bottom: 60 }}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis 
+                        dataKey="name" 
+                        tickLine={false} 
+                        axisLine={false} 
+                        tickMargin={10} 
+                        angle={-45}
+                        textAnchor="end"
+                        interval={0}
+                        height={100} // Adjust height to prevent label cutoff
+                        tick={{ fontSize: 10 }}
                     />
-                    <Bar dataKey="risks" fill="var(--color-risks)" radius={4} />
+                    <YAxis allowDecimals={false} />
+                    <ChartTooltip
+                        cursor={{ fill: 'hsl(var(--muted))' }}
+                        content={<ChartTooltipContent indicator="line" />}
+                    />
+                    <Bar dataKey="risks" radius={4}>
+                        <LabelList position="top" offset={5} className="fill-foreground" fontSize={10} />
+                         {chartData.barData.map((entry) => (
+                           <Cell key={`cell-${entry.name}`} fill={entry.fill} />
+                        ))}
+                    </Bar>
                 </BarChart>
                 ) : (
                     <div className="flex items-center justify-center h-full">
