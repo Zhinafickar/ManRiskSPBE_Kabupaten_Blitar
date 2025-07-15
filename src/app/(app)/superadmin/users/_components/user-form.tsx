@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -29,8 +30,8 @@ import {
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import type { UserProfile } from '@/types/user';
-import { useEffect, useState } from 'react';
-import { updateUserData } from '@/services/user-service';
+import { useEffect, useState, useMemo } from 'react';
+import { updateUserData, getAllUsers } from '@/services/user-service';
 import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
@@ -52,6 +53,7 @@ export function UserForm({ isOpen, setIsOpen, user, allRoles }: UserFormProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const [superAdminExists, setSuperAdminExists] = useState(false);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -63,6 +65,18 @@ export function UserForm({ isOpen, setIsOpen, user, allRoles }: UserFormProps) {
       role: '',
     },
   });
+
+  useEffect(() => {
+    async function checkSuperAdmin() {
+        const users = await getAllUsers();
+        // Check if a superadmin exists and it's not the user currently being edited
+        const aSuperAdminExists = users.some(u => u.role === 'superadmin' && u.uid !== user?.uid);
+        setSuperAdminExists(aSuperAdminExists);
+    }
+    if (isOpen) {
+        checkSuperAdmin();
+    }
+  }, [isOpen, user]);
 
   useEffect(() => {
     if (user) {
@@ -80,6 +94,13 @@ export function UserForm({ isOpen, setIsOpen, user, allRoles }: UserFormProps) {
       });
     }
   }, [user, isOpen, form]);
+
+  const filteredRoles = useMemo(() => {
+    if (superAdminExists) {
+        return allRoles.filter(role => role !== 'superadmin');
+    }
+    return allRoles;
+  }, [allRoles, superAdminExists]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
@@ -156,7 +177,7 @@ export function UserForm({ isOpen, setIsOpen, user, allRoles }: UserFormProps) {
                   <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                     <FormControl><SelectTrigger><SelectValue placeholder="Select a role" /></SelectTrigger></FormControl>
                     <SelectContent>
-                      {allRoles.map((role) => (
+                      {filteredRoles.map((role) => (
                         <SelectItem key={role} value={role}>{role}</SelectItem>
                       ))}
                     </SelectContent>

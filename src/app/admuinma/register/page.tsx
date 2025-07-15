@@ -31,6 +31,8 @@ import Image from 'next/image';
 import { ADMIN_ROLES } from '@/constants/admin-data';
 import { TokenVerification } from '../_components/token-verification';
 import { useAdminVerification } from '../_components/admin-verification-context';
+import { getAllUsers } from '@/services/user-service';
+import type { UserProfile } from '@/types/user';
 
 const formSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
@@ -45,6 +47,20 @@ function RegisterForm() {
   const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [availableAdminRoles, setAvailableAdminRoles] = useState<string[]>([]);
+
+  useEffect(() => {
+    async function checkSuperAdmin() {
+        const users = await getAllUsers();
+        const superAdminExists = users.some(user => user.role === 'superadmin');
+        if (superAdminExists) {
+            setAvailableAdminRoles(ADMIN_ROLES.filter(role => role !== 'superadmin'));
+        } else {
+            setAvailableAdminRoles(ADMIN_ROLES);
+        }
+    }
+    checkSuperAdmin();
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -174,7 +190,7 @@ function RegisterForm() {
                         </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                        {ADMIN_ROLES.map((role) => (
+                        {availableAdminRoles.map((role) => (
                             <SelectItem key={role} value={role}>
                             {role.charAt(0).toUpperCase() + role.slice(1)}
                             </SelectItem>
