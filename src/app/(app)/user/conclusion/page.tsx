@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 // --- Chart Configs ---
 const riskLevelColors = {
@@ -262,6 +263,9 @@ export default function ReportPage() {
 
           <div className="printable-area space-y-8">
               <div className="text-center space-y-2 mb-8">
+                <div className="flex justify-center">
+                    <Image src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png" alt="Logo Kabupaten Blitar" width={100} height={100} />
+                </div>
                 <h1 className="text-2xl font-bold">Laporan Akhir Hasil Analisis Risiko SPBE</h1>
                 <p className="text-muted-foreground">{userProfile.role}</p>
               </div>
