@@ -9,6 +9,7 @@ import type { Survey } from '@/types/survey';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, type ChartConfig } from "@/components/ui/chart";
 import { PieChart as RechartsPieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, LabelList } from 'recharts';
 import { TrendingUp, PieChart as PieChartIcon } from 'lucide-react';
+import { ROLES } from '@/constants/data';
 
 // --- Chart Configs ---
 const riskLevelColors = {
@@ -28,11 +29,6 @@ const pieChartConfig = {
 
 const barChartConfig = {
   risks: { label: 'Risiko Tinggi & Sedang' },
-  'Dinas Kependudukan dan Pencatatan Sipil': { color: riskLevelColors.Bahaya },
-  'Dinas Kesehatan': { color: riskLevelColors.Sedang },
-  'Dinas Pendidikan': { color: riskLevelColors.Rendah },
-  'Dinas Komunikasi, Informatika, Statistik Dan Persandian': { color: riskLevelColors.Minor },
-  'Badan Pengelolaan Keuangan Dan Aset Daerah': { color: 'hsl(var(--chart-5))' },
 } satisfies ChartConfig;
 
 // --- Skeleton Component ---
@@ -101,12 +97,17 @@ export function RiskAnalysisCard() { // Keep the exported name the same to avoid
       }));
 
     // Data for Bar Chart
-    const roleRiskCounts = surveys.reduce((acc, survey) => {
-      if ((survey.riskLevel === 'Bahaya' || survey.riskLevel === 'Sedang') && survey.userRole) {
-        acc[survey.userRole] = (acc[survey.userRole] || 0) + 1;
-      }
-      return acc;
+    const allDepartments = ROLES.filter(role => role !== 'Penguji Coba');
+    const roleRiskCounts = allDepartments.reduce((acc, role) => {
+        acc[role] = 0;
+        return acc;
     }, {} as Record<string, number>);
+
+    surveys.forEach(survey => {
+        if ((survey.riskLevel === 'Bahaya' || survey.riskLevel === 'Sedang') && survey.userRole && survey.userRole in roleRiskCounts) {
+            roleRiskCounts[survey.userRole]++;
+        }
+    });
 
     const barData = Object.entries(roleRiskCounts)
       .map(([name, risks], index) => ({ name, risks, fill: barColors[index % barColors.length] }))
