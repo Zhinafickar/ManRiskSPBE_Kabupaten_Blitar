@@ -19,76 +19,36 @@ export default function AdminDashboard() {
 
       <RiskAnalysisCard />
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>View All Survey Results</CardTitle>
-            <CardDescription>
-              Access a comprehensive table of all survey data submitted by users.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild>
-              <Link href="/admuinma/results">
-                <FileText className="mr-2 h-4 w-4" />
-                View Survey Results
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>View Continuity Plans</CardTitle>
-            <CardDescription>
-              See all business continuity plans submitted across the organization.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild>
-              <Link href="/admuinma/continuity-results">
-                <ClipboardCheck className="mr-2 h-4 w-4" />
-                View Continuity Plans
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Data Visualization</CardTitle>
-            <CardDescription>
-              Explore graphical representations of survey data for better insights.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild>
-              <Link href="/admuinma/visualization">
-                <AreaChart className="mr-2 h-4 w-4" />
-                Go to Visualization
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Organisasi Perangkat Daerah (OPD)</CardTitle>
-            <CardDescription>
-              View the list of all registered OPD and their data.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild>
-              <Link href="/admuinma/opd">
-                <Building className="mr-2 h-4 w-4" />
-                View OPD
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-      </div>
+      <Card>
+        <CardHeader>
+            <CardTitle>Menu Manajemen</CardTitle>
+            <CardDescription>Akses cepat ke semua fitur pelaporan dan data organisasi.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="space-y-2">
+                <h4 className="font-semibold">Data & Laporan</h4>
+                <div className="flex flex-col gap-2">
+                    <Button asChild variant="outline" className="justify-start">
+                        <Link href="/admuinma/results"><FileText className="mr-2 h-4 w-4" />Semua Hasil Survei</Link>
+                    </Button>
+                    <Button asChild variant="outline" className="justify-start">
+                        <Link href="/admuinma/continuity-results"><ClipboardCheck className="mr-2 h-4 w-4" />Rencana Kontinuitas</Link>
+                    </Button>
+                    <Button asChild variant="outline" className="justify-start">
+                        <Link href="/admuinma/visualization"><AreaChart className="mr-2 h-4 w-4" />Visualisasi Data</Link>
+                    </Button>
+                </div>
+            </div>
+            <div className="space-y-2">
+                <h4 className="font-semibold">Organisasi</h4>
+                <div className="flex flex-col gap-2">
+                     <Button asChild variant="outline" className="justify-start">
+                        <Link href="/admuinma/opd"><Building className="mr-2 h-4 w-4" />Organisasi Perangkat Daerah (OPD)</Link>
+                    </Button>
+                </div>
+            </div>
+        </CardContent>
+       </Card>
     </div>
   );
 }
