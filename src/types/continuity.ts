@@ -34,4 +34,5 @@ export interface ContinuityPlan {
   rto: string;
   rpo: string;
   createdAt: string;
+  isFictitious?: boolean;
 }

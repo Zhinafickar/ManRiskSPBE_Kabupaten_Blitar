@@ -18,4 +18,5 @@ export interface Survey {
     kontrolFisik?: string[];
     kontrolTeknologi?: string[];
     mitigasi?: string;
+    isFictitious?: boolean;
 }
