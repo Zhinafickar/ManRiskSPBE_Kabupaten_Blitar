@@ -224,7 +224,19 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
               name="riskEvent"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Kategori Risiko (ISO 31000 dan Cobit 5 for risk)</FormLabel>
+                  <div className="flex items-center gap-2">
+                    <FormLabel>Kategori Risiko</FormLabel>
+                    <TooltipProvider>
+                      <Tooltip delayDuration={300}>
+                        <TooltipTrigger type="button">
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                          <p>Referensi: ISO 31000 dan Cobit 5 for risk</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                    <Popover open={riskEventOpen} onOpenChange={setRiskEventOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -260,7 +272,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
               name="impactArea"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Risiko (ISO 31000 dan Cobit 5 for risk)</FormLabel>
+                  <FormLabel>Risiko</FormLabel>
                   <Popover open={impactAreaOpen} onOpenChange={setImpactAreaOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -339,7 +351,19 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
             {/* Controls Section */}
             <div className="space-y-2 rounded-lg border p-4">
               <div className="flex items-center justify-between">
-                  <FormLabel>Kendali Sesuai ISO 27001</FormLabel>
+                  <div className="flex items-center gap-2">
+                    <FormLabel>Kendali</FormLabel>
+                    <TooltipProvider>
+                      <Tooltip delayDuration={300}>
+                        <TooltipTrigger type="button">
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                          <p>Referensi: ISO 27001</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                    <Button
                         type="button"
                         variant="outline"
