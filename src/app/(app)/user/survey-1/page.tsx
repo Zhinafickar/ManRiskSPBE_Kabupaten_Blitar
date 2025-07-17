@@ -364,7 +364,26 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                 name="mitigasi"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Mitigasi</FormLabel>
+                    <div className="flex items-center gap-2">
+                        <FormLabel>Mitigasi</FormLabel>
+                        <TooltipProvider>
+                            <Tooltip delayDuration={300}>
+                                <TooltipTrigger type="button">
+                                    <Info className="h-4 w-4 text-muted-foreground" />
+                                </TooltipTrigger>
+                                <TooltipContent side="right" align="start" className="max-w-xs">
+                                    <div className="space-y-2 p-2">
+                                        {MITIGATION_OPTIONS.map((option) => (
+                                            <div key={option.name}>
+                                                <p className="font-bold">{option.name}</p>
+                                                <p>{option.description}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </div>
                     <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                         <SelectTrigger>
@@ -372,23 +391,11 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                         </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                        <TooltipProvider>
                             {MITIGATION_OPTIONS.map((option) => (
-                            <Tooltip key={option.name} delayDuration={300}>
-                                <TooltipTrigger asChild>
-                                <SelectItem value={option.name} className="w-full">
-                                    <div className="flex items-center justify-between w-full">
-                                    <span>{option.name}</span>
-                                    <Info className="h-4 w-4 text-muted-foreground" />
-                                    </div>
+                                <SelectItem key={option.name} value={option.name}>
+                                    {option.name}
                                 </SelectItem>
-                                </TooltipTrigger>
-                                <TooltipContent side="right" align="start">
-                                <p className="max-w-xs">{option.description}</p>
-                                </TooltipContent>
-                            </Tooltip>
                             ))}
-                        </TooltipProvider>
                         </SelectContent>
                     </Select>
                     <FormMessage />
