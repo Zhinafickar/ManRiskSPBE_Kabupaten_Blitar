@@ -231,8 +231,8 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                         <TooltipTrigger type="button">
                           <Info className="h-4 w-4 text-muted-foreground" />
                         </TooltipTrigger>
-                        <TooltipContent side="right">
-                          <p>Referensi: ISO 31000 dan Cobit 5 for risk</p>
+                        <TooltipContent side="right" className="max-w-xs">
+                          <p>Daftar kategori risiko pada formulir ini mengacu pada standar ISO 31000 dan Cobit 5 untuk memastikan identifikasi yang komprehensif.</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -358,8 +358,8 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                         <TooltipTrigger type="button">
                           <Info className="h-4 w-4 text-muted-foreground" />
                         </TooltipTrigger>
-                        <TooltipContent side="right">
-                          <p>Referensi: ISO 27001</p>
+                        <TooltipContent side="right" className="max-w-xs">
+                           <p>Daftar kendali pada formulir ini mengacu pada standar keamanan informasi ISO 27001 untuk membantu pemilihan mitigasi yang paling efektif.</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
