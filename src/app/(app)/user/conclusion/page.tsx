@@ -211,6 +211,9 @@ export default function ReportPage() {
     return (
       <div className="space-y-6">
           <style jsx global>{`
+            .print-only {
+                display: none;
+            }
             @media print {
               body {
                  -webkit-print-color-adjust: exact !important;
@@ -238,6 +241,9 @@ export default function ReportPage() {
               }
               .no-print {
                 display: none;
+              }
+              .print-only {
+                display: block;
               }
               .card-print {
                 border: none !important;
@@ -292,6 +298,10 @@ export default function ReportPage() {
             {/* --- Main Content --- */}
             <div className="space-y-8">
               
+              <div className="print-only text-center mb-8">
+                 <Image src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png" alt="Logo" width={100} height={100} className="mx-auto" />
+              </div>
+
               <Card className="card-print">
                   <CardHeader><CardTitle>Biografi Pengguna</CardTitle></CardHeader>
                   <CardContent>
