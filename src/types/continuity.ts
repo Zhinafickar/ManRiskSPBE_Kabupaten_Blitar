@@ -1,8 +1,16 @@
 import { z } from 'zod';
 
+const SurveyDetailSchema = z.object({
+  riskEvent: z.string(),
+  impactArea: z.string(),
+  cause: z.string(),
+  impact: z.string(),
+  riskLevel: z.string(),
+});
+
 export const SuggestContinuityPlanInputSchema = z.object({
-  risiko: z.string().describe('The specific risk event and impact area, formatted as "Risk Event - Impact Area".'),
-  allSurveyData: z.string().describe('A JSON string of all historical survey data for context.'),
+  selectedSurveyDetails: SurveyDetailSchema.describe('An object containing the full details of the specific survey entry for which a plan is being created.'),
+  allSurveyData: z.string().describe('A JSON string of all historical survey data for broader context.'),
 });
 export type SuggestContinuityPlanInput = z.infer<typeof SuggestContinuityPlanInputSchema>;
 

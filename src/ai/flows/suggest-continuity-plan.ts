@@ -24,7 +24,7 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert risk management consultant for a government agency in Indonesia.
 Your task is to provide a concise and practical starting point for a business continuity plan.
 
-You will be given a specific risk and the complete history of all risk surveys submitted to the system.
+You will be given the full details of a specific risk survey and the complete history of all risk surveys submitted to the system.
 Analyze the given risk in the context of the historical data.
 
 Based on this analysis, suggest a practical recovery activity, a target time, a person in charge (PIC), and the necessary resources.
@@ -35,8 +35,12 @@ Based on this analysis, suggest a practical recovery activity, a target time, a 
 - **PIC:** Suggest a department or role, not a specific person's name. (e.g., "Tim Jaringan", "Kepala Dinas").
 - **Sumberdaya:** List the essential resources needed. Be brief.
 
-**Selected Risk to Analyze:**
-{{risiko}}
+**Specific Survey Details to Analyze:**
+- Kategori Risiko: {{selectedSurveyDetails.riskEvent}}
+- Risiko Spesifik: {{selectedSurveyDetails.impactArea}}
+- Penyebab: {{selectedSurveyDetails.cause}}
+- Dampak: {{selectedSurveyDetails.impact}}
+- Tingkat Risiko: {{selectedSurveyDetails.riskLevel}}
 
 **Historical Survey Data for Context:**
 {{allSurveyData}}

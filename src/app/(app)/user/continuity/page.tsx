@@ -45,7 +45,7 @@ export default function ContinuityPage() {
   const { user, userProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isAiLoading, setIsAiLoading] = useState(false);
-  const [availableRisks, setAvailableRisks] = useState<string[]>([]);
+  const [userSurveys, setUserSurveys] = useState<Survey[]>([]);
   const [allSurveyData, setAllSurveyData] = useState<Survey[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -56,7 +56,7 @@ export default function ContinuityPage() {
     },
   });
 
-  const { fields, append, remove, replace } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "plans"
   });
@@ -65,29 +65,37 @@ export default function ContinuityPage() {
 
   useEffect(() => {
     if (user) {
-        getUserSurveys(user.uid).then(surveys => {
-          const uniqueRisks = new Set<string>();
-          surveys.forEach(survey => {
-            if (survey.riskEvent && survey.impactArea) {
-              uniqueRisks.add(`${survey.riskEvent} - ${survey.impactArea}`);
-            }
-          });
-          setAvailableRisks(Array.from(uniqueRisks));
-        });
+        getUserSurveys(user.uid).then(setUserSurveys);
         getAllSurveyData().then(setAllSurveyData);
     }
   }, [user]);
+
+  const availableRisks = userSurveys.map(survey => `${survey.riskEvent} - ${survey.impactArea}`);
 
   const handleAiSuggestion = async () => {
     if (!selectedRisk) {
         toast({ variant: 'destructive', title: 'Error', description: 'Silakan pilih risiko terlebih dahulu.' });
         return;
     }
+
+    const selectedSurvey = userSurveys.find(s => `${s.riskEvent} - ${s.impactArea}` === selectedRisk);
+    
+    if (!selectedSurvey) {
+        toast({ variant: 'destructive', title: 'Error', description: 'Detail survei untuk risiko yang dipilih tidak ditemukan.' });
+        return;
+    }
+
     setIsAiLoading(true);
 
     try {
         const suggestion = await suggestContinuityPlan({
-            risiko: selectedRisk,
+            selectedSurveyDetails: {
+                riskEvent: selectedSurvey.riskEvent,
+                impactArea: selectedSurvey.impactArea,
+                cause: selectedSurvey.cause,
+                impact: selectedSurvey.impact,
+                riskLevel: selectedSurvey.riskLevel || 'N/A'
+            },
             allSurveyData: JSON.stringify(allSurveyData),
         });
 
@@ -95,7 +103,6 @@ export default function ContinuityPage() {
         const lastPlanIndex = currentPlans.length - 1;
         const lastPlan = currentPlans[lastPlanIndex];
 
-        // If the last plan is already filled (indicated by RTO/RPO), add a new plan.
         if (lastPlan && lastPlan.rto && lastPlan.rpo) {
             append({
                 ...suggestion,
@@ -104,12 +111,10 @@ export default function ContinuityPage() {
             });
             toast({ title: 'Saran Baru Ditambahkan', description: 'Saran baru telah ditambahkan sebagai rencana di bawah.' });
         } else {
-            // Otherwise, update the last (or current) plan.
             form.setValue(`plans.${lastPlanIndex}.aktivitas`, suggestion.aktivitas, { shouldValidate: true });
             form.setValue(`plans.${lastPlanIndex}.targetWaktu`, suggestion.targetWaktu, { shouldValidate: true });
             form.setValue(`plans.${lastPlanIndex}.pic`, suggestion.pic, { shouldValidate: true });
             form.setValue(`plans.${lastPlanIndex}.sumberdaya`, suggestion.sumberdaya, { shouldValidate: true });
-            // Clear RTO/RPO in case user is re-rolling AI on a partially filled form
             form.setValue(`plans.${lastPlanIndex}.rto`, '', { shouldValidate: true });
             form.setValue(`plans.${lastPlanIndex}.rpo`, '', { shouldValidate: true });
             toast({ title: 'Saran Diperbarui', description: 'Saran telah diterapkan pada rencana saat ini.' });
