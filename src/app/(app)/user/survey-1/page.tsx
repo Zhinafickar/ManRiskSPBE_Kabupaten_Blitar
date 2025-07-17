@@ -35,7 +35,7 @@ import {
 } from '@/constants/data';
 import { addSurvey } from '@/services/survey-service';
 import { useAuth } from '@/hooks/use-auth';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarIcon, Check, ChevronsUpDown, Info, Sparkles, TrendingDown, TrendingUp, Loader2 } from 'lucide-react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
@@ -46,6 +46,9 @@ import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { suggestCauseImpact } from '@/ai/flows/suggest-cause-impact';
 import { determineRiskSentiment } from '@/ai/flows/determine-risk-sentiment';
+import { sortRelevantControls } from '@/ai/flows/sort-relevant-controls';
+import { useDebounce } from 'use-debounce';
+
 
 const formSchema = z.object({
   riskEvent: z.string({ required_error: 'Silakan pilih kategori risiko.' }).min(1, { message: 'Kategori risiko harus diisi.' }),
@@ -67,7 +70,10 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
   const { toast } = useToast();
   const { user, userProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [isAiCauseImpactLoading, setIsAiCauseImpactLoading] = useState(false);
+  const [isAiControlsLoading, setIsAiControlsLoading] = useState(false);
+
+  // State for popovers
   const [riskEventOpen, setRiskEventOpen] = useState(false);
   const [impactAreaOpen, setImpactAreaOpen] = useState(false);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
@@ -75,11 +81,17 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
   const [kontrolOrangOpen, setKontrolOrangOpen] = useState(false);
   const [kontrolFisikOpen, setKontrolFisikOpen] = useState(false);
   const [kontrolTeknologiOpen, setKontrolTeknologiOpen] = useState(false);
+  
   const [availableImpactAreas, setAvailableImpactAreas] = useState<string[]>([]);
   const [riskIndicator, setRiskIndicator] = useState<RiskIndicator>({ level: null, color: '' });
-
   const [riskSentiment, setRiskSentiment] = useState<'Positif' | 'Negatif' | 'Netral' | null>(null);
   const [isSentimentLoading, setIsSentimentLoading] = useState(false);
+
+  // Sorted controls state
+  const [sortedOrganizational, setSortedOrganizational] = useState(ORGANIZATIONAL_CONTROLS);
+  const [sortedPeople, setSortedPeople] = useState(PEOPLE_CONTROLS);
+  const [sortedPhysical, setSortedPhysical] = useState(PHYSICAL_CONTROLS);
+  const [sortedTechnological, setSortedTechnological] = useState(TECHNOLOGICAL_CONTROLS);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -100,51 +112,92 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
     },
   });
 
+  const watchedFields = form.watch(['riskEvent', 'impactArea', 'areaDampak', 'cause', 'impact', 'frequency', 'impactMagnitude']);
+  const [debouncedWatchedFields] = useDebounce(watchedFields, 1000);
+
+  const riskContextForAI = useMemo(() => {
+    const [riskEvent, impactArea, areaDampak, cause, impact, frequency, impactMagnitude] = debouncedWatchedFields;
+    const indicator = getRiskLevel(frequency, impactMagnitude);
+    if (riskEvent && impactArea && areaDampak && cause && impact && indicator.level) {
+        return { riskEvent, impactArea, areaDampak, cause, impact, riskLevel: indicator.level };
+    }
+    return null;
+  }, [debouncedWatchedFields]);
+  
+  useEffect(() => {
+    if (!riskContextForAI) {
+        // Reset to default sort order if context is incomplete
+        if (sortedOrganizational.length !== ORGANIZATIONAL_CONTROLS.length) {
+            setSortedOrganizational(ORGANIZATIONAL_CONTROLS);
+            setSortedPeople(PEOPLE_CONTROLS);
+            setSortedPhysical(PHYSICAL_CONTROLS);
+            setSortedTechnological(TECHNOLOGICAL_CONTROLS);
+        }
+        return;
+    };
+    
+    let isCancelled = false;
+    const fetchSortedControls = async () => {
+        setIsAiControlsLoading(true);
+        try {
+            const result = await sortRelevantControls(riskContextForAI);
+            if (!isCancelled) {
+                setSortedOrganizational(result.sortedOrganizational);
+                setSortedPeople(result.sortedPeople);
+                setSortedPhysical(result.sortedPhysical);
+                setSortedTechnological(result.sortedTechnological);
+            }
+        } catch (e) {
+            console.error("Failed to sort controls with AI", e);
+            // On error, reset to default order
+            if (!isCancelled) {
+                setSortedOrganizational(ORGANIZATIONAL_CONTROLS);
+                setSortedPeople(PEOPLE_CONTROLS);
+                setSortedPhysical(PHYSICAL_CONTROLS);
+                setSortedTechnological(TECHNOLOGICAL_CONTROLS);
+            }
+        } finally {
+            if (!isCancelled) {
+                setIsAiControlsLoading(false);
+            }
+        }
+    };
+
+    fetchSortedControls();
+    
+    return () => {
+        isCancelled = true;
+    };
+    
+  }, [riskContextForAI]);
+
+
   const selectedRiskEvent = form.watch('riskEvent');
-  const selectedImpactArea = form.watch('impactArea');
-  const selectedAreaDampak = form.watch('areaDampak');
   const frequency = form.watch('frequency');
   const impactMagnitude = form.watch('impactMagnitude');
 
   useEffect(() => {
     const riskEventObject = RISK_EVENTS.find(event => event.name === selectedRiskEvent);
-    if (riskEventObject) {
-      setAvailableImpactAreas(riskEventObject.impactAreas);
-    } else {
-      setAvailableImpactAreas([]);
-    }
+    setAvailableImpactAreas(riskEventObject ? riskEventObject.impactAreas : []);
     form.setValue('impactArea', '');
   }, [selectedRiskEvent, form]);
 
   useEffect(() => {
-    if (frequency && impactMagnitude) {
-        const indicator = getRiskLevel(frequency, impactMagnitude);
-        setRiskIndicator(indicator);
-    } else {
-        setRiskIndicator({ level: null, color: '' });
-    }
+    setRiskIndicator(getRiskLevel(frequency, impactMagnitude));
   }, [frequency, impactMagnitude]);
   
   useEffect(() => {
-    // Clear cause and impact fields when dependencies change
-    form.setValue('cause', '');
-    form.setValue('impact', '');
-  }, [selectedRiskEvent, selectedImpactArea, selectedAreaDampak, form]);
-
-  useEffect(() => {
-    if (selectedRiskEvent && selectedImpactArea) {
+    const { riskEvent, impactArea } = form.getValues();
+    if (riskEvent && impactArea) {
       setIsSentimentLoading(true);
-      determineRiskSentiment({
-        riskCategory: selectedRiskEvent,
-        risk: selectedImpactArea
-      })
-      .then(result => setRiskSentiment(result.sentiment))
-      .catch(() => setRiskSentiment(null)) // Handle error case
-      .finally(() => setIsSentimentLoading(false));
+      determineRiskSentiment({ riskCategory: riskEvent, risk: impactArea })
+        .then(result => setRiskSentiment(result.sentiment))
+        .catch(() => setRiskSentiment(null))
+        .finally(() => setIsSentimentLoading(false));
     } else {
       setRiskSentiment(null);
     }
-  }, [selectedRiskEvent, selectedImpactArea]);
+  }, [form.watch('riskEvent'), form.watch('impactArea')]);
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -171,20 +224,16 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
       toast({ variant: 'destructive', title: 'Data Kurang', description: 'Pilih Kategori Risiko, Risiko, dan Area Dampak terlebih dahulu.' });
       return;
     }
-    setIsAiLoading(true);
+    setIsAiCauseImpactLoading(true);
     try {
-      const result = await suggestCauseImpact({
-        riskCategory: riskEvent,
-        risk: impactArea,
-        impactArea: areaDampak,
-      });
+      const result = await suggestCauseImpact({ riskCategory: riskEvent, risk: impactArea, impactArea: areaDampak });
       form.setValue('cause', result.cause, { shouldValidate: true });
       form.setValue('impact', result.impact, { shouldValidate: true });
       toast({ title: 'Saran Diterapkan', description: 'Kolom Penyebab dan Dampak telah diisi oleh AI.' });
     } catch (error) {
       toast({ variant: 'destructive', title: 'Gagal', description: 'Gagal mendapatkan saran dari AI.' });
     } finally {
-      setIsAiLoading(false);
+      setIsAiCauseImpactLoading(false);
     }
   };
 
@@ -192,47 +241,23 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
     <Card>
       <CardHeader>
         <CardTitle>Input Kejadian Risiko</CardTitle>
-        <CardDescription>Isi formulir penilaian risiko di bawah ini. Pilih kategori risiko untuk melihat risiko yang relevan.</CardDescription>
+        <CardDescription>Isi formulir penilaian risiko di bawah ini. Pilihan pada dropdown kontrol akan disortir otomatis oleh AI berdasarkan konteks yang Anda berikan.</CardDescription>
       </CardHeader>
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="space-y-6">
+            {/* Risk Category and Specific Risk */}
             <FormField
               control={form.control}
               name="riskEvent"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <div className="flex items-center gap-2">
-                    <FormLabel>Kategori Risiko (ISO 31000 dan Cobit 5 for risk)</FormLabel>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-5 w-5 rounded-full">
-                                <Info className="h-4 w-4 text-muted-foreground" />
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80">
-                            <div className="space-y-2">
-                                <h4 className="font-medium leading-none">Penjelasan Standar</h4>
-                                <p className="text-sm text-muted-foreground">
-                                    <strong>ISO 31000:</strong> Standar internasional untuk manajemen risiko secara umum.
-                                    <br />
-                                    <strong>COBIT 5 for Risk:</strong> Kerangka kerja yang berfokus pada risiko terkait Teknologi Informasi (TI).
-                                </p>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
-                  </div>
+                  <FormLabel>Kategori Risiko (ISO 31000 dan Cobit 5 for risk)</FormLabel>
                    <Popover open={riskEventOpen} onOpenChange={setRiskEventOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          className={cn("w-full justify-between", !field.value && "text-muted-foreground")}
-                        >
-                          {field.value
-                            ? RISK_EVENTS.find(event => event.name === field.value)?.name
-                            : "Pilih kategori risiko..."}
+                        <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value && "text-muted-foreground")}>
+                          {field.value ? RISK_EVENTS.find(event => event.name === field.value)?.name : "Pilih kategori risiko..."}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </FormControl>
@@ -244,14 +269,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                         <CommandList>
                           <CommandGroup>
                             {RISK_EVENTS.map((event) => (
-                              <CommandItem
-                                key={event.name}
-                                value={event.name}
-                                onSelect={() => {
-                                  form.setValue("riskEvent", event.name);
-                                  setRiskEventOpen(false);
-                                }}
-                              >
+                              <CommandItem key={event.name} value={event.name} onSelect={() => { form.setValue("riskEvent", event.name); setRiskEventOpen(false); }}>
                                 <Check className={cn("mr-2 h-4 w-4", event.name === field.value ? "opacity-100" : "opacity-0")} />
                                 {event.name}
                               </CommandItem>
@@ -274,20 +292,8 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                   <Popover open={impactAreaOpen} onOpenChange={setImpactAreaOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          disabled={!selectedRiskEvent || availableImpactAreas.length === 0}
-                          className={cn(
-                            "w-full justify-between",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value
-                            ? availableImpactAreas.find(
-                                (area) => area === field.value
-                              )
-                            : "Pilih risiko..."}
+                        <Button variant="outline" role="combobox" disabled={!selectedRiskEvent || availableImpactAreas.length === 0} className={cn("w-full justify-between", !field.value && "text-muted-foreground")}>
+                          {field.value ? availableImpactAreas.find((area) => area === field.value) : "Pilih risiko..."}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </FormControl>
@@ -299,22 +305,8 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                         <CommandList>
                           <CommandGroup>
                             {availableImpactAreas.map((area) => (
-                              <CommandItem
-                                key={area}
-                                value={area}
-                                onSelect={() => {
-                                  form.setValue("impactArea", area);
-                                  setImpactAreaOpen(false);
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    area === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
+                              <CommandItem key={area} value={area} onSelect={() => { form.setValue("impactArea", area); setImpactAreaOpen(false); }}>
+                                <Check className={cn("mr-2 h-4 w-4", area === field.value ? "opacity-100" : "opacity-0")} />
                                 {area}
                               </CommandItem>
                             ))}
@@ -324,41 +316,16 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                     </PopoverContent>
                   </Popover>
                   <div className="h-5 mt-1.5">
-                    {isSentimentLoading ? (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>Menganalisis...</span>
-                      </div>
-                    ) : riskSentiment === 'Positif' ? (
-                      <div className="flex items-center gap-2 text-sm text-green-600">
-                        <TrendingUp className="h-4 w-4" />
-                        <span>Risiko ini bersifat Positif (Peluang)</span>
-                      </div>
-                    ) : riskSentiment === 'Negatif' ? (
-                      <div className="flex items-center gap-2 text-sm text-red-600">
-                        <TrendingDown className="h-4 w-4" />
-                        <span>Risiko ini bersifat Negatif (Ancaman)</span>
-                      </div>
-                    ) : null}
+                    {isSentimentLoading ? (<div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /><span>Menganalisis...</span></div>) : 
+                     riskSentiment === 'Positif' ? (<div className="flex items-center gap-2 text-sm text-green-600"><TrendingUp className="h-4 w-4" /><span>Risiko ini bersifat Positif (Peluang)</span></div>) : 
+                     riskSentiment === 'Negatif' ? (<div className="flex items-center gap-2 text-sm text-red-600"><TrendingDown className="h-4 w-4" /><span>Risiko ini bersifat Negatif (Ancaman)</span></div>) : null}
                   </div>
                   <FormMessage />
                 </FormItem>
               )}
             />
-             <FormField
-                control={form.control}
-                name="areaDampak"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Area Dampak</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl><SelectTrigger><SelectValue placeholder="Pilih area dampak" /></SelectTrigger></FormControl>
-                        <SelectContent>{AREA_DAMPAK_OPTIONS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
-                    </Select>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
+            {/* Impact Area and Date */}
+             <FormField control={form.control} name="areaDampak" render={({ field }) => (<FormItem><FormLabel>Area Dampak</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Pilih area dampak" /></SelectTrigger></FormControl><SelectContent>{AREA_DAMPAK_OPTIONS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>)} />
             <FormField
               control={form.control}
               name="eventDate"
@@ -368,368 +335,49 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                   <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "dd/MM/yyyy")
-                          ) : (
-                            <span>Pilih tanggal</span>
-                          )}
+                        <Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
+                          {field.value ? format(field.value, "dd/MM/yyyy") : <span>Pilih tanggal</span>}
                           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={(date) => {
-                           if (date) {
-                              field.onChange(date);
-                              setDatePickerOpen(false);
-                           }
-                        }}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
-                        }
-                        initialFocus
-                      />
+                      <Calendar mode="single" selected={field.value} onSelect={(date) => { if (date) { field.onChange(date); setDatePickerOpen(false); }}} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} initialFocus />
                     </PopoverContent>
                   </Popover>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            {/* Cause and Impact with AI */}
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="cause"
-                  render={({ field }) => (
-                    <FormItem>
-                       <FormLabel>Penyebab</FormLabel>
-                      <FormControl><Textarea placeholder="Jelaskan penyebab kejadian risiko..." {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="impact"
-                  render={({ field }) => (
-                    <FormItem>
-                       <div className='flex items-center justify-between'>
-                         <FormLabel>Dampak</FormLabel>
-                         <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={handleCauseImpactSuggestion}
-                            disabled={isAiLoading || !selectedRiskEvent || !selectedImpactArea || !selectedAreaDampak}
-                            className="h-auto px-2 py-1 text-xs -translate-y-1"
-                          >
-                            <Sparkles className="mr-1 h-3 w-3" />
-                            Beri Saran (AI)
-                          </Button>
-                       </div>
-                      <FormControl><Textarea placeholder="Jelaskan potensi dampaknya..." {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <FormField control={form.control} name="cause" render={({ field }) => (<FormItem><FormLabel>Penyebab</FormLabel><FormControl><Textarea placeholder="Jelaskan penyebab kejadian risiko..." {...field} /></FormControl><FormMessage /></FormItem>)} />
+                <FormField control={form.control} name="impact" render={({ field }) => (<FormItem><div className='flex items-center justify-between'><FormLabel>Dampak</FormLabel><Button type="button" variant="ghost" size="sm" onClick={handleCauseImpactSuggestion} disabled={isAiCauseImpactLoading || !form.getValues('riskEvent') || !form.getValues('impactArea') || !form.getValues('areaDampak')} className="h-auto px-2 py-1 text-xs -translate-y-1"><Sparkles className="mr-1 h-3 w-3" />Beri Saran (AI)</Button></div><FormControl><Textarea placeholder="Jelaskan potensi dampaknya..." {...field} /></FormControl><FormMessage /></FormItem>)} />
               </div>
+            {/* Frequency and Magnitude */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                control={form.control}
-                name="frequency"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Frekuensi Kejadian</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl><SelectTrigger><SelectValue placeholder="Pilih frekuensi" /></SelectTrigger></FormControl>
-                        <SelectContent>{FREQUENCY_LEVELS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
-                    </Select>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <FormField
-                control={form.control}
-                name="impactMagnitude"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Besaran Dampak</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl><SelectTrigger><SelectValue placeholder="Pilih besaran dampak" /></SelectTrigger></FormControl>
-                        <SelectContent>{IMPACT_MAGNITUDES.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
-                    </Select>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
+                <FormField control={form.control} name="frequency" render={({ field }) => (<FormItem><FormLabel>Frekuensi Kejadian</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Pilih frekuensi" /></SelectTrigger></FormControl><SelectContent>{FREQUENCY_LEVELS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>)} />
+                <FormField control={form.control} name="impactMagnitude" render={({ field }) => (<FormItem><FormLabel>Besaran Dampak</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Pilih besaran dampak" /></SelectTrigger></FormControl><SelectContent>{IMPACT_MAGNITUDES.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>)} />
             </div>
+            {/* Risk Indicator */}
             <div className="space-y-2 rounded-lg border p-4">
                 <FormLabel>Analisis Risiko</FormLabel>
-                <div className='pt-2'>
-                {riskIndicator.level ? (
-                    <Badge className={cn("text-base", riskIndicator.color)}>
-                    {riskIndicator.level}
-                    </Badge>
-                ) : (
-                    <p className="text-sm text-muted-foreground">Indikator Risiko Anda Akan Keluar Disini</p>
-                )}
-                </div>
+                <div className='pt-2'>{riskIndicator.level ? (<Badge className={cn("text-base", riskIndicator.color)}>{riskIndicator.level}</Badge>) : (<p className="text-sm text-muted-foreground">Indikator Risiko Anda Akan Keluar Disini</p>)}</div>
             </div>
+            {/* Controls Section */}
             <div className="space-y-2 rounded-lg border p-4">
               <div className="flex items-center gap-2">
                   <FormLabel>Kendali Sesuai ISO 27001</FormLabel>
-                  <Popover>
-                      <PopoverTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-5 w-5 rounded-full">
-                              <Info className="h-4 w-4 text-muted-foreground" />
-                          </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-80">
-                          <div className="space-y-2">
-                              <h4 className="font-medium leading-none">Penjelasan Standar</h4>
-                              <p className="text-sm text-muted-foreground">
-                                  <strong>ISO 27001:</strong> Standar internasional untuk sistem manajemen keamanan informasi (SMKI), menyediakan kerangka kerja untuk melindungi aset informasi.
-                              </p>
-                          </div>
-                      </PopoverContent>
-                  </Popover>
+                   {isAiControlsLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                 <FormField
-                  control={form.control}
-                  name="kontrolOrganisasi"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Kontrol Organisasi</FormLabel>
-                      <Popover open={kontrolOrganisasiOpen} onOpenChange={setKontrolOrganisasiOpen}>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}
-                            >
-                              {field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol organisasi..."}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                          <Command>
-                            <CommandInput placeholder="Cari kontrol..." />
-                            <CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty>
-                            <CommandList>
-                              <CommandGroup>
-                                {ORGANIZATIONAL_CONTROLS.map((item) => (
-                                  <CommandItem
-                                    key={item}
-                                    value={item}
-                                    onSelect={() => {
-                                      const value = field.value || [];
-                                      const newValue = value.includes(item)
-                                        ? value.filter((i) => i !== item)
-                                        : [...value, item];
-                                      form.setValue("kontrolOrganisasi", newValue);
-                                    }}
-                                  >
-                                    <Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />
-                                    {item}
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="kontrolOrang"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Kontrol Orang</FormLabel>
-                      <Popover open={kontrolOrangOpen} onOpenChange={setKontrolOrangOpen}>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}
-                            >
-                               {field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol orang..."}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                          <Command>
-                            <CommandInput placeholder="Cari kontrol..." />
-                            <CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty>
-                            <CommandList>
-                              <CommandGroup>
-                                {PEOPLE_CONTROLS.map((item) => (
-                                  <CommandItem
-                                    key={item}
-                                    value={item}
-                                    onSelect={() => {
-                                      const value = field.value || [];
-                                      const newValue = value.includes(item)
-                                        ? value.filter((i) => i !== item)
-                                        : [...value, item];
-                                      form.setValue("kontrolOrang", newValue);
-                                    }}
-                                  >
-                                    <Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />
-                                    {item}
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="kontrolFisik"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Kontrol Fisik</FormLabel>
-                      <Popover open={kontrolFisikOpen} onOpenChange={setKontrolFisikOpen}>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}
-                            >
-                              {field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol fisik..."}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                          <Command>
-                            <CommandInput placeholder="Cari kontrol..." />
-                            <CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty>
-                            <CommandList>
-                              <CommandGroup>
-                                {PHYSICAL_CONTROLS.map((item) => (
-                                  <CommandItem
-                                    key={item}
-                                    value={item}
-                                    onSelect={() => {
-                                      const value = field.value || [];
-                                      const newValue = value.includes(item)
-                                        ? value.filter((i) => i !== item)
-                                        : [...value, item];
-                                      form.setValue("kontrolFisik", newValue);
-                                    }}
-                                  >
-                                    <Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />
-                                    {item}
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="kontrolTeknologi"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Kontrol Teknologi</FormLabel>
-                       <Popover open={kontrolTeknologiOpen} onOpenChange={setKontrolTeknologiOpen}>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}
-                            >
-                              {field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol teknologi..."}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                          <Command>
-                            <CommandInput placeholder="Cari kontrol..." />
-                            <CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty>
-                            <CommandList>
-                              <CommandGroup>
-                                {TECHNOLOGICAL_CONTROLS.map((item) => (
-                                  <CommandItem
-                                    key={item}
-                                    value={item}
-                                    onSelect={() => {
-                                      const value = field.value || [];
-                                      const newValue = value.includes(item)
-                                        ? value.filter((i) => i !== item)
-                                        : [...value, item];
-                                      form.setValue("kontrolTeknologi", newValue);
-                                    }}
-                                  >
-                                    <Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />
-                                    {item}
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                 <FormField control={form.control} name="kontrolOrganisasi" render={({ field }) => (<FormItem className="flex flex-col"><FormLabel>Kontrol Organisasi</FormLabel><Popover open={kontrolOrganisasiOpen} onOpenChange={setKontrolOrganisasiOpen}><PopoverTrigger asChild><FormControl><Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}>{field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol organisasi..."}<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-[--radix-popover-trigger-width] p-0"><Command><CommandInput placeholder="Cari kontrol..." /><CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty><CommandList><CommandGroup>{sortedOrganizational.map((item) => (<CommandItem key={item} value={item} onSelect={() => { const value = field.value || []; const newValue = value.includes(item) ? value.filter((i) => i !== item) : [...value, item]; form.setValue("kontrolOrganisasi", newValue);}}><Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />{item}</CommandItem>))}</CommandGroup></CommandList></Command></PopoverContent></Popover><FormMessage /></FormItem>)}/>
+                 <FormField control={form.control} name="kontrolOrang" render={({ field }) => (<FormItem className="flex flex-col"><FormLabel>Kontrol Orang</FormLabel><Popover open={kontrolOrangOpen} onOpenChange={setKontrolOrangOpen}><PopoverTrigger asChild><FormControl><Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}>{field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol orang..."}<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-[--radix-popover-trigger-width] p-0"><Command><CommandInput placeholder="Cari kontrol..." /><CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty><CommandList><CommandGroup>{sortedPeople.map((item) => (<CommandItem key={item} value={item} onSelect={() => { const value = field.value || []; const newValue = value.includes(item) ? value.filter((i) => i !== item) : [...value, item]; form.setValue("kontrolOrang", newValue);}}><Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />{item}</CommandItem>))}</CommandGroup></CommandList></Command></PopoverContent></Popover><FormMessage /></FormItem>)}/>
+                 <FormField control={form.control} name="kontrolFisik" render={({ field }) => (<FormItem className="flex flex-col"><FormLabel>Kontrol Fisik</FormLabel><Popover open={kontrolFisikOpen} onOpenChange={setKontrolFisikOpen}><PopoverTrigger asChild><FormControl><Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}>{field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol fisik..."}<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-[--radix-popover-trigger-width] p-0"><Command><CommandInput placeholder="Cari kontrol..." /><CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty><CommandList><CommandGroup>{sortedPhysical.map((item) => (<CommandItem key={item} value={item} onSelect={() => { const value = field.value || []; const newValue = value.includes(item) ? value.filter((i) => i !== item) : [...value, item]; form.setValue("kontrolFisik", newValue);}}><Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />{item}</CommandItem>))}</CommandGroup></CommandList></Command></PopoverContent></Popover><FormMessage /></FormItem>)}/>
+                 <FormField control={form.control} name="kontrolTeknologi" render={({ field }) => (<FormItem className="flex flex-col"><FormLabel>Kontrol Teknologi</FormLabel><Popover open={kontrolTeknologiOpen} onOpenChange={setKontrolTeknologiOpen}><PopoverTrigger asChild><FormControl><Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}>{field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol teknologi..."}<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-[--radix-popover-trigger-width] p-0"><Command><CommandInput placeholder="Cari kontrol..." /><CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty><CommandList><CommandGroup>{sortedTechnological.map((item) => (<CommandItem key={item} value={item} onSelect={() => { const value = field.value || []; const newValue = value.includes(item) ? value.filter((i) => i !== item) : [...value, item]; form.setValue("kontrolTeknologi", newValue);}}><Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />{item}</CommandItem>))}</CommandGroup></CommandList></Command></PopoverContent></Popover><FormMessage /></FormItem>)}/>
               </div>
             </div>
-             <FormField
-              control={form.control}
-              name="mitigasi"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Mitigasi</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih mitigasi" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {MITIGATION_OPTIONS.map((option) => (
-                        <SelectItem key={option.name} value={option.name}>
-                          {option.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+             <FormField control={form.control} name="mitigasi" render={({ field }) => (<FormItem><FormLabel>Mitigasi</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Pilih mitigasi" /></SelectTrigger></FormControl><SelectContent>{MITIGATION_OPTIONS.map((option) => (<SelectItem key={option.name} value={option.name}>{option.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
           </CardContent>
           <CardFooter>
             <Button type="submit" disabled={isLoading}>{isLoading ? 'Mengirim...' : 'Kirim Survei'}</Button>
