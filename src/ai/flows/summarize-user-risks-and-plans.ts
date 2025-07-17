@@ -31,20 +31,23 @@ const prompt = ai.definePrompt({
   name: 'summarizeUserRisksAndPlansPrompt',
   input: {schema: SummarizeUserRisksAndPlansInputSchema},
   output: {schema: SummarizeUserRisksAndPlansOutputSchema},
-  prompt: `You are an expert risk analyst tasked with creating a personalized summary for a user from a specific government department in Indonesia.
+  prompt: `Anda adalah seorang analis risiko ahli yang bertugas membuat ringkasan formal untuk laporan resmi di sebuah instansi pemerintah di Indonesia.
 
-Analyze the provided JSON data for their risk surveys and continuity plans.
+Analisis data survei risiko dan rencana kontinuitas untuk departemen berikut: **{{userRole}}**.
 
-**Analysis Steps for Department: {{userRole}}**
-1.  **Identify High-Priority Risks:** Pinpoint the most significant risks based on their 'riskLevel' (e.g., 'Bahaya', 'Sedang'). Note the most common 'riskEvent' categories.
-2.  **Assess Continuity Preparedness:** Compare the high-priority risks identified with the continuity plans submitted ('userContinuityData'). Are there high-priority risks that do NOT have a corresponding continuity plan?
-3.  **Synthesize Findings:** Combine these points into a concise, easy-to-read summary (2-3 sentences) for this specific user. Address them directly. Start with the most critical finding regarding their department. For example: "Berdasarkan data Anda, risiko utama di departemen Anda terkait dengan..." or "Tingkat kesiapan Anda cukup baik, namun terdapat beberapa risiko 'Bahaya' terkait... yang belum memiliki rencana kontinuitas."
+**Langkah Analisis:**
+1.  **Identifikasi Risiko Prioritas:** Tentukan risiko paling signifikan berdasarkan 'riskLevel' (misalnya, 'Bahaya', 'Sedang'). Catat kategori 'riskEvent' yang paling sering muncul.
+2.  **Evaluasi Kesiapan Kontinuitas:** Bandingkan risiko prioritas yang teridentifikasi dengan rencana kontinuitas yang telah dibuat ('userContinuityData'). Identifikasi apakah ada risiko prioritas tinggi yang belum memiliki rencana kontinuitas yang sesuai.
+3.  **Sintesis Temuan:** Gabungkan poin-poin ini menjadi ringkasan yang padat, formal, dan analitis (2-3 kalimat) yang cocok untuk laporan resmi. Gunakan bahasa yang baku dan objektif. Hindari sapaan langsung seperti "Anda" atau "departemen Anda". Mulailah dengan temuan paling kritis.
 
-**Data for Analysis:**
--   **User's Survey Data:** {{userSurveyData}}
--   **User's Continuity Plan Data:** {{userContinuityData}}
+**Contoh Ringkasan Formal:**
+"Berdasarkan analisis data, risiko utama yang teridentifikasi di {{userRole}} berkaitan dengan [Kategori Risiko Utama]. Terdapat beberapa risiko dengan tingkat 'Bahaya' yang memerlukan perhatian segera, di mana sebagian belum memiliki rencana kontinuitas yang memadai."
 
-Provide your output in the requested JSON format.`,
+**Data untuk Analisis:**
+-   **Data Survei Pengguna:** {{userSurveyData}}
+-   **Data Kontinuitas Pengguna:** {{userContinuityData}}
+
+Sediakan output Anda dalam format JSON yang diminta.`,
 });
 
 const summarizeUserRisksAndPlansFlow = ai.defineFlow(
