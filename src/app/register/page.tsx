@@ -220,7 +220,7 @@ export default function RegisterPageContent() {
                             >
                               {field.value
                                 ? availableRoles.find(role => role === field.value)
-                                : "Select your role/department"}
+                                : "Select your OPD"}
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                           </FormControl>

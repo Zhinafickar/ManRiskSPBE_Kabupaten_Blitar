@@ -162,7 +162,7 @@ export default function RegisterForm({ availableRoles }: RegisterFormProps) {
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select your role/department" />
+                    <SelectValue placeholder="Select your OPD" />
                   </Trigger>
                 </FormControl>
                 <SelectContent>
