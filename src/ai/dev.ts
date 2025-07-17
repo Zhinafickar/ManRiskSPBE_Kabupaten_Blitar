@@ -7,3 +7,4 @@ import '@/ai/flows/suggest-cause-impact.ts';
 import '@/ai/flows/determine-risk-sentiment.ts';
 import '@/ai/flows/summarize-risks-and-plans.ts';
 import '@/ai/flows/sort-relevant-controls.ts';
+import '@/ai/flows/summarize-user-risks-and-plans.ts';

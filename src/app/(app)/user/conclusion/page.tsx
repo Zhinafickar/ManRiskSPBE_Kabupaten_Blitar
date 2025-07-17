@@ -17,6 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import { AiUserSummaryCard } from './_components/ai-user-summary-card';
 
 // --- Chart Configs ---
 const riskLevelColors = {
@@ -302,6 +303,8 @@ export default function ReportPage() {
                       </div>
                   </CardContent>
               </Card>
+
+              <AiUserSummaryCard surveys={surveys} plans={plans} userRole={userProfile.role} />
 
               <Card className="card-print">
                   <CardHeader>
