@@ -191,8 +191,8 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
   };
 
   const handleControlsSuggestion = async () => {
-    const { riskEvent, impactArea, cause, impact } = form.getValues();
-    if (!riskEvent || !impactArea || !cause || !impact || !riskIndicator.level) {
+    const { riskEvent, impactArea, areaDampak, cause, impact, frequency, impactMagnitude } = form.getValues();
+    if (!riskEvent || !impactArea || !areaDampak || !cause || !impact || !frequency || !impactMagnitude || !riskIndicator.level) {
       toast({ variant: 'destructive', title: 'Data Kurang', description: 'Harap isi semua detail risiko (termasuk Penyebab, Dampak, Frekuensi, dan Besaran) sebelum meminta saran kontrol.' });
       return;
     }
@@ -201,8 +201,11 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
       const result = await suggestControlsAndMitigation({
         riskEvent,
         impactArea,
+        areaDampak,
         cause,
         impact,
+        frequency,
+        impactMagnitude,
         riskLevel: riskIndicator.level,
       });
       form.setValue('kontrolOrganisasi', result.suggestedKontrolOrganisasi, { shouldValidate: true });

@@ -20,8 +20,11 @@ import {
 const SuggestControlsAndMitigationInputSchema = z.object({
   riskEvent: z.string().describe('The high-level category of the risk.'),
   impactArea: z.string().describe('The specific risk being analyzed.'),
+  areaDampak: z.string().describe('The specific business area affected by the risk.'),
   cause: z.string().describe('The described cause of the risk.'),
   impact: z.string().describe('The described impact of the risk.'),
+  frequency: z.string().describe('The frequency level of the risk event.'),
+  impactMagnitude: z.string().describe('The impact magnitude level of the risk event.'),
   riskLevel: z.string().describe("The calculated risk level (e.g., 'Bahaya', 'Sedang')."),
 });
 export type SuggestControlsAndMitigationInput = z.infer<typeof SuggestControlsAndMitigationInputSchema>;
@@ -48,16 +51,19 @@ const prompt = ai.definePrompt({
 Your task is to analyze a given risk and suggest appropriate security controls and a mitigation strategy.
 
 **Instructions:**
-1.  Analyze the provided risk details: Kategori Risiko, Risiko, Penyebab, Dampak, and Tingkat Risiko.
+1.  Analyze the comprehensive risk details provided: Kategori Risiko, Risiko, Area Dampak, Penyebab, Dampak, Frekuensi, Besaran Dampak, and Tingkat Risiko.
 2.  From the lists of available controls below, select the MOST RELEVANT controls for each category. Do not select more than 5 controls for each category. If no control is relevant, return an empty array for that category.
-3.  From the list of available mitigation options, select the SINGLE MOST APPROPRIATE mitigation strategy.
-4.  Your response must only contain values that exist in the provided lists.
+3.  Based on all the risk details AND the controls you have just selected, choose the SINGLE MOST APPROPRIATE mitigation strategy from the list of available mitigation options. For example, if many controls are applicable, 'Peningkatan Risiko' (Mitigation) might be best. If very few controls exist or are effective, 'Pembagian Risiko' (Transfer) or 'Penerimaan Risiko' (Acceptance) might be more suitable.
+4.  Your response must only contain values that are exact matches from the provided lists.
 
 **Risk Details to Analyze:**
 - **Kategori Risiko:** {{riskEvent}}
 - **Risiko:** {{impactArea}}
+- **Area Dampak:** {{areaDampak}}
 - **Penyebab:** {{cause}}
 - **Dampak:** {{impact}}
+- **Frekuensi:** {{frequency}}
+- **Besaran Dampak:** {{impactMagnitude}}
 - **Tingkat Risiko:** {{riskLevel}}
 
 ---
