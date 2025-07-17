@@ -30,21 +30,21 @@ const prompt = ai.definePrompt({
   name: 'summarizeRisksAndPlansPrompt',
   input: {schema: SummarizeRisksAndPlansInputSchema},
   output: {schema: SummarizeRisksAndPlansOutputSchema},
-  prompt: `You are an expert risk analyst for a government body. Your task is to provide a high-level summary of the current risk landscape based on data from multiple departments.
+  prompt: `Anda adalah seorang analis risiko ahli untuk sebuah badan pemerintah di Indonesia. Tugas Anda adalah memberikan ringkasan tingkat tinggi dari lanskap risiko saat ini berdasarkan data dari berbagai departemen.
 
-Analyze the provided JSON data for all risk surveys and continuity plans.
+Analisis data JSON yang disediakan untuk semua survei risiko dan rencana kesinambungan.
 
-**Analysis Steps:**
-1.  **Identify High-Risk Areas:** Pinpoint which departments ('userRole') report the most risks, especially those with 'Bahaya' or 'Sedang' levels.
-2.  **Find Common Risk Categories:** Determine which 'riskEvent' categories appear most frequently across all surveys.
-3.  **Assess Continuity Preparedness:** Compare the risks identified (especially high-priority ones) with the continuity plans submitted. Note any gaps where high-priority risks do not have a corresponding plan.
-4.  **Synthesize Findings:** Combine these points into a concise, easy-to-read summary (2-4 sentences). Start with the most critical finding.
+**Langkah Analisis:**
+1.  **Identifikasi Area Berisiko Tinggi:** Tentukan departemen ('userRole') mana yang paling banyak melaporkan risiko, terutama yang memiliki tingkat 'Bahaya' atau 'Sedang'.
+2.  **Temukan Kategori Risiko Umum:** Identifikasi kategori 'riskEvent' mana yang paling sering muncul di semua survei.
+3.  **Nilai Kesiapan Kesinambungan:** Bandingkan risiko yang teridentifikasi (terutama yang berprioritas tinggi) dengan rencana kesinambungan yang telah diajukan. Catat adanya kesenjangan di mana risiko prioritas tinggi tidak memiliki rencana yang sesuai.
+4.  **Sintesis Temuan:** Gabungkan poin-poin ini menjadi ringkasan yang padat dan mudah dibaca (2-4 kalimat) dengan bahasa formal. Mulailah dengan temuan yang paling kritis.
 
-**Data for Analysis:**
--   **All Survey Data:** {{allSurveyData}}
--   **All Continuity Plan Data:** {{allContinuityData}}
+**Data untuk Analisis:**
+-   **Semua Data Survei:** {{allSurveyData}}
+-   **Semua Data Rencana Kesinambungan:** {{allContinuityData}}
 
-Provide your output in the requested JSON format.`,
+Sediakan output Anda dalam format JSON yang diminta.`,
 });
 
 const summarizeRisksAndPlansFlow = ai.defineFlow(

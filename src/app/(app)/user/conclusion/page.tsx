@@ -306,8 +306,8 @@ export default function ReportPage() {
                   <CardHeader><CardTitle>Biografi Pengguna</CardTitle></CardHeader>
                   <CardContent>
                       <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-sm">
-                          <div><span className="font-semibold block text-muted-foreground">Nama:</span> {userProfile.fullName}</div>
-                          <div><span className="font-semibold block text-muted-foreground">Jabatan/Departemen:</span> {userProfile.role}</div>
+                          <div><span className="font-semibold block text-muted-foreground">Nama Penginput:</span> {userProfile.fullName}</div>
+                          <div><span className="font-semibold block text-muted-foreground">OPD:</span> {userProfile.role}</div>
                           <div><span className="font-semibold block text-muted-foreground">Tanggal Laporan:</span> {today}</div>
                           <div><span className="font-semibold block text-muted-foreground">Email:</span> {userProfile.email}</div>
                       </div>

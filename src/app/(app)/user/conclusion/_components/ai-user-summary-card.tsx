@@ -21,7 +21,7 @@ function AiSummarySkeleton() {
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <Bot className="h-6 w-6" />
-                    Ringkasan Analisis AI
+                    Ringkasan Manajemen Risiko
                 </CardTitle>
                 <CardDescription>AI sedang menganalisis data Anda untuk memberikan wawasan...</CardDescription>
             </CardHeader>
@@ -77,7 +77,7 @@ export function AiUserSummaryCard({ surveys, plans, userRole }: AiUserSummaryCar
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <Bot className="h-6 w-6 text-primary" />
-                    Ringkasan Analisis AI
+                    Ringkasan Manajemen Risiko
                 </CardTitle>
                 <CardDescription>Ringkasan otomatis dari semua risiko dan rencana kontinuitas yang telah Anda input.</CardDescription>
             </CardHeader>
