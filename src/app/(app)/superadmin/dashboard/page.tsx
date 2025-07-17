@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Users, FileText, AreaChart, Shield, Building, ClipboardCheck, KeyRound, Info } from "lucide-react";
 import { RiskAnalysisCard } from "@/app/(app)/_components/risk-analysis-card";
 import { Separator } from "@/components/ui/separator";
-import { AiRiskSummaryCard } from "./_components/ai-risk-summary-card";
+import { AiRiskSummaryCard } from "@/app/(app)/_components/ai-risk-summary-card";
 
 export default function SuperAdminDashboard() {
   return (

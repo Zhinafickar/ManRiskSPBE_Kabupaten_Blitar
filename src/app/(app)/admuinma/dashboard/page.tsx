@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { FileText, AreaChart, Building, ClipboardCheck } from "lucide-react";
 import { RiskAnalysisCard } from "@/app/(app)/_components/risk-analysis-card";
+import { AiRiskSummaryCard } from "@/app/(app)/_components/ai-risk-summary-card";
 
 export default function AdminDashboard() {
   return (
@@ -18,6 +19,8 @@ export default function AdminDashboard() {
       </div>
 
       <RiskAnalysisCard />
+
+      <AiRiskSummaryCard />
 
       <Card>
         <CardHeader>
