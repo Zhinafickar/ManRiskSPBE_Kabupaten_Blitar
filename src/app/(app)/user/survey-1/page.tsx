@@ -35,9 +35,10 @@ import {
 } from '@/constants/data';
 import { addSurvey } from '@/services/survey-service';
 import { useAuth } from '@/hooks/use-auth';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon, Check, ChevronsUpDown, Sparkles, TrendingDown, TrendingUp, Loader2, RotateCw } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, ChevronsUpDown, Sparkles, TrendingDown, TrendingUp, Loader2, RotateCw, Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import { getRiskLevel, type RiskIndicator } from '@/lib/risk-matrix';
@@ -358,7 +359,42 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                  <FormField control={form.control} name="kontrolTeknologi" render={({ field }) => (<FormItem className="flex flex-col"><FormLabel>Kontrol Teknologi</FormLabel><Popover open={kontrolTeknologiOpen} onOpenChange={setKontrolTeknologiOpen}><PopoverTrigger asChild><FormControl><Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}>{field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol teknologi..."}<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-[--radix-popover-trigger-width] p-0"><Command><CommandInput placeholder="Cari kontrol..." /><CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty><CommandList><CommandGroup>{sortedTechnological.map((item) => (<CommandItem key={item} value={item} onSelect={() => { const value = field.value || []; const newValue = value.includes(item) ? value.filter((i) => i !== item) : [...value, item]; form.setValue("kontrolTeknologi", newValue);}}><Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />{item}</CommandItem>))}</CommandGroup></CommandList></Command></PopoverContent></Popover><FormMessage /></FormItem>)}/>
               </div>
             </div>
-             <FormField control={form.control} name="mitigasi" render={({ field }) => (<FormItem><FormLabel>Mitigasi</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Pilih mitigasi" /></SelectTrigger></FormControl><SelectContent>{MITIGATION_OPTIONS.map((option) => (<SelectItem key={option.name} value={option.name}>{option.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
+             <FormField
+                control={form.control}
+                name="mitigasi"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Mitigasi</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Pilih mitigasi" />
+                        </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                        <TooltipProvider>
+                            {MITIGATION_OPTIONS.map((option) => (
+                            <Tooltip key={option.name} delayDuration={300}>
+                                <TooltipTrigger asChild>
+                                <SelectItem value={option.name} className="w-full">
+                                    <div className="flex items-center justify-between w-full">
+                                    <span>{option.name}</span>
+                                    <Info className="h-4 w-4 text-muted-foreground" />
+                                    </div>
+                                </SelectItem>
+                                </TooltipTrigger>
+                                <TooltipContent side="right" align="start">
+                                <p className="max-w-xs">{option.description}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                            ))}
+                        </TooltipProvider>
+                        </SelectContent>
+                    </Select>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
           </CardContent>
           <CardFooter>
             <Button type="submit" disabled={isLoading}>{isLoading ? 'Mengirim...' : 'Kirim Survei'}</Button>
