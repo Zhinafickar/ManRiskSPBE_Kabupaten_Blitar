@@ -46,7 +46,6 @@ import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { suggestCauseImpact } from '@/ai/flows/suggest-cause-impact';
 import { determineRiskSentiment } from '@/ai/flows/determine-risk-sentiment';
-import { suggestControlsAndMitigation } from '@/ai/flows/suggest-controls-mitigation';
 
 const formSchema = z.object({
   riskEvent: z.string({ required_error: 'Silakan pilih kategori risiko.' }).min(1, { message: 'Kategori risiko harus diisi.' }),
@@ -69,7 +68,6 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
   const { user, userProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isAiLoading, setIsAiLoading] = useState(false);
-  const [isControlsAiLoading, setIsControlsAiLoading] = useState(false);
   const [riskEventOpen, setRiskEventOpen] = useState(false);
   const [impactAreaOpen, setImpactAreaOpen] = useState(false);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
@@ -189,39 +187,6 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
       setIsAiLoading(false);
     }
   };
-
-  const handleControlsSuggestion = async () => {
-    const { riskEvent, impactArea, areaDampak, cause, impact, frequency, impactMagnitude } = form.getValues();
-    if (!riskEvent || !impactArea || !areaDampak || !cause || !impact || !frequency || !impactMagnitude || !riskIndicator.level) {
-      toast({ variant: 'destructive', title: 'Data Kurang', description: 'Harap isi semua detail risiko (termasuk Penyebab, Dampak, Frekuensi, dan Besaran) sebelum meminta saran kontrol.' });
-      return;
-    }
-    setIsControlsAiLoading(true);
-    try {
-      const result = await suggestControlsAndMitigation({
-        riskEvent,
-        impactArea,
-        areaDampak,
-        cause,
-        impact,
-        frequency,
-        impactMagnitude,
-        riskLevel: riskIndicator.level,
-      });
-      form.setValue('kontrolOrganisasi', result.suggestedKontrolOrganisasi, { shouldValidate: true });
-      form.setValue('kontrolOrang', result.suggestedKontrolOrang, { shouldValidate: true });
-      form.setValue('kontrolFisik', result.suggestedKontrolFisik, { shouldValidate: true });
-      form.setValue('kontrolTeknologi', result.suggestedKontrolTeknologi, { shouldValidate: true });
-      form.setValue('mitigasi', result.suggestedMitigasi, { shouldValidate: true });
-      toast({ title: 'Saran Kontrol Diterapkan', description: 'Kontrol kendali dan mitigasi telah diisi oleh AI.' });
-    } catch (error) {
-      console.error("AI Controls Suggestion Error:", error);
-      toast({ variant: 'destructive', title: 'Gagal', description: 'Gagal mendapatkan saran dari AI.' });
-    } finally {
-      setIsControlsAiLoading(false);
-    }
-  };
-
 
   return (
     <Card>
@@ -520,36 +485,23 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                 </div>
             </div>
             <div className="space-y-2 rounded-lg border p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <FormLabel>Kendali Sesuai ISO 27001</FormLabel>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-5 w-5 rounded-full">
-                                <Info className="h-4 w-4 text-muted-foreground" />
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80">
-                            <div className="space-y-2">
-                                <h4 className="font-medium leading-none">Penjelasan Standar</h4>
-                                <p className="text-sm text-muted-foreground">
-                                    <strong>ISO 27001:</strong> Standar internasional untuk sistem manajemen keamanan informasi (SMKI), menyediakan kerangka kerja untuk melindungi aset informasi.
-                                </p>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
-                </div>
-                 <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleControlsSuggestion}
-                    disabled={isControlsAiLoading}
-                    className="h-auto px-2 py-1 text-xs"
-                >
-                    <Sparkles className="mr-1 h-3 w-3" />
-                    {isControlsAiLoading ? 'Menganalisis...' : 'Saran Kontrol & Mitigasi (AI)'}
-                </Button>
+              <div className="flex items-center gap-2">
+                  <FormLabel>Kendali Sesuai ISO 27001</FormLabel>
+                  <Popover>
+                      <PopoverTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-5 w-5 rounded-full">
+                              <Info className="h-4 w-4 text-muted-foreground" />
+                          </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80">
+                          <div className="space-y-2">
+                              <h4 className="font-medium leading-none">Penjelasan Standar</h4>
+                              <p className="text-sm text-muted-foreground">
+                                  <strong>ISO 27001:</strong> Standar internasional untuk sistem manajemen keamanan informasi (SMKI), menyediakan kerangka kerja untuk melindungi aset informasi.
+                              </p>
+                          </div>
+                      </PopoverContent>
+                  </Popover>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                  <FormField
