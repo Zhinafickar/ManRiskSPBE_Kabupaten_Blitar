@@ -37,6 +37,7 @@ import {
   Fingerprint,
   BarChart,
   ListTree,
+  Wrench,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -122,6 +123,15 @@ export function MainNav() {
                     </CollapsibleContent>
                 </Collapsible>
             </SidebarMenuItem>
+
+            <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/dev-ot'} tooltip="Dev Ot">
+                <Link href="/dev-ot">
+                    <Wrench />
+                    <span>Dev Ot</span>
+                </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
         </SidebarMenu>
     )
   }
@@ -203,6 +213,15 @@ export function MainNav() {
                         </SidebarMenuSub>
                     </CollapsibleContent>
                 </Collapsible>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/dev-ot'} tooltip="Dev Ot">
+                <Link href="/dev-ot">
+                    <Wrench />
+                    <span>Dev Ot</span>
+                </Link>
+                </SidebarMenuButton>
             </SidebarMenuItem>
         </SidebarMenu>
     )
