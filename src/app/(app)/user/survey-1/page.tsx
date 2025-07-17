@@ -35,9 +35,9 @@ import {
 } from '@/constants/data';
 import { addSurvey } from '@/services/survey-service';
 import { useAuth } from '@/hooks/use-auth';
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon, Check, ChevronsUpDown, Info, Sparkles, TrendingDown, TrendingUp, Loader2 } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, ChevronsUpDown, Sparkles, TrendingDown, TrendingUp, Loader2, RotateCw } from 'lucide-react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import { getRiskLevel, type RiskIndicator } from '@/lib/risk-matrix';
@@ -47,7 +47,7 @@ import { format } from 'date-fns';
 import { suggestCauseImpact } from '@/ai/flows/suggest-cause-impact';
 import { determineRiskSentiment } from '@/ai/flows/determine-risk-sentiment';
 import { sortRelevantControls } from '@/ai/flows/sort-relevant-controls';
-import { useDebounce } from 'use-debounce';
+import type { SortRelevantControlsInput } from '@/types/controls';
 
 
 const formSchema = z.object({
@@ -112,66 +112,6 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
     },
   });
 
-  const watchedFields = form.watch(['riskEvent', 'impactArea', 'areaDampak', 'cause', 'impact', 'frequency', 'impactMagnitude']);
-  const [debouncedWatchedFields] = useDebounce(watchedFields, 1000);
-
-  const riskContextForAI = useMemo(() => {
-    const [riskEvent, impactArea, areaDampak, cause, impact, frequency, impactMagnitude] = debouncedWatchedFields;
-    const indicator = getRiskLevel(frequency, impactMagnitude);
-    if (riskEvent && impactArea && areaDampak && cause && impact && indicator.level) {
-        return { riskEvent, impactArea, areaDampak, cause, impact, riskLevel: indicator.level };
-    }
-    return null;
-  }, [debouncedWatchedFields]);
-  
-  useEffect(() => {
-    if (!riskContextForAI) {
-        // Reset to default sort order if context is incomplete
-        if (sortedOrganizational.length !== ORGANIZATIONAL_CONTROLS.length) {
-            setSortedOrganizational(ORGANIZATIONAL_CONTROLS);
-            setSortedPeople(PEOPLE_CONTROLS);
-            setSortedPhysical(PHYSICAL_CONTROLS);
-            setSortedTechnological(TECHNOLOGICAL_CONTROLS);
-        }
-        return;
-    };
-    
-    let isCancelled = false;
-    const fetchSortedControls = async () => {
-        setIsAiControlsLoading(true);
-        try {
-            const result = await sortRelevantControls(riskContextForAI);
-            if (!isCancelled) {
-                setSortedOrganizational(result.sortedOrganizational);
-                setSortedPeople(result.sortedPeople);
-                setSortedPhysical(result.sortedPhysical);
-                setSortedTechnological(result.sortedTechnological);
-            }
-        } catch (e) {
-            console.error("Failed to sort controls with AI", e);
-            // On error, reset to default order
-            if (!isCancelled) {
-                setSortedOrganizational(ORGANIZATIONAL_CONTROLS);
-                setSortedPeople(PEOPLE_CONTROLS);
-                setSortedPhysical(PHYSICAL_CONTROLS);
-                setSortedTechnological(TECHNOLOGICAL_CONTROLS);
-            }
-        } finally {
-            if (!isCancelled) {
-                setIsAiControlsLoading(false);
-            }
-        }
-    };
-
-    fetchSortedControls();
-    
-    return () => {
-        isCancelled = true;
-    };
-    
-  }, [riskContextForAI]);
-
-
   const selectedRiskEvent = form.watch('riskEvent');
   const frequency = form.watch('frequency');
   const impactMagnitude = form.watch('impactMagnitude');
@@ -211,6 +151,11 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
         await addSurvey({ ...values, surveyType: 1, userId: user.uid, userRole: userProfile.role, riskLevel: indicator.level ?? undefined });
         toast({ title: 'Sukses', description: 'Survei berhasil dikirim.' });
         form.reset();
+        // Reset controls to default order after submission
+        setSortedOrganizational(ORGANIZATIONAL_CONTROLS);
+        setSortedPeople(PEOPLE_CONTROLS);
+        setSortedPhysical(PHYSICAL_CONTROLS);
+        setSortedTechnological(TECHNOLOGICAL_CONTROLS);
     } catch (error) {
         toast({ variant: 'destructive', title: 'Error', description: 'Gagal mengirim survei.' });
     } finally {
@@ -236,12 +181,38 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
       setIsAiCauseImpactLoading(false);
     }
   };
+  
+  const handleSortControls = async () => {
+      const { riskEvent, impactArea, areaDampak, cause, impact, frequency, impactMagnitude } = form.getValues();
+      const { level: riskLevel } = getRiskLevel(frequency, impactMagnitude);
+
+      if (!riskEvent || !impactArea || !areaDampak || !cause || !impact || !riskLevel) {
+          toast({ variant: 'destructive', title: 'Data Kurang Lengkap', description: 'Harap isi semua kolom identifikasi risiko (sampai besaran dampak) untuk mendapatkan saran penyortiran.' });
+          return;
+      }
+
+      setIsAiControlsLoading(true);
+      try {
+          const result = await sortRelevantControls({ riskEvent, impactArea, areaDampak, cause, impact, riskLevel });
+          setSortedOrganizational(result.sortedOrganizational);
+          setSortedPeople(result.sortedPeople);
+          setSortedPhysical(result.sortedPhysical);
+          setSortedTechnological(result.sortedTechnological);
+          toast({ title: 'Sukses', description: 'Urutan pilihan kontrol telah disesuaikan oleh AI.' });
+      } catch (e) {
+          console.error("Failed to sort controls with AI", e);
+          toast({ variant: 'destructive', title: 'Gagal', description: 'Gagal mendapatkan saran dari AI. Silakan coba lagi.' });
+      } finally {
+          setIsAiControlsLoading(false);
+      }
+  };
+
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Input Kejadian Risiko</CardTitle>
-        <CardDescription>Isi formulir penilaian risiko di bawah ini. Pilihan pada dropdown kontrol akan disortir otomatis oleh AI berdasarkan konteks yang Anda berikan.</CardDescription>
+        <CardDescription>Isi formulir penilaian risiko di bawah ini. Anda dapat meminta AI untuk menyortir pilihan kontrol berdasarkan konteks yang Anda berikan.</CardDescription>
       </CardHeader>
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -366,9 +337,19 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
             </div>
             {/* Controls Section */}
             <div className="space-y-2 rounded-lg border p-4">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between">
                   <FormLabel>Kendali Sesuai ISO 27001</FormLabel>
-                   {isAiControlsLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+                   <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleSortControls}
+                        disabled={isAiControlsLoading}
+                        className="h-auto px-2 py-1 text-xs"
+                    >
+                        {isAiControlsLoading ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <RotateCw className="mr-1 h-3 w-3" />}
+                        {isAiControlsLoading ? 'Menyortir...' : 'Sortir Pilihan dengan AI'}
+                    </Button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                  <FormField control={form.control} name="kontrolOrganisasi" render={({ field }) => (<FormItem className="flex flex-col"><FormLabel>Kontrol Organisasi</FormLabel><Popover open={kontrolOrganisasiOpen} onOpenChange={setKontrolOrganisasiOpen}><PopoverTrigger asChild><FormControl><Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value?.length && "text-muted-foreground")}>{field.value && field.value.length > 0 ? `${field.value.length} terpilih` : "Pilih kontrol organisasi..."}<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-[--radix-popover-trigger-width] p-0"><Command><CommandInput placeholder="Cari kontrol..." /><CommandEmpty>Kontrol tidak ditemukan.</CommandEmpty><CommandList><CommandGroup>{sortedOrganizational.map((item) => (<CommandItem key={item} value={item} onSelect={() => { const value = field.value || []; const newValue = value.includes(item) ? value.filter((i) => i !== item) : [...value, item]; form.setValue("kontrolOrganisasi", newValue);}}><Check className={cn("mr-2 h-4 w-4", field.value?.includes(item) ? "opacity-100" : "opacity-0")} />{item}</CommandItem>))}</CommandGroup></CommandList></Command></PopoverContent></Popover><FormMessage /></FormItem>)}/>
