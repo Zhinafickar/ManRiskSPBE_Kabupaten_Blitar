@@ -24,16 +24,8 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert risk management consultant for a government agency in Indonesia.
 Your task is to provide a concise and practical starting point for a business continuity plan.
 
-You will be given the full details of a specific risk survey and the complete history of all risk surveys submitted to the system.
+You will be given the full details of a specific risk survey, a list of existing plans for that risk, and the complete history of all risk surveys submitted to the system.
 Analyze the given risk in the context of the historical data.
-
-Based on this analysis, suggest a practical recovery activity, a target time, a person in charge (PIC), and the necessary resources.
-
-**Instructions:**
-- **Aktivitas:** Be specific and action-oriented. What is the first critical step to recovery?
-- **Target Waktu:** Be realistic. How long should this activity take? (e.g., "2 Jam", "8 Jam", "1 Hari Kerja").
-- **PIC:** Suggest a department or role, not a specific person's name. (e.g., "Tim Jaringan", "Kepala Dinas").
-- **Sumberdaya:** List the essential resources needed. Be brief.
 
 **Specific Survey Details to Analyze:**
 - Kategori Risiko: {{selectedSurveyDetails.riskEvent}}
@@ -44,6 +36,21 @@ Based on this analysis, suggest a practical recovery activity, a target time, a 
 
 **Historical Survey Data for Context:**
 {{allSurveyData}}
+
+{{#if existingPlans}}
+**IMPORTANT: The user has already created the following plans for this risk:**
+{{#each existingPlans}}
+- {{this}}
+{{/each}}
+**You MUST suggest a NEW and DIFFERENT recovery activity.** Do not repeat any activities from the list above.
+If you cannot think of a new, distinct, and practical recovery activity, you MUST set the 'aktivitas' field to exactly "Tidak ada rencana lain yang terpikirkan".
+{{/if}}
+
+**Instructions:**
+- **Aktivitas:** Be specific and action-oriented. What is the first critical step to recovery?
+- **Target Waktu:** Be realistic. How long should this activity take? (e.g., "2 Jam", "8 Jam", "1 Hari Kerja").
+- **PIC:** Suggest a department or role, not a specific person's name. (e.g., "Tim Jaringan", "Kepala Dinas").
+- **Sumberdaya:** List the essential resources needed. Be brief.
 
 Provide your suggestions in the specified JSON format.`,
 });

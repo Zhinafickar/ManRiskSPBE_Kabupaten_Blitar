@@ -88,6 +88,12 @@ export default function ContinuityPage() {
     setIsAiLoading(true);
 
     try {
+        const currentPlans = form.getValues('plans');
+        // Get a list of non-empty, existing plan activities to provide as context
+        const existingActivities = currentPlans
+            .map(p => p.aktivitas.trim())
+            .filter(a => a.length > 0);
+            
         const suggestion = await suggestContinuityPlan({
             selectedSurveyDetails: {
                 riskEvent: selectedSurvey.riskEvent,
@@ -97,27 +103,35 @@ export default function ContinuityPage() {
                 riskLevel: selectedSurvey.riskLevel || 'N/A'
             },
             allSurveyData: JSON.stringify(allSurveyData),
+            existingPlans: existingActivities,
         });
+        
+        if (suggestion.aktivitas === "Tidak ada rencana lain yang terpikirkan") {
+            toast({
+                title: 'Tidak Ada Saran Baru',
+                description: 'AI tidak dapat menemukan rencana pemulihan baru yang berbeda dari yang sudah ada.',
+            });
+            setIsAiLoading(false);
+            return;
+        }
 
-        const currentPlans = form.getValues('plans');
         const lastPlanIndex = currentPlans.length - 1;
         const lastPlan = currentPlans[lastPlanIndex];
 
-        if (lastPlan && lastPlan.rto && lastPlan.rpo) {
+        // If the last plan is completely empty, fill it. Otherwise, append a new plan.
+        if (lastPlan && !lastPlan.aktivitas && !lastPlan.targetWaktu && !lastPlan.pic && !lastPlan.sumberdaya) {
+             form.setValue(`plans.${lastPlanIndex}.aktivitas`, suggestion.aktivitas, { shouldValidate: true });
+             form.setValue(`plans.${lastPlanIndex}.targetWaktu`, suggestion.targetWaktu, { shouldValidate: true });
+             form.setValue(`plans.${lastPlanIndex}.pic`, suggestion.pic, { shouldValidate: true });
+             form.setValue(`plans.${lastPlanIndex}.sumberdaya`, suggestion.sumberdaya, { shouldValidate: true });
+             toast({ title: 'Saran Diterapkan', description: 'Saran telah diterapkan pada rencana saat ini.' });
+        } else {
             append({
                 ...suggestion,
-                rto: '',
+                rto: '', // RTO and RPO should be filled by user
                 rpo: '',
             });
             toast({ title: 'Saran Baru Ditambahkan', description: 'Saran baru telah ditambahkan sebagai rencana di bawah.' });
-        } else {
-            form.setValue(`plans.${lastPlanIndex}.aktivitas`, suggestion.aktivitas, { shouldValidate: true });
-            form.setValue(`plans.${lastPlanIndex}.targetWaktu`, suggestion.targetWaktu, { shouldValidate: true });
-            form.setValue(`plans.${lastPlanIndex}.pic`, suggestion.pic, { shouldValidate: true });
-            form.setValue(`plans.${lastPlanIndex}.sumberdaya`, suggestion.sumberdaya, { shouldValidate: true });
-            form.setValue(`plans.${lastPlanIndex}.rto`, '', { shouldValidate: true });
-            form.setValue(`plans.${lastPlanIndex}.rpo`, '', { shouldValidate: true });
-            toast({ title: 'Saran Diperbarui', description: 'Saran telah diterapkan pada rencana saat ini.' });
         }
 
     } catch (error) {
