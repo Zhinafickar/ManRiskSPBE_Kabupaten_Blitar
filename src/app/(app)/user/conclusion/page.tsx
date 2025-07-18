@@ -399,11 +399,11 @@ export default function ReportPage() {
                           <TableBody>
                               {surveys.map(s => (
                                   <TableRow key={s.id}>
-                                      <TableCell className="whitespace-normal">{s.riskEvent} - {s.impactArea}</TableCell>
-                                      <TableCell className="whitespace-normal">{(s.kontrolOrganisasi || []).join(',\n') || 'N/A'}</TableCell>
-                                      <TableCell className="whitespace-normal">{(s.kontrolOrang || []).join(',\n') || 'N/A'}</TableCell>
-                                      <TableCell className="whitespace-normal">{(s.kontrolFisik || []).join(',\n') || 'N/A'}</TableCell>
-                                      <TableCell className="whitespace-normal">{(s.kontrolTeknologi || []).join(',\n') || 'N/A'}</TableCell>
+                                      <TableCell className="whitespace-pre-wrap">{s.riskEvent} - {s.impactArea}</TableCell>
+                                      <TableCell className="whitespace-pre-wrap">{(s.kontrolOrganisasi || []).join('\n') || 'N/A'}</TableCell>
+                                      <TableCell className="whitespace-pre-wrap">{(s.kontrolOrang || []).join('\n') || 'N/A'}</TableCell>
+                                      <TableCell className="whitespace-pre-wrap">{(s.kontrolFisik || []).join('\n') || 'N/A'}</TableCell>
+                                      <TableCell className="whitespace-pre-wrap">{(s.kontrolTeknologi || []).join('\n') || 'N/A'}</TableCell>
                                       <TableCell>{s.mitigasi}</TableCell>
                                   </TableRow>
                               ))}
@@ -483,4 +483,5 @@ export default function ReportPage() {
           </div>
       </div>
     );
-}
+
+    
