@@ -179,30 +179,22 @@ export async function verifyAndConsumeToken(name: string, token: string): Promis
     }
 
     const tokensRef = collection(db, "adminTokens");
+    const q = query(tokensRef, where("token", "==", token));
     
     try {
-        // Fetch all documents and filter on the client side to avoid query permission issues for unauthenticated users.
-        // This is acceptable as the number of admin tokens is expected to be small.
-        const querySnapshot = await getDocs(tokensRef);
+        const querySnapshot = await getDocs(q);
 
         if (querySnapshot.empty) {
             return { success: false, message: 'Token tidak valid atau tidak ditemukan.' };
         }
 
-        // Find the token that matches the provided token string.
-        const matchingToken = querySnapshot.docs.find(doc => doc.data().token === token);
-        
-        if (!matchingToken) {
-            return { success: false, message: 'Token tidak valid.' };
-        }
-        
-        const tokenData = matchingToken.data();
+        const tokenDoc = querySnapshot.docs[0];
+        const tokenData = tokenDoc.data();
 
-        // Verify that the name associated with the token also matches.
         if (tokenData.name === name) {
             return { success: true, message: 'Token berhasil diverifikasi.' };
         } else {
-            return { success: false, message: 'Nama atau token tidak valid.' };
+            return { success: false, message: 'Nama yang terkait dengan token ini tidak cocok.' };
         }
 
     } catch (error: any) {
