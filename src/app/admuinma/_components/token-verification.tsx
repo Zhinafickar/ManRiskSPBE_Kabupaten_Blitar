@@ -27,7 +27,7 @@ const formSchema = z.object({
 });
 
 export function TokenVerification() {
-  const { setIsVerified, setAvailableRoles } = useAdminVerification();
+  const { setIsVerified } = useAdminVerification();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -46,7 +46,6 @@ export function TokenVerification() {
                 title: 'Verifikasi Berhasil',
                 description: 'Silakan lanjutkan ke otentikasi admin.',
             });
-            setAvailableRoles(result.availableRoles);
             setIsVerified(true);
         } else {
             toast({
@@ -60,7 +59,7 @@ export function TokenVerification() {
         toast({
             variant: 'destructive',
             title: 'Verifikasi Gagal',
-            description: "Terjadi kesalahan pada server saat verifikasi.",
+            description: "Gagal memeriksa peran atau token.",
         });
     } finally {
         setIsLoading(false);

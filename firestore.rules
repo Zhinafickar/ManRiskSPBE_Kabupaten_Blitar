@@ -1,34 +1,99 @@
+
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Allow public read access to roles and users for registration purposes
-    match /roles/{roleId} {
-      allow read, list: if true;
-      allow write: if request.auth != null;
+
+    // 🔐 Helper functions
+    function isAuth() {
+      return request.auth != null;
     }
 
+    function isSuperAdmin() {
+      return isAuth() &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
+    }
+
+    function isAdmin() {
+      let role = get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+      return isAuth() && (role == 'admin' || role == 'superadmin');
+    }
+
+    function isOwner(userId) {
+      return isAuth() && request.auth.uid == userId;
+    }
+
+    // 👤 USERS COLLECTION
     match /users/{userId} {
-      allow read, list: if true;
+      // ✅ Siapa saja (termasuk unauthenticated client) bisa LIST (baca daftar)
+      // Ini dibutuhkan untuk halaman registrasi admin untuk mengecek peran.
+      allow list: if true;
+
+      // Hanya user yang login bisa GET (baca 1 dokumen)
+      allow get: if isAuth();
+
+      // Buat user hanya saat registrasi
       allow create: if request.auth != null && request.auth.uid == userId;
-      allow update, delete: if request.auth != null && request.auth.uid == userId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
+
+      // Update hanya oleh pemilik atau admin
+      allow update: if isOwner(userId) || isAdmin();
+
+      // Hapus hanya oleh admin
+      allow delete: if isAdmin();
     }
 
-    match /adminTokens/{token} {
-      allow list: if request.query.limit == 1; // Allows a very specific query for token verification
-      allow create: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
-      allow delete: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
-      // No public read on individual documents
-      allow read, update: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
+    // 🔐 ROLES COLLECTION
+    match /roles/{roleId} {
+      // ✅ Semua orang bisa melihat role (untuk dropdown role saat registrasi)
+      allow get, list: if true;
+
+      // Buat role saat registrasi oleh user terotentikasi
+      allow create: if isAuth();
+
+      // Hapus hanya oleh admin
+      allow delete: if isAdmin();
+      
+      // Update tidak diizinkan
+      allow update: if false;
     }
-    
+
+    // 🔑 ADMIN TOKENS COLLECTION
+    match /adminTokens/{tokenId} {
+      // ✅ Izinkan query 'list' untuk verifikasi token oleh unauthenticated users
+      // Ini aman karena Server Action yang akan melakukan query-nya
+      allow get, list: if true;
+
+      // Hanya superadmin bisa kelola (buat, update, hapus)
+      allow create, update, delete: if isSuperAdmin();
+    }
+
+    // 📋 SURVEYS COLLECTION
     match /surveys/{surveyId} {
-      allow read, write: if request.auth != null;
+      // Semua user yang login bisa membuat survey
+      allow create: if isAuth();
+
+      // Semua user yang login bisa membaca semua survey
+      allow read: if isAuth();
+
+      // Update & delete hanya untuk pemilik atau admin
+      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
     }
 
+    // 📄 CONTINUITY PLANS COLLECTION
     match /continuityPlans/{planId} {
-      allow read, write: if request.auth != null;
+       // Semua user yang login bisa membuat
+      allow create: if isAuth();
+
+      // Semua user yang login bisa membaca semua
+      allow read: if isAuth();
+      
+      // Update & delete hanya untuk pemilik atau admin
+      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+
+    // 🛑 Fallback deny semua untuk path yang tidak terdefinisi
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

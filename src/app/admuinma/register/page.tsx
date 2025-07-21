@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -31,6 +31,8 @@ import Image from 'next/image';
 import { TokenVerification } from '../_components/token-verification';
 import { useAdminVerification } from '../_components/admin-verification-context';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { getAllUsers } from '@/services/user-service';
+import { ADMIN_ROLES } from '@/constants/admin-data';
 
 const formSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
@@ -41,14 +43,40 @@ const formSchema = z.object({
   role: z.string({ required_error: 'Please select an admin role.' }).min(1, {message: "Please select an admin role."}),
 });
 
-interface RegisterFormProps {
-    availableAdminRoles: string[];
-}
-
-function RegisterForm({ availableAdminRoles }: RegisterFormProps) {
+function RegisterForm() {
   const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [availableAdminRoles, setAvailableAdminRoles] = useState<string[]>([]);
+  const [rolesLoading, setRolesLoading] = useState(true);
+
+  useEffect(() => {
+    async function checkSuperAdminAndSetRoles() {
+      setRolesLoading(true);
+      try {
+        const users = await getAllUsers();
+        const aSuperAdminExists = users.some(u => u.role === 'superadmin');
+        
+        const roles = aSuperAdminExists
+          ? ADMIN_ROLES.filter(role => role !== 'superadmin')
+          : ADMIN_ROLES;
+        
+        setAvailableAdminRoles(roles);
+      } catch (error) {
+          console.error("Failed to fetch users for role check:", error);
+          toast({
+              variant: 'destructive',
+              title: 'Error',
+              description: 'Gagal memuat peran yang tersedia. Silakan coba lagi.'
+          });
+          // Fallback to only allowing 'admin' role if check fails
+          setAvailableAdminRoles(['admin']);
+      } finally {
+        setRolesLoading(false);
+      }
+    }
+    checkSuperAdminAndSetRoles();
+  }, [toast]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -173,10 +201,10 @@ function RegisterForm({ availableAdminRoles }: RegisterFormProps) {
                     render={({ field }) => (
                         <FormItem>
                         <FormLabel>Admin Role</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value} disabled={rolesLoading}>
                             <FormControl>
                             <SelectTrigger>
-                                <SelectValue placeholder="Select admin role" />
+                                <SelectValue placeholder={rolesLoading ? "Loading roles..." : "Select admin role"} />
                             </SelectTrigger>
                             </FormControl>
                             <SelectContent>
@@ -191,7 +219,7 @@ function RegisterForm({ availableAdminRoles }: RegisterFormProps) {
                         </FormItem>
                     )}
                     />
-                    <Button type="submit" className="w-full" disabled={isLoading}>
+                    <Button type="submit" className="w-full" disabled={isLoading || rolesLoading}>
                     {isLoading ? 'Creating account...' : 'Create Admin Account'}
                     </Button>
                 </form>
@@ -209,11 +237,11 @@ function RegisterForm({ availableAdminRoles }: RegisterFormProps) {
 }
 
 export default function AdminRegisterPage() {
-  const { isVerified, availableRoles } = useAdminVerification();
+  const { isVerified } = useAdminVerification();
 
-  if (!isVerified || !availableRoles) {
+  if (!isVerified) {
     return <TokenVerification />;
   }
 
-  return <RegisterForm availableAdminRoles={availableRoles} />;
+  return <RegisterForm />;
 }

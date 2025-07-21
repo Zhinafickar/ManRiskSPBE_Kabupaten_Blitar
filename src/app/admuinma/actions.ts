@@ -8,7 +8,6 @@ import { ADMIN_ROLES } from '@/constants/admin-data';
 interface VerificationResult {
     success: boolean;
     message: string;
-    availableRoles?: string[];
 }
 
 export async function verifyAdminTokenAction(name: string, token: string): Promise<VerificationResult> {
@@ -33,19 +32,9 @@ export async function verifyAdminTokenAction(name: string, token: string): Promi
             return { success: false, message: 'Nama yang terkait dengan token ini tidak cocok.' };
         }
         
-        // Token and name are valid, now check for available admin roles.
-        const usersRef = collection(db, 'users');
-        const usersSnapshot = await getDocs(usersRef);
-        const superAdminExists = usersSnapshot.docs.some(doc => doc.data().role === 'superadmin');
-
-        const availableRoles = superAdminExists 
-            ? ADMIN_ROLES.filter(role => role !== 'superadmin')
-            : ADMIN_ROLES;
-
         return { 
             success: true, 
             message: 'Token berhasil diverifikasi.',
-            availableRoles: availableRoles
         };
 
     } catch (error: any) {
