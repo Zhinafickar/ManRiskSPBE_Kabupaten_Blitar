@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as XLSX from 'xlsx';
@@ -25,11 +26,11 @@ export const exportToExcel = ({ surveys, continuityPlans, fileName }: ExportPara
     // --- Create Survey Sheet ---
     if (surveys && surveys.length > 0) {
         const surveyDataForSheet = surveys.map(survey => ({
+            'Tanggal Laporan': survey.createdAt ? new Date(survey.createdAt).toLocaleDateString('id-ID') : 'N/A',
             'Peran Pengguna': survey.userRole,
             'Kategori Risiko': survey.riskEvent,
             'Risiko': survey.impactArea,
             'Area Dampak': survey.areaDampak || 'N/A',
-            'Waktu Kejadian': survey.eventDate ? new Date(survey.eventDate).toLocaleDateString('id-ID') : 'N/A',
             'Penyebab': survey.cause || 'N/A',
             'Dampak': survey.impact || 'N/A',
             'Frekuensi': survey.frequency,

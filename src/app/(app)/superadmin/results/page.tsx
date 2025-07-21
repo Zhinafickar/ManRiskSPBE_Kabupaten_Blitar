@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -125,7 +126,6 @@ export default function SuperAdminResultsPage() {
                 <TableHead className="text-primary-foreground">Frequency</TableHead>
                 <TableHead className="text-primary-foreground">Impact</TableHead>
                 <TableHead className="text-primary-foreground">Risk Level</TableHead>
-                <TableHead className="text-primary-foreground">Waktu Kejadian</TableHead>
                 <TableHead className="text-primary-foreground">Mitigasi</TableHead>
                 <TableHead className="text-right text-primary-foreground">Actions</TableHead>
               </TableRow>
@@ -140,7 +140,6 @@ export default function SuperAdminResultsPage() {
                   <TableCell>{survey.frequency}</TableCell>
                   <TableCell>{survey.impactMagnitude}</TableCell>
                    <TableCell><RiskIndicatorBadge level={survey.riskLevel} /></TableCell>
-                   <TableCell>{survey.eventDate ? new Date(survey.eventDate).toLocaleDateString('id-ID') : 'N/A'}</TableCell>
                   <TableCell className="max-w-xs truncate">{survey.mitigasi || 'N/A'}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>

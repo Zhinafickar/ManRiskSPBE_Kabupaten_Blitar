@@ -118,7 +118,6 @@ export default function UserResultsPage() {
                 <TableHead className="text-primary-foreground">Frekuensi</TableHead>
                 <TableHead className="text-primary-foreground">Dampak</TableHead>
                 <TableHead className="text-primary-foreground">Tingkat Risiko</TableHead>
-                <TableHead className="text-primary-foreground">Waktu Kejadian</TableHead>
                 <TableHead className="text-primary-foreground">Mitigasi</TableHead>
                 <TableHead className="text-right text-primary-foreground">Aksi</TableHead>
               </TableRow>
@@ -132,7 +131,6 @@ export default function UserResultsPage() {
                   <TableCell>{survey.frequency}</TableCell>
                   <TableCell>{survey.impactMagnitude}</TableCell>
                   <TableCell><RiskIndicatorBadge level={survey.riskLevel} /></TableCell>
-                  <TableCell>{survey.eventDate ? new Date(survey.eventDate).toLocaleDateString('id-ID') : 'N/A'}</TableCell>
                   <TableCell className="max-w-xs truncate">{survey.mitigasi || 'N/A'}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>

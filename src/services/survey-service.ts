@@ -1,5 +1,5 @@
 import { db, isFirebaseConfigured } from '@/lib/firebase';
-import { collection, getDocs, addDoc, query, where, doc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, query, where, doc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { Survey } from '@/types/survey';
 
 export async function getAllSurveyData() {
@@ -13,13 +13,12 @@ export async function getAllSurveyData() {
       ...data,
       // Ensure timestamps are serializable
       createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : null,
-      eventDate: data.eventDate?.toDate ? data.eventDate.toDate().toISOString() : null
-    };
+    } as Survey;
   });
   return surveyList;
 }
 
-export async function addSurvey(surveyData: Omit<Survey, 'id' | 'createdAt'>) {
+export async function addSurvey(surveyData: Omit<Survey, 'id'>) {
     if (!isFirebaseConfigured || !db) {
         console.error("Firebase not configured, cannot add survey.");
         throw new Error("Firebase not configured");
@@ -27,7 +26,8 @@ export async function addSurvey(surveyData: Omit<Survey, 'id' | 'createdAt'>) {
     const surveysCollection = collection(db, 'surveys');
     await addDoc(surveysCollection, {
         ...surveyData,
-        createdAt: new Date(),
+        // Use the provided date or the server timestamp
+        createdAt: surveyData.createdAt ? new Date(surveyData.createdAt) : serverTimestamp(),
     });
 }
 
@@ -42,7 +42,6 @@ export async function getUserSurveys(userId: string) {
             id: doc.id, 
             ...data,
             createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : null,
-            eventDate: data.eventDate?.toDate ? data.eventDate.toDate().toISOString() : null
         } as Survey;
     });
     return surveyList;

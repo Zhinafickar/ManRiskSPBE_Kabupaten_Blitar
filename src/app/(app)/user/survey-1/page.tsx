@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import {
     RISK_EVENTS,
     FREQUENCY_LEVELS,
@@ -49,13 +49,13 @@ import { suggestCauseImpact } from '@/ai/flows/suggest-cause-impact';
 import { determineRiskSentiment } from '@/ai/flows/determine-risk-sentiment';
 import { sortRelevantControls } from '@/ai/flows/sort-relevant-controls';
 import type { SortRelevantControlsInput } from '@/types/controls';
+import { Switch } from '@/components/ui/switch';
 
 
 const formSchema = z.object({
   riskEvent: z.string({ required_error: 'Silakan pilih kategori risiko.' }).min(1, { message: 'Kategori risiko harus diisi.' }),
   impactArea: z.string({ required_error: 'Silakan pilih risiko.' }).min(1, { message: 'Risiko harus diisi.' }),
   areaDampak: z.string({ required_error: 'Area dampak harus diisi.' }).min(1, { message: 'Area dampak harus diisi.' }),
-  eventDate: z.date({ required_error: 'Waktu kejadian harus diisi.' }),
   cause: z.string().min(10, { message: 'Penyebab harus diisi minimal 10 karakter.' }),
   impact: z.string().min(10, { message: 'Dampak harus diisi minimal 10 karakter.' }),
   frequency: z.string().min(1, { message: "Frekuensi kejadian harus dipilih." }),
@@ -65,6 +65,7 @@ const formSchema = z.object({
   kontrolFisik: z.array(z.string()).optional(),
   kontrolTeknologi: z.array(z.string()).optional(),
   mitigasi: z.string().min(1, { message: "Mitigasi harus dipilih." }),
+  createdAt: z.date().optional(),
 });
 
 export default function Survey1Page({ params, searchParams }: { params: any, searchParams: any}) {
@@ -93,6 +94,8 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
   const [sortedPeople, setSortedPeople] = useState(PEOPLE_CONTROLS);
   const [sortedPhysical, setSortedPhysical] = useState(PHYSICAL_CONTROLS);
   const [sortedTechnological, setSortedTechnological] = useState(TECHNOLOGICAL_CONTROLS);
+  
+  const [isDateManipulationEnabled, setIsDateManipulationEnabled] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -100,7 +103,6 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
       riskEvent: '',
       impactArea: '',
       areaDampak: '',
-      eventDate: undefined,
       cause: '',
       impact: '',
       frequency: '',
@@ -110,6 +112,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
       kontrolFisik: [],
       kontrolTeknologi: [],
       mitigasi: '',
+      createdAt: undefined,
     },
   });
 
@@ -157,6 +160,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
         setSortedPeople(PEOPLE_CONTROLS);
         setSortedPhysical(PHYSICAL_CONTROLS);
         setSortedTechnological(TECHNOLOGICAL_CONTROLS);
+        setIsDateManipulationEnabled(false);
     } catch (error) {
         toast({ variant: 'destructive', title: 'Error', description: 'Gagal mengirim survei.' });
     } finally {
@@ -218,29 +222,37 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="space-y-6">
-            <FormField
-              control={form.control}
-              name="eventDate"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Waktu Kejadian</FormLabel>
-                  <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
-                          {field.value ? format(field.value, "dd/MM/yyyy") : <span>Pilih tanggal</span>}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar mode="single" selected={field.value} onSelect={(date) => { if (date) { field.onChange(date); setDatePickerOpen(false); }}} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} initialFocus />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="space-y-2 rounded-lg border p-4">
+                <div className="flex items-center justify-between">
+                    <FormLabel>Ubah Tanggal Laporan (Opsional)</FormLabel>
+                    <Switch
+                        checked={isDateManipulationEnabled}
+                        onCheckedChange={setIsDateManipulationEnabled}
+                    />
+                </div>
+                <FormField
+                control={form.control}
+                name="createdAt"
+                render={({ field }) => (
+                    <FormItem className="flex flex-col pt-2">
+                    <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+                        <PopoverTrigger asChild>
+                        <FormControl>
+                            <Button variant={"outline"} disabled={!isDateManipulationEnabled} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
+                            {field.value ? format(field.value, "dd/MM/yyyy") : <span>Pilih tanggal</span>}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                        </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar mode="single" selected={field.value} onSelect={(date) => { if (date) { field.onChange(date); setDatePickerOpen(false); }}} disabled={(date) => date > new Date()} initialFocus />
+                        </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+            </div>
             {/* Risk Category and Specific Risk */}
             <FormField
               control={form.control}
