@@ -15,12 +15,13 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
-import { verifyAndConsumeToken, getAllUsers } from '@/services/user-service';
+import { getAllUsers } from '@/services/user-service';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ADMIN_ROLES } from '@/constants/admin-data';
 import { useAdminVerification } from '../_components/admin-verification-context';
+import { verifyAdminTokenAction } from '../actions';
 
 const formSchema = z.object({
   name: z.string().min(1, { message: 'Nama harus diisi.' }),
@@ -40,7 +41,8 @@ export function TokenVerification() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-        const result = await verifyAndConsumeToken(values.name, values.token);
+        const result = await verifyAdminTokenAction(values.name, values.token);
+        
         if (result.success) {
             toast({
                 title: 'Verifikasi Berhasil',

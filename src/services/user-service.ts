@@ -172,36 +172,3 @@ export async function deleteAdminToken(tokenId: string) {
     const tokenRef = doc(db, 'adminTokens', tokenId);
     await deleteDoc(tokenRef);
 }
-
-export async function verifyAndConsumeToken(name: string, token: string): Promise<{ success: boolean; message: string }> {
-    if (!isFirebaseConfigured || !db) {
-        return { success: false, message: 'Layanan tidak tersedia. Silakan coba lagi nanti.' };
-    }
-
-    const tokensRef = collection(db, "adminTokens");
-    const q = query(tokensRef, where("token", "==", token));
-    
-    try {
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.empty) {
-            return { success: false, message: 'Token tidak valid atau tidak ditemukan.' };
-        }
-
-        const tokenDoc = querySnapshot.docs[0];
-        const tokenData = tokenDoc.data();
-
-        if (tokenData.name === name) {
-            return { success: true, message: 'Token berhasil diverifikasi.' };
-        } else {
-            return { success: false, message: 'Nama yang terkait dengan token ini tidak cocok.' };
-        }
-
-    } catch (error: any) {
-        console.error("Error during token verification: ", error);
-        if (error.code === 'permission-denied') {
-             return { success: false, message: 'Terjadi kesalahan: Izin ditolak. Silakan periksa aturan keamanan Firestore Anda.' };
-        }
-        return { success: false, message: 'Terjadi kesalahan saat verifikasi token.' };
-    }
-}
