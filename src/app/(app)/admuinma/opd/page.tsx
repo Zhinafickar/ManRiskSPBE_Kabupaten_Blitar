@@ -6,8 +6,10 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { getAllUsers } from '@/services/user-service';
+import { getAllSurveyData } from '@/services/survey-service';
 import { ROLES } from '@/constants/data';
 import type { UserProfile } from '@/types/user';
+import type { Survey } from '@/types/survey';
 import { Building, Search, FileDown } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -31,26 +33,63 @@ function OPDTableSkeleton() {
     );
 }
 
+type DepartmentStatus = 'Kosong' | 'Ada User' | 'User Menginput';
+
+function StatusBadge({ status }: { status: DepartmentStatus }) {
+    switch (status) {
+        case 'User Menginput':
+            return <Badge className="bg-green-100 text-green-800 border-green-200 hover:bg-green-200">User Menginput</Badge>;
+        case 'Ada User':
+            return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200">Ada User</Badge>;
+        case 'Kosong':
+            return <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-200 hover:bg-red-200">Kosong</Badge>;
+        default:
+            return <Badge variant="outline">N/A</Badge>;
+    }
+}
+
+
 export default function OPDPage() {
     const { userProfile } = useAuth();
     const [users, setUsers] = useState<UserProfile[]>([]);
+    const [surveys, setSurveys] = useState<Survey[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
 
     useEffect(() => {
-        getAllUsers()
-            .then(setUsers)
-            .finally(() => setLoading(false));
+        Promise.all([
+            getAllUsers(),
+            getAllSurveyData()
+        ]).then(([userResults, surveyResults]) => {
+            setUsers(userResults);
+            setSurveys(surveyResults);
+        }).finally(() => setLoading(false));
     }, []);
 
     const filteredDepartments = useMemo(() => {
         const assignedRoles = new Set(users.map(user => user.role));
+        const rolesWithSurveys = new Set(surveys.map(survey => survey.userRole));
         
-        const allDepartments = ROLES.filter(role => role !== 'Penguji Coba').map(role => ({
-            name: role,
-            isTaken: assignedRoles.has(role)
-        })).sort((a, b) => a.name.localeCompare(b.name));
+        const allDepartments = ROLES.filter(role => role !== 'Penguji Coba').map(role => {
+            let status: DepartmentStatus;
+            const isTaken = assignedRoles.has(role);
+            const hasInput = rolesWithSurveys.has(role);
+
+            if (isTaken && hasInput) {
+                status = 'User Menginput';
+            } else if (isTaken) {
+                status = 'Ada User';
+            } else {
+                status = 'Kosong';
+            }
+            
+            return {
+                name: role,
+                isTaken,
+                status
+            }
+        }).sort((a, b) => a.name.localeCompare(b.name));
 
         if (!searchTerm) {
             return allDepartments;
@@ -60,18 +99,18 @@ export default function OPDPage() {
             dept.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
 
-    }, [users, searchTerm]);
+    }, [users, surveys, searchTerm]);
     
     const handleExport = () => {
         const dataForSheet = filteredDepartments.map(dept => ({
             'OPD': dept.name,
-            'Status': dept.isTaken ? 'Terisi' : 'Kosong',
+            'Status': dept.status,
         }));
 
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(dataForSheet);
 
-        ws['!cols'] = [{ wch: 60 }, { wch: 15 }];
+        ws['!cols'] = [{ wch: 60 }, { wch: 20 }];
 
         XLSX.utils.book_append_sheet(wb, ws, 'Status OPD');
         XLSX.writeFile(wb, `${userProfile?.role}_Status_OPD.xlsx`);
@@ -133,11 +172,7 @@ export default function OPDPage() {
                                                         </Button>
                                                     </TableCell>
                                                     <TableCell className="text-right">
-                                                        {dept.isTaken ? (
-                                                            <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200 hover:bg-green-200">Terisi</Badge>
-                                                        ) : (
-                                                            <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-200 hover:bg-red-200">Kosong</Badge>
-                                                        )}
+                                                       <StatusBadge status={dept.status} />
                                                     </TableCell>
                                                 </TableRow>
                                             ))
