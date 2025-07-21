@@ -6,13 +6,6 @@ import type { Survey } from '@/types/survey';
 import type { ContinuityPlan } from '@/types/continuity';
 import type { UserProfile } from '@/types/user';
 
-const riskLevelColors: { [key: string]: string } = {
-    'Bahaya': 'DC2626',   // red-600
-    'Sedang': 'EAB308',   // yellow-500
-    'Rendah': '16A34A',   // green-600
-    'Minor':  '2563EB',   // blue-600
-};
-
 interface ExportParams {
     surveys: Survey[];
     continuityPlans: ContinuityPlan[];
@@ -20,88 +13,83 @@ interface ExportParams {
     userProfile: UserProfile | null;
 }
 
+const createSheetWithHeader = (
+    workbook: XLSX.WorkBook,
+    sheetName: string,
+    data: any[],
+    headers: string[],
+    userProfile: UserProfile | null
+) => {
+    // Create an empty worksheet with just the data headers to establish columns
+    const ws = XLSX.utils.json_to_sheet([], { header: headers });
+
+    // --- Header Section ---
+    const today = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+    const opdName = userProfile?.role || 'N/A';
+    const userName = userProfile?.fullName || 'N/A';
+
+    const headerRows = [
+        ['Laporan Manajemen Risiko'],
+        ['Kabupaten Blitar'],
+        [`Organisasi Perangkat Daerah (OPD): ${opdName}`],
+        [], // Spacer row
+        ['Nama Penginput:', userName],
+        ['Tanggal Laporan:', today]
+    ];
+    
+    // Add the header rows to the worksheet starting from cell A1
+    XLSX.utils.sheet_add_aoa(ws, headerRows, { origin: 'A1' });
+
+    // Merge cells for the main titles to make them span across the table width
+    ws['!merges'] = [
+        { s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } },
+        { s: { r: 1, c: 0 }, e: { r: 1, c: headers.length - 1 } },
+        { s: { r: 2, c: 0 }, e: { r: 2, c: headers.length - 1 } },
+    ];
+    
+    // --- Data Section ---
+    // Add the actual JSON data to the sheet, starting after the header block (at row 8, which is A8)
+    XLSX.utils.sheet_add_json(ws, data, { origin: 'A8', skipHeader: true });
+
+    // --- Styling and Formatting ---
+    const colWidths = headers.map((header, i) => {
+        const keyName = Object.keys(data[0] || {})[i] || '';
+        const headerLength = header.length;
+        const dataLengths = data.map(row => {
+            const value = (row as any)[keyName];
+            if (typeof value === 'string' && value.includes('\n')) {
+                // For multiline strings, get the length of the longest line
+                return Math.max(...value.split('\n').map(line => line.length));
+            }
+            return (value?.toString() || "").length;
+        });
+
+        return {
+            wch: Math.min(Math.max(...dataLengths, headerLength) + 2, 80) // Set a max width of 80
+        };
+    });
+    ws['!cols'] = colWidths;
+
+    // Iterate over all cells to apply word wrap
+    const range = XLSX.utils.decode_range(ws['!ref']!);
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+        for (let C = range.s.c; C <= range.e.c; ++C) {
+            const cell_address = { c: C, r: R };
+            const cell_ref = XLSX.utils.encode_cell(cell_address);
+            if (ws[cell_ref]) {
+                ws[cell_ref].s = { ...ws[cell_ref].s, alignment: { wrapText: true, vertical: 'top' } };
+            }
+        }
+    }
+    
+    // Append the finished worksheet to the workbook
+    XLSX.utils.book_append_sheet(workbook, ws, sheetName);
+    return ws; // Return worksheet for further modification if needed
+};
+
+
 export const exportToExcel = ({ surveys, continuityPlans, fileName, userProfile }: ExportParams) => {
     const wb = XLSX.utils.book_new();
-
-    const addSheetWithHeader = (
-        workbook: XLSX.WorkBook,
-        sheetName: string,
-        data: any[],
-        headers: string[]
-    ) => {
-        const ws = XLSX.utils.json_to_sheet([], { header: headers });
-
-        // --- Header Section ---
-        const today = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
-        const opdName = userProfile?.role || 'N/A';
-        const userName = userProfile?.fullName || 'N/A';
-
-        const headerRows = [
-            ['Laporan Manajemen Risiko'],
-            ['Kabupaten Blitar'],
-            [`Organisasi Perangkat Daerah (OPD): ${opdName}`],
-            [], // Spacer row
-            ['Nama Penginput:', userName],
-            ['Tanggal Laporan:', today]
-        ];
-        
-        XLSX.utils.sheet_add_aoa(ws, headerRows, { origin: 'A1' });
-
-        // Merge cells for main titles
-        ws['!merges'] = [
-            { s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } },
-            { s: { r: 1, c: 0 }, e: { r: 1, c: headers.length - 1 } },
-            { s: { r: 2, c: 0 }, e: { r: 2, c: headers.length - 1 } },
-        ];
-
-        // Apply bold style to headers
-        for (let i = 1; i <= 6; i++) {
-            const cellA = ws[`A${i}`];
-            if (cellA) {
-                cellA.s = { font: { bold: true } };
-            }
-            if (i <= 3) {
-                 if (cellA) cellA.s.alignment = { horizontal: 'center' };
-            }
-        }
-        
-        // --- Data Section ---
-        XLSX.utils.sheet_add_json(ws, data, { origin: 'A8', skipHeader: true });
-        
-        // Set column widths and styles
-        const colWidths = headers.map((key, i) => {
-             const keyName = Object.keys(data[0] || {})[i] || '';
-             const headerLength = key.length;
-             const dataLengths = data.map(row => {
-                const value = (row as any)[keyName];
-                if (typeof value === 'string' && value.includes('\n')) {
-                    // For multiline strings, get the length of the longest line
-                    return Math.max(...value.split('\n').map(line => line.length));
-                }
-                return (value?.toString() || "").length;
-             });
-
-            return {
-                wch: Math.min(Math.max(...dataLengths, headerLength) + 2, 80)
-            };
-        });
-        ws['!cols'] = colWidths;
-        
-        // Wrap text for all cells
-        for (let R = 0; R < (ws['!ref'] ? XLSX.utils.decode_range(ws['!ref']).e.r : 0) + 1; ++R) {
-             for (let C = 0; C < (ws['!ref'] ? XLSX.utils.decode_range(ws['!ref']).e.c : 0) + 1; ++C) {
-                const cell_address = {c:C, r:R};
-                const cell_ref = XLSX.utils.encode_cell(cell_address);
-                if (ws[cell_ref]) {
-                    ws[cell_ref].s = { ...ws[cell_ref].s, alignment: { wrapText: true, vertical: 'top' } };
-                }
-            }
-        }
-        
-        XLSX.utils.book_append_sheet(workbook, ws, sheetName);
-        return ws;
-    };
-
 
     if (surveys && surveys.length > 0) {
         const surveyHeaders = [
@@ -128,22 +116,7 @@ export const exportToExcel = ({ surveys, continuityPlans, fileName, userProfile 
             mitigasi: survey.mitigasi || 'N/A',
         }));
 
-        const wsSurveys = addSheetWithHeader(wb, 'Hasil Survei', surveyDataForSheet, surveyHeaders);
-
-        const riskLevelColIndex = 9; // 'J' corresponds to Tingkat Risiko
-        surveyDataForSheet.forEach((row, index) => {
-            const riskLevel = row.riskLevel;
-            if (riskLevel && riskLevelColors[riskLevel]) {
-                const cellAddress = XLSX.utils.encode_cell({c: riskLevelColIndex, r: index + 7});
-                if (wsSurveys[cellAddress]) {
-                    wsSurveys[cellAddress].s = {
-                        ...wsSurveys[cellAddress].s,
-                        fill: { fgColor: { rgb: riskLevelColors[riskLevel] } },
-                        font: { color: { rgb: riskLevel === 'Sedang' ? "000000" : "FFFFFF" } }
-                    };
-                }
-            }
-        });
+        createSheetWithHeader(wb, 'Hasil Survei', surveyDataForSheet, surveyHeaders, userProfile);
     }
 
     if (continuityPlans && continuityPlans.length > 0) {
@@ -163,7 +136,7 @@ export const exportToExcel = ({ surveys, continuityPlans, fileName, userProfile 
             createdAt: new Date(plan.createdAt).toLocaleString('id-ID'),
         }));
         
-        addSheetWithHeader(wb, 'Rencana Kontinuitas', planDataForSheet, planHeaders);
+        createSheetWithHeader(wb, 'Rencana Kontinuitas', planDataForSheet, planHeaders, userProfile);
     }
     
     if (wb.SheetNames.length > 0) {
