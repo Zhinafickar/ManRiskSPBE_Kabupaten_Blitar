@@ -15,10 +15,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
-import { verifyAndConsumeToken } from '@/services/user-service';
+import { verifyAndConsumeToken, getAllUsers } from '@/services/user-service';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ADMIN_ROLES } from '@/constants/admin-data';
 
 const formSchema = z.object({
   name: z.string().min(1, { message: 'Nama harus diisi.' }),
@@ -26,7 +27,7 @@ const formSchema = z.object({
 });
 
 interface TokenVerificationProps {
-  onVerified: () => void;
+  onVerified: (availableRoles: string[]) => void;
 }
 
 export function TokenVerification({ onVerified }: TokenVerificationProps) {
@@ -40,20 +41,41 @@ export function TokenVerification({ onVerified }: TokenVerificationProps) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    const result = await verifyAndConsumeToken(values.name, values.token);
-    if (result.success) {
-      toast({
-        title: 'Verifikasi Berhasil',
-        description: 'Silakan lanjutkan ke otentikasi admin.',
-      });
-      onVerified();
-    } else {
-      toast({
-        variant: 'destructive',
-        title: 'Verifikasi Gagal',
-        description: result.message,
-      });
-      setIsLoading(false);
+    try {
+        // First, check for available roles
+        const users = await getAllUsers();
+        const superAdminExists = users.some(user => user.role === 'superadmin');
+        let availableRoles: string[];
+        if (superAdminExists) {
+            availableRoles = ADMIN_ROLES.filter(role => role !== 'superadmin');
+        } else {
+            availableRoles = ADMIN_ROLES;
+        }
+
+        // Then, verify the token
+        const result = await verifyAndConsumeToken(values.name, values.token);
+        if (result.success) {
+            toast({
+                title: 'Verifikasi Berhasil',
+                description: 'Silakan lanjutkan ke otentikasi admin.',
+            });
+            onVerified(availableRoles);
+        } else {
+            toast({
+                variant: 'destructive',
+                title: 'Verifikasi Gagal',
+                description: result.message,
+            });
+            setIsLoading(false);
+        }
+    } catch (error) {
+        console.error("Error during verification process:", error);
+        toast({
+            variant: 'destructive',
+            title: 'Verifikasi Gagal',
+            description: "Terjadi kesalahan saat memeriksa peran atau token. Pastikan aturan Firestore memperbolehkan pembacaan untuk pengguna yang tidak terautentikasi.",
+        });
+        setIsLoading(false);
     }
   }
 

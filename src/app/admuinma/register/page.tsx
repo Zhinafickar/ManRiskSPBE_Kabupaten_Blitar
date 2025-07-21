@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -28,10 +28,8 @@ import { createUserWithEmailAndPassword, sendEmailVerification, signOut } from '
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import Image from 'next/image';
-import { ADMIN_ROLES } from '@/constants/admin-data';
 import { TokenVerification } from '../_components/token-verification';
 import { useAdminVerification } from '../_components/admin-verification-context';
-import { getAllUsers } from '@/services/user-service';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 const formSchema = z.object({
@@ -43,27 +41,14 @@ const formSchema = z.object({
   role: z.string({ required_error: 'Please select an admin role.' }).min(1, {message: "Please select an admin role."}),
 });
 
-function RegisterForm() {
+interface RegisterFormProps {
+    availableAdminRoles: string[];
+}
+
+function RegisterForm({ availableAdminRoles }: RegisterFormProps) {
   const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [availableAdminRoles, setAvailableAdminRoles] = useState<string[]>([]);
-  const [rolesLoading, setRolesLoading] = useState(true);
-
-  useEffect(() => {
-    async function checkSuperAdmin() {
-        setRolesLoading(true);
-        const users = await getAllUsers();
-        const superAdminExists = users.some(user => user.role === 'superadmin');
-        if (superAdminExists) {
-            setAvailableAdminRoles(ADMIN_ROLES.filter(role => role !== 'superadmin'));
-        } else {
-            setAvailableAdminRoles(ADMIN_ROLES);
-        }
-        setRolesLoading(false);
-    }
-    checkSuperAdmin();
-  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -188,10 +173,10 @@ function RegisterForm() {
                     render={({ field }) => (
                         <FormItem>
                         <FormLabel>Admin Role</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value} disabled={rolesLoading}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                             <SelectTrigger>
-                                <SelectValue placeholder={rolesLoading ? "Loading roles..." : "Select admin role"} />
+                                <SelectValue placeholder="Select admin role" />
                             </SelectTrigger>
                             </FormControl>
                             <SelectContent>
@@ -206,7 +191,7 @@ function RegisterForm() {
                         </FormItem>
                     )}
                     />
-                    <Button type="submit" className="w-full" disabled={isLoading || rolesLoading}>
+                    <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? 'Creating account...' : 'Create Admin Account'}
                     </Button>
                 </form>
@@ -225,10 +210,16 @@ function RegisterForm() {
 
 export default function AdminRegisterPage() {
   const { isVerified, setIsVerified } = useAdminVerification();
+  const [availableRoles, setAvailableRoles] = useState<string[] | null>(null);
 
-  if (!isVerified) {
-    return <TokenVerification onVerified={() => setIsVerified(true)} />;
+  const handleVerificationSuccess = (roles: string[]) => {
+      setAvailableRoles(roles);
+      setIsVerified(true);
   }
 
-  return <RegisterForm />;
+  if (!isVerified) {
+    return <TokenVerification onVerified={handleVerificationSuccess} />;
+  }
+
+  return <RegisterForm availableAdminRoles={availableRoles!} />;
 }
