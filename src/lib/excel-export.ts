@@ -4,8 +4,8 @@
 import * as XLSX from 'xlsx';
 import type { Survey } from '@/types/survey';
 import type { ContinuityPlan } from '@/types/continuity';
+import type { UserProfile } from '@/types/user';
 
-// Corresponds to the colors used in RiskIndicatorBadge
 const riskLevelColors: { [key: string]: string } = {
     'Bahaya': 'DC2626',   // red-600
     'Sedang': 'EAB308',   // yellow-500
@@ -17,84 +17,155 @@ interface ExportParams {
     surveys: Survey[];
     continuityPlans: ContinuityPlan[];
     fileName: string;
+    userProfile: UserProfile | null;
 }
 
-export const exportToExcel = ({ surveys, continuityPlans, fileName }: ExportParams) => {
-    // Create a new workbook
+export const exportToExcel = ({ surveys, continuityPlans, fileName, userProfile }: ExportParams) => {
     const wb = XLSX.utils.book_new();
 
-    // --- Create Survey Sheet ---
+    const addSheetWithHeader = (
+        workbook: XLSX.WorkBook,
+        sheetName: string,
+        data: any[],
+        headers: string[]
+    ) => {
+        const ws = XLSX.utils.json_to_sheet([], { header: headers });
+
+        // --- Header Section ---
+        const today = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+        const opdName = userProfile?.role || 'N/A';
+        const userName = userProfile?.fullName || 'N/A';
+
+        const headerRows = [
+            ['Laporan Manajemen Risiko'],
+            ['Kabupaten Blitar'],
+            [`Organisasi Perangkat Daerah (OPD): ${opdName}`],
+            [], // Spacer row
+            ['Nama Penginput:', userName],
+            ['Tanggal Laporan:', today]
+        ];
+        
+        XLSX.utils.sheet_add_aoa(ws, headerRows, { origin: 'A1' });
+
+        // Merge cells for main titles
+        ws['!merges'] = [
+            { s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } },
+            { s: { r: 1, c: 0 }, e: { r: 1, c: headers.length - 1 } },
+            { s: { r: 2, c: 0 }, e: { r: 2, c: headers.length - 1 } },
+        ];
+
+        // Apply bold style to headers
+        for (let i = 1; i <= 6; i++) {
+            const cellA = ws[`A${i}`];
+            if (cellA) {
+                cellA.s = { font: { bold: true } };
+            }
+            if (i <= 3) {
+                 if (cellA) cellA.s.alignment = { horizontal: 'center' };
+            }
+        }
+        
+        // --- Data Section ---
+        XLSX.utils.sheet_add_json(ws, data, { origin: 'A8', skipHeader: true });
+        
+        // Set column widths and styles
+        const colWidths = headers.map((key, i) => {
+             const keyName = Object.keys(data[0] || {})[i] || '';
+             const headerLength = key.length;
+             const dataLengths = data.map(row => {
+                const value = (row as any)[keyName];
+                if (typeof value === 'string' && value.includes('\n')) {
+                    // For multiline strings, get the length of the longest line
+                    return Math.max(...value.split('\n').map(line => line.length));
+                }
+                return (value?.toString() || "").length;
+             });
+
+            return {
+                wch: Math.min(Math.max(...dataLengths, headerLength) + 2, 80)
+            };
+        });
+        ws['!cols'] = colWidths;
+        
+        // Wrap text for all cells
+        for (let R = 0; R < (ws['!ref'] ? XLSX.utils.decode_range(ws['!ref']).e.r : 0) + 1; ++R) {
+             for (let C = 0; C < (ws['!ref'] ? XLSX.utils.decode_range(ws['!ref']).e.c : 0) + 1; ++C) {
+                const cell_address = {c:C, r:R};
+                const cell_ref = XLSX.utils.encode_cell(cell_address);
+                if (ws[cell_ref]) {
+                    ws[cell_ref].s = { ...ws[cell_ref].s, alignment: { wrapText: true, vertical: 'top' } };
+                }
+            }
+        }
+        
+        XLSX.utils.book_append_sheet(workbook, ws, sheetName);
+        return ws;
+    };
+
+
     if (surveys && surveys.length > 0) {
+        const surveyHeaders = [
+            'Tanggal Laporan', 'Peran Pengguna', 'Kategori Risiko', 'Risiko',
+            'Area Dampak', 'Penyebab', 'Dampak', 'Frekuensi', 'Besaran Dampak',
+            'Tingkat Risiko', 'Kontrol Organisasi', 'Kontrol Orang', 'Kontrol Fisik',
+            'Kontrol Teknologi', 'Mitigasi'
+        ];
         const surveyDataForSheet = surveys.map(survey => ({
-            'Tanggal Laporan': survey.createdAt ? new Date(survey.createdAt).toLocaleDateString('id-ID') : 'N/A',
-            'Peran Pengguna': survey.userRole,
-            'Kategori Risiko': survey.riskEvent,
-            'Risiko': survey.impactArea,
-            'Area Dampak': survey.areaDampak || 'N/A',
-            'Penyebab': survey.cause || 'N/A',
-            'Dampak': survey.impact || 'N/A',
-            'Frekuensi': survey.frequency,
-            'Besaran Dampak': survey.impactMagnitude,
-            'Tingkat Risiko': survey.riskLevel || 'N/A',
-            'Kontrol Organisasi': survey.kontrolOrganisasi?.join('; ') || 'N/A',
-            'Kontrol Orang': survey.kontrolOrang?.join('; ') || 'N/A',
-            'Kontrol Fisik': survey.kontrolFisik?.join('; ') || 'N/A',
-            'Kontrol Teknologi': survey.kontrolTeknologi?.join('; ') || 'N/A',
-            'Mitigasi': survey.mitigasi || 'N/A',
+            createdAt: survey.createdAt ? new Date(survey.createdAt).toLocaleDateString('id-ID') : 'N/A',
+            userRole: survey.userRole,
+            riskEvent: survey.riskEvent,
+            impactArea: survey.impactArea,
+            areaDampak: survey.areaDampak || 'N/A',
+            cause: survey.cause || 'N/A',
+            impact: survey.impact || 'N/A',
+            frequency: survey.frequency,
+            impactMagnitude: survey.impactMagnitude,
+            riskLevel: survey.riskLevel || 'N/A',
+            kontrolOrganisasi: survey.kontrolOrganisasi?.join('\n') || 'N/A',
+            kontrolOrang: survey.kontrolOrang?.join('\n') || 'N/A',
+            kontrolFisik: survey.kontrolFisik?.join('\n') || 'N/A',
+            kontrolTeknologi: survey.kontrolTeknologi?.join('\n') || 'N/A',
+            mitigasi: survey.mitigasi || 'N/A',
         }));
 
-        const wsSurveys = XLSX.utils.json_to_sheet(surveyDataForSheet);
+        const wsSurveys = addSheetWithHeader(wb, 'Hasil Survei', surveyDataForSheet, surveyHeaders);
 
-        // Apply styles to the 'Tingkat Risiko' column
-        const riskLevelColIndex = 'J'; // Corresponds to 'Tingkat Risiko'
+        const riskLevelColIndex = 9; // 'J' corresponds to Tingkat Risiko
         surveyDataForSheet.forEach((row, index) => {
-            const riskLevel = row['Tingkat Risiko'];
+            const riskLevel = row.riskLevel;
             if (riskLevel && riskLevelColors[riskLevel]) {
-                const cellAddress = `${riskLevelColIndex}${index + 2}`; // +2 because of header row and 1-based indexing
+                const cellAddress = XLSX.utils.encode_cell({c: riskLevelColIndex, r: index + 7});
                 if (wsSurveys[cellAddress]) {
                     wsSurveys[cellAddress].s = {
+                        ...wsSurveys[cellAddress].s,
                         fill: { fgColor: { rgb: riskLevelColors[riskLevel] } },
                         font: { color: { rgb: riskLevel === 'Sedang' ? "000000" : "FFFFFF" } }
                     };
                 }
             }
         });
-
-        // Auto-fit columns for survey sheet
-        const surveyColWidths = Object.keys(surveyDataForSheet[0]).map(key => ({
-            wch: Math.min(Math.max(...surveyDataForSheet.map(row => ((row as any)[key]?.toString() || "").length), key.length) + 2, 80)
-        }));
-        wsSurveys['!cols'] = surveyColWidths;
-
-        XLSX.utils.book_append_sheet(wb, wsSurveys, 'Hasil Survei');
     }
 
-    // --- Create Continuity Plan Sheet ---
     if (continuityPlans && continuityPlans.length > 0) {
+        const planHeaders = [
+            'Peran Pengguna', 'Risiko', 'Aktivitas', 'Target Waktu', 'PIC', 
+            'Sumberdaya', 'RTO', 'RPO', 'Tanggal Dibuat'
+        ];
         const planDataForSheet = continuityPlans.map(plan => ({
-            'Peran Pengguna': plan.userRole,
-            'Risiko': plan.risiko,
-            'Aktivitas': plan.aktivitas,
-            'Target Waktu': plan.targetWaktu,
-            'PIC': plan.pic,
-            'Sumberdaya': plan.sumberdaya,
-            'RTO': plan.rto,
-            'RPO': plan.rpo,
-            'Tanggal Dibuat': new Date(plan.createdAt).toLocaleString('id-ID'),
+            userRole: plan.userRole,
+            risiko: plan.risiko,
+            aktivitas: plan.aktivitas,
+            targetWaktu: plan.targetWaktu,
+            pic: plan.pic,
+            sumberdaya: plan.sumberdaya,
+            rto: plan.rto,
+            rpo: plan.rpo,
+            createdAt: new Date(plan.createdAt).toLocaleString('id-ID'),
         }));
-
-        const wsPlans = XLSX.utils.json_to_sheet(planDataForSheet);
-
-        // Auto-fit columns for continuity plan sheet
-        const planColWidths = Object.keys(planDataForSheet[0]).map(key => ({
-            wch: Math.min(Math.max(...planDataForSheet.map(row => ((row as any)[key]?.toString() || "").length), key.length) + 2, 80)
-        }));
-        wsPlans['!cols'] = planColWidths;
-
-        XLSX.utils.book_append_sheet(wb, wsPlans, 'Rencana Kontinuitas');
+        
+        addSheetWithHeader(wb, 'Rencana Kontinuitas', planDataForSheet, planHeaders);
     }
     
-    // Write the workbook and trigger download only if there's at least one sheet
     if (wb.SheetNames.length > 0) {
         XLSX.writeFile(wb, `${fileName}.xlsx`);
     } else {

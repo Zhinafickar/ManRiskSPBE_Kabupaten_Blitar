@@ -84,7 +84,7 @@ export default function UserResultsPage() {
   const handleExport = () => {
     if (!userProfile) return;
     const fileName = `${userProfile.role}_Hasil_Management_Risiko`;
-    exportToExcel({ surveys, continuityPlans, fileName });
+    exportToExcel({ surveys, continuityPlans, fileName, userProfile });
   };
 
   const surveysAvailable = surveys.length > 0;

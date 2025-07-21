@@ -95,7 +95,7 @@ export default function AdminResultsPage() {
   const handleExport = () => {
     const roleName = userProfile?.role || 'Admin';
     const fileName = `${roleName}_Hasil_Management_Risiko`;
-    exportToExcel({ surveys, continuityPlans, fileName });
+    exportToExcel({ surveys, continuityPlans, fileName, userProfile });
   };
 
   const surveysAvailable = surveys.length > 0;

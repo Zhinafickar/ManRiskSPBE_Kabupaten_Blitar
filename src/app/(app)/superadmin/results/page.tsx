@@ -95,7 +95,7 @@ export default function SuperAdminResultsPage() {
   const handleExport = () => {
     const roleName = userProfile?.role || 'SuperAdmin';
     const fileName = `${roleName}_Hasil_Management_Risiko`;
-    exportToExcel({ surveys, continuityPlans, fileName });
+    exportToExcel({ surveys, continuityPlans, fileName, userProfile });
   };
 
   const surveysAvailable = surveys.length > 0;
