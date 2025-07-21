@@ -209,17 +209,11 @@ function RegisterForm({ availableAdminRoles }: RegisterFormProps) {
 }
 
 export default function AdminRegisterPage() {
-  const { isVerified, setIsVerified } = useAdminVerification();
-  const [availableRoles, setAvailableRoles] = useState<string[] | null>(null);
+  const { isVerified, availableRoles } = useAdminVerification();
 
-  const handleVerificationSuccess = (roles: string[]) => {
-      setAvailableRoles(roles);
-      setIsVerified(true);
+  if (!isVerified || !availableRoles) {
+    return <TokenVerification />;
   }
 
-  if (!isVerified) {
-    return <TokenVerification onVerified={handleVerificationSuccess} />;
-  }
-
-  return <RegisterForm availableAdminRoles={availableRoles!} />;
+  return <RegisterForm availableAdminRoles={availableRoles} />;
 }

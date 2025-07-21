@@ -20,17 +20,15 @@ import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ADMIN_ROLES } from '@/constants/admin-data';
+import { useAdminVerification } from '../_components/admin-verification-context';
 
 const formSchema = z.object({
   name: z.string().min(1, { message: 'Nama harus diisi.' }),
   token: z.string().min(1, { message: 'Token harus diisi.' }),
 });
 
-interface TokenVerificationProps {
-  onVerified: (availableRoles: string[]) => void;
-}
-
-export function TokenVerification({ onVerified }: TokenVerificationProps) {
+export function TokenVerification() {
+  const { setIsVerified, setAvailableRoles } = useAdminVerification();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -42,24 +40,24 @@ export function TokenVerification({ onVerified }: TokenVerificationProps) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-        // First, check for available roles
-        const users = await getAllUsers();
-        const superAdminExists = users.some(user => user.role === 'superadmin');
-        let availableRoles: string[];
-        if (superAdminExists) {
-            availableRoles = ADMIN_ROLES.filter(role => role !== 'superadmin');
-        } else {
-            availableRoles = ADMIN_ROLES;
-        }
-
-        // Then, verify the token
         const result = await verifyAndConsumeToken(values.name, values.token);
         if (result.success) {
             toast({
                 title: 'Verifikasi Berhasil',
                 description: 'Silakan lanjutkan ke otentikasi admin.',
             });
-            onVerified(availableRoles);
+            
+            // Check for available roles only AFTER successful token verification
+            const users = await getAllUsers();
+            const superAdminExists = users.some(user => user.role === 'superadmin');
+            
+            if (superAdminExists) {
+                setAvailableRoles(ADMIN_ROLES.filter(role => role !== 'superadmin'));
+            } else {
+                setAvailableRoles(ADMIN_ROLES);
+            }
+            
+            setIsVerified(true);
         } else {
             toast({
                 variant: 'destructive',
@@ -73,7 +71,7 @@ export function TokenVerification({ onVerified }: TokenVerificationProps) {
         toast({
             variant: 'destructive',
             title: 'Verifikasi Gagal',
-            description: "Terjadi kesalahan saat memeriksa peran atau token. Pastikan aturan Firestore memperbolehkan pembacaan untuk pengguna yang tidak terautentikasi.",
+            description: "Terjadi kesalahan saat memeriksa peran atau token.",
         });
         setIsLoading(false);
     }
