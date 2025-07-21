@@ -26,22 +26,31 @@ const createSheetWithHeader = (
     const today = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
     const opdName = userProfile?.role || 'N/A';
     const userName = userProfile?.fullName || 'N/A';
+    const isAdminOrSuperAdmin = userProfile?.role === 'admin' || userProfile?.role === 'superadmin';
 
     const reportHeader = [
         ["Laporan Manajemen Risiko"],
         ["Kabupaten Blitar"],
-        [`Organisasi Perangkat Daerah (OPD): ${opdName}`],
-        [],
-        ['Nama Penginput:', userName],
-        ['Tanggal Laporan:', today],
-        [],
     ];
+    
+    // Only show the OPD line if the user is not an admin or superadmin
+    if (!isAdminOrSuperAdmin) {
+        reportHeader.push([`Organisasi Perangkat Daerah (OPD): ${opdName}`]);
+    }
+
+    reportHeader.push(
+        [], // Empty row for spacing
+        ['Nama Pengunduh:', userName],
+        ['Tanggal Laporan:', today],
+        []  // Empty row for spacing
+    );
+
 
     const dataHeaders = Object.keys(data[0]);
     const dataRows = data.map(row => Object.values(row));
 
     const finalSheetData = [...reportHeader, dataHeaders, ...dataRows];
-    const ws = XLSX.utils.aoa_to_sheet(finalSheetData, { cellStyles: true });
+    const ws = XLSX.utils.aoa_to_sheet(finalSheetData);
 
     // --- Styling and Formatting ---
     const colWidths = dataHeaders.map((header: string) => {
@@ -51,16 +60,17 @@ const createSheetWithHeader = (
             return value ? String(value).length : 0;
         });
         const maxLength = Math.max(headerLength, ...dataLengths);
-        return { wch: Math.min(maxLength + 5, 60) };
+        return { wch: Math.min(Math.max(maxLength, headerLength) + 2, 60) };
     });
     ws['!cols'] = colWidths;
     
     // Merge title header cells
+    const titleHeaderRowCount = reportHeader.length - (dataHeaders.length > 0 ? 1 : 0);
      if (dataHeaders.length > 1) {
         ws['!merges'] = [
             { s: { r: 0, c: 0 }, e: { r: 0, c: dataHeaders.length - 1 } },
             { s: { r: 1, c: 0 }, e: { r: 1, c: dataHeaders.length - 1 } },
-            { s: { r: 2, c: 0 }, e: { r: 2, c: dataHeaders.length - 1 } },
+            ...(!isAdminOrSuperAdmin ? [{ s: { r: 2, c: 0 }, e: { r: 2, c: dataHeaders.length - 1 } }] : [])
         ];
     }
 
@@ -73,16 +83,16 @@ const createSheetWithHeader = (
             if (!ws[cell_ref]) continue;
             if (!ws[cell_ref].s) ws[cell_ref].s = {};
 
-            const isHeaderRow = R < 7;
-            const isDataHeaderRow = R === 7;
+            const isTitleHeaderRow = R < titleHeaderRowCount - 1; // Top-level headers (Laporan, Kabupaten, etc.)
+            const isDataHeaderRow = R === titleHeaderRowCount -1; // The actual table headers (Tanggal, Peran, etc.)
 
             // Apply text wrapping to all data rows
-            if (!isHeaderRow) {
+            if (!isTitleHeaderRow && !isDataHeaderRow) {
                 ws[cell_ref].s.alignment = { wrapText: true, vertical: 'top' };
             }
             
             // Make headers bold (Top title headers and table header row)
-            if (isHeaderRow || isDataHeaderRow) {
+            if (isTitleHeaderRow || isDataHeaderRow) {
                  if (!ws[cell_ref].s.font) ws[cell_ref].s.font = {};
                  ws[cell_ref].s.font.bold = true;
             }
@@ -98,7 +108,7 @@ export const exportToExcel = ({ surveys, continuityPlans, fileName, userProfile 
     if (surveys && surveys.length > 0) {
         const surveyDataForSheet = surveys.map(survey => ({
             'Tanggal Laporan': survey.createdAt ? new Date(survey.createdAt).toLocaleDateString('id-ID') : 'N/A',
-            'Peran Pengguna': survey.userRole,
+            ...(userProfile?.role === 'admin' || userProfile?.role === 'superadmin' ? { 'Peran Pengguna': survey.userRole } : {}),
             'Kategori Risiko': survey.riskEvent,
             'Risiko': survey.impactArea,
             'Area Dampak': survey.areaDampak || 'N/A',
@@ -118,7 +128,7 @@ export const exportToExcel = ({ surveys, continuityPlans, fileName, userProfile 
 
     if (continuityPlans && continuityPlans.length > 0) {
         const planDataForSheet = continuityPlans.map(plan => ({
-            'Peran Pengguna': plan.userRole,
+            ...(userProfile?.role === 'admin' || userProfile?.role === 'superadmin' ? { 'Peran Pengguna': plan.userRole } : {}),
             'Risiko': plan.risiko,
             'Aktivitas': plan.aktivitas,
             'Target Waktu': plan.targetWaktu,
