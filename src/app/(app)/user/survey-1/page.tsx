@@ -133,36 +133,39 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
   useEffect(() => {
     if (selectedRiskEvent === CUSTOM_VALUE) {
         setIsCustomRiskEvent(true);
-        setIsCustomImpactArea(true);
         form.setValue('impactArea', '');
         setAvailableImpactAreas([]);
+        setIsCustomImpactArea(true); // If category is custom, risk must be custom too.
     } else {
         setIsCustomRiskEvent(false);
         const riskEventObject = RISK_EVENTS.find(event => event.name === selectedRiskEvent);
-        setAvailableImpactAreas(riskEventObject ? riskEventObject.impactAreas : []);
-        // Reset impact area if it's not in the new list or if it was a custom one
-        if (selectedImpactArea && !riskEventObject?.impactAreas.includes(selectedImpactArea) || isCustomImpactArea) {
+        const newImpactAreas = riskEventObject ? riskEventObject.impactAreas : [];
+        setAvailableImpactAreas(newImpactAreas);
+        
+        // If the current impactArea is not in the new list, reset it.
+        if (selectedImpactArea && !newImpactAreas.includes(selectedImpactArea) && selectedImpactArea !== CUSTOM_VALUE) {
             form.setValue('impactArea', '');
             setIsCustomImpactArea(false);
         }
     }
-  }, [selectedRiskEvent, form, isCustomImpactArea, selectedImpactArea]);
+  }, [selectedRiskEvent, form, selectedImpactArea]);
 
   useEffect(() => {
     if (selectedImpactArea === CUSTOM_VALUE) {
         setIsCustomImpactArea(true);
-    } else if (selectedImpactArea !== '' && isCustomImpactArea) {
-       // if user started typing then switched back to dropdown, reset custom flag
-       const riskEventObject = RISK_EVENTS.find(event => event.name === selectedRiskEvent);
-       if(riskEventObject?.impactAreas.includes(selectedImpactArea)){
-           setIsCustomImpactArea(false);
-       }
+    } else {
+        // This handles the case where the user selects a value from the dropdown after being in custom mode.
+        const riskEventObject = RISK_EVENTS.find(event => event.name === selectedRiskEvent);
+        if (riskEventObject && riskEventObject.impactAreas.includes(selectedImpactArea)) {
+            setIsCustomImpactArea(false);
+        }
     }
-  }, [selectedImpactArea, selectedRiskEvent, isCustomImpactArea]);
+  }, [selectedImpactArea, selectedRiskEvent]);
+
 
   useEffect(() => {
     const { riskEvent, impactArea } = form.getValues();
-    if (riskEvent && impactArea && riskEvent !== CUSTOM_VALUE && impactArea !== CUSTOM_VALUE) {
+    if (riskEvent && impactArea && !isCustomRiskEvent && !isCustomImpactArea) {
       setIsSentimentLoading(true);
       determineRiskSentiment({ riskCategory: riskEvent, risk: impactArea })
         .then(result => setRiskSentiment(result.sentiment))
@@ -171,7 +174,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
     } else {
       setRiskSentiment(null);
     }
-  }, [form.watch('riskEvent'), form.watch('impactArea')]);
+  }, [form.watch('riskEvent'), form.watch('impactArea'), isCustomRiskEvent, isCustomImpactArea]);
 
   useEffect(() => {
     setRiskIndicator(getRiskLevel(frequency, impactMagnitude));
@@ -305,6 +308,9 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                                     onClick={() => {
                                         setIsCustomRiskEvent(false);
                                         form.setValue('riskEvent', '');
+                                        // Also reset impact area
+                                        form.setValue('impactArea', '');
+                                        setIsCustomImpactArea(false);
                                     }}
                                 >
                                     <X className="mr-2 h-4 w-4" /> Batal
