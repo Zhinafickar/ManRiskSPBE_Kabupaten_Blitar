@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -78,8 +79,8 @@ export default function AdminContinuityResultsPage() {
               {plans.map((plan) => (
                 <TableRow key={plan.id}>
                   <TableCell className="font-medium max-w-xs truncate">{plan.userRole || 'N/A'}</TableCell>
-                  <TableCell className="max-w-xs truncate">{plan.risiko}</TableCell>
-                  <TableCell className="max-w-xs truncate">{plan.aktivitas}</TableCell>
+                  <TableCell className="max-w-xs whitespace-normal">{plan.risiko}</TableCell>
+                  <TableCell className="max-w-xs whitespace-normal">{plan.aktivitas}</TableCell>
                   <TableCell>{plan.targetWaktu}</TableCell>
                   <TableCell>{plan.pic}</TableCell>
                   <TableCell>{plan.rto}</TableCell>
