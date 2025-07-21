@@ -71,7 +71,7 @@ export function TokenVerification() {
         toast({
             variant: 'destructive',
             title: 'Verifikasi Gagal',
-            description: "Terjadi kesalahan saat memeriksa peran atau token.",
+            description: "Gagal memeriksa peran atau token.",
         });
         setIsLoading(false);
     }
