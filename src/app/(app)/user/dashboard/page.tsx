@@ -220,16 +220,16 @@ function QuickGuideCard() {
       </CardHeader>
       <CardContent className="text-sm text-muted-foreground space-y-4">
         <div>
-            <h4 className="font-semibold text-foreground">1. Pelajari Referensi & Tutorial</h4>
-            <p>Buka menu 'Informasi Penting' untuk melihat 'Referensi Perhitungan' dan 'Tutorial' agar Anda memahami cara kerja aplikasi.</p>
+            <h4 className="font-semibold text-foreground">1. Pelajari Referensi & Informasi Penting</h4>
+            <p>Buka menu 'Informasi Penting' untuk melihat 'Referensi Perhitungan', 'Referensi Inputan', dan 'Tutorial' agar Anda memahami cara kerja aplikasi.</p>
         </div>
         <div>
             <h4 className="font-semibold text-foreground">2. Isi Survei Risiko</h4>
-            <p>Di menu 'Manajemen Risiko', gunakan 'Input Form' untuk satu risiko atau 'Input Tabel' untuk beberapa risiko sekaligus. Manfaatkan fitur saran AI untuk membantu pengisian.</p>
+            <p>Di menu 'Manajemen Risiko', pilih 'Input Form' untuk mengisi formulir. Manfaatkan fitur saran AI untuk membantu pengisian.</p>
         </div>
         <div>
             <h4 className="font-semibold text-foreground">3. Buat Rencana Kontinuitas</h4>
-            <p>Setelah survei diisi, buka menu 'Kontinuitas' untuk membuat rencana pemulihan berdasarkan risiko yang telah Anda identifikasi.</p>
+            <p>Setelah survei diisi, buka menu 'Kontinuitas' dan pilih 'Input Rencana' untuk membuat rencana pemulihan berdasarkan risiko yang telah Anda identifikasi.</p>
         </div>
          <div>
             <h4 className="font-semibold text-foreground">4. Tinjau & Cetak Laporan</h4>
