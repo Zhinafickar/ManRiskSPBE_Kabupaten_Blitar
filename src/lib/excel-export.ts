@@ -34,14 +34,43 @@ const createSheetWithHeader = (
         [], // Spacer row
     ];
 
-    const ws = XLSX.utils.aoa_to_sheet(headerRows);
-    
-    // Add the table headers starting after the main header block
-    XLSX.utils.sheet_add_aoa(ws, [headers], { origin: 'A8' });
-    
-    // Add the JSON data starting from the next row, skipping its own header
-    XLSX.utils.sheet_add_json(ws, data, { origin: 'A9', skipHeader: true });
+    const ws_data = [
+      ...headerRows,
+      headers,
+      ...data.map(row => headers.map(header => {
+            const key = Object.keys(data[0] || {}).find(k => k.toLowerCase() === header.toLowerCase().replace(/ /g, '')) || header;
+            // A bit of a hack to map headers to keys, ideally keys would be consistent
+             const keyMap: { [key: string]: string } = {
+                'tanggallaporan': 'createdAt',
+                'peranpengguna': 'userRole',
+                'kategoririsiko': 'riskEvent',
+                'risiko': 'risiko' in row ? row.risiko : row.impactArea,
+                'areadampak': 'areaDampak',
+                'penyebab': 'cause',
+                'dampak': 'impact',
+                'frekuensi': 'frequency',
+                'besarandampak': 'impactMagnitude',
+                'tingkatrisiko': 'riskLevel',
+                'kontrolorganisasi': 'kontrolOrganisasi',
+                'kontrolorang': 'kontrolOrang',
+                'kontrolfisik': 'kontrolFisik',
+                'kontrolteknologi': 'kontrolTeknologi',
+                'mitigasi': 'mitigasi',
+                'aktivitas': 'aktivitas',
+                'targetwaktu': 'targetWaktu',
+                'pic': 'pic',
+                'sumberdaya': 'sumberdaya',
+                'rto': 'rto',
+                'rpo': 'rpo',
+                'tanggaldibuat': 'createdAt',
+            };
+            const dataKey = keyMap[header.toLowerCase().replace(/ /g, '')];
+            return (row as any)[dataKey] || '';
+      }))
+    ];
 
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    
     // --- Styling and Formatting ---
     ws['!merges'] = [
         { s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } },
@@ -61,7 +90,7 @@ const createSheetWithHeader = (
         });
 
         return {
-            wch: Math.min(Math.max(...dataLengths, headerLength) + 5, 60)
+            wch: Math.min(Math.max(...dataLengths, headerLength, 15) + 5, 60)
         };
     });
     ws['!cols'] = colWidths;
@@ -73,7 +102,14 @@ const createSheetWithHeader = (
             const cell_ref = XLSX.utils.encode_cell(cell_address);
             if (ws[cell_ref]) {
                 if (!ws[cell_ref].s) ws[cell_ref].s = {};
+                // Apply word wrap and top alignment to all cells
                 ws[cell_ref].s.alignment = { ...ws[cell_ref].s.alignment, wrapText: true, vertical: 'top' };
+                
+                // Apply bold to header rows (first 3), spacer rows (4,6), info rows(5,7), and table header (8)
+                if (R < 8) { // This now covers all header content and the table header row
+                     if (!ws[cell_ref].s.font) ws[cell_ref].s.font = {};
+                     ws[cell_ref].s.font.bold = true;
+                }
             }
         }
     }
