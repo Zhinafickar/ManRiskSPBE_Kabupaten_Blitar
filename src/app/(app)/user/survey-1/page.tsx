@@ -35,9 +35,9 @@ import {
 } from '@/constants/data';
 import { addSurvey } from '@/services/survey-service';
 import { useAuth } from '@/hooks/use-auth';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon, Check, ChevronsUpDown, Sparkles, TrendingDown, TrendingUp, Loader2, RotateCw, Info } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, ChevronsUpDown, Sparkles, TrendingDown, TrendingUp, Loader2, RotateCw, Info, Pencil, X } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
@@ -50,11 +50,13 @@ import { determineRiskSentiment } from '@/ai/flows/determine-risk-sentiment';
 import { sortRelevantControls } from '@/ai/flows/sort-relevant-controls';
 import type { SortRelevantControlsInput } from '@/types/controls';
 import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
 
+const CUSTOM_VALUE = "[Ketik Sendiri...]";
 
 const formSchema = z.object({
-  riskEvent: z.string({ required_error: 'Silakan pilih kategori risiko.' }).min(1, { message: 'Kategori risiko harus diisi.' }),
-  impactArea: z.string({ required_error: 'Silakan pilih risiko.' }).min(1, { message: 'Risiko harus diisi.' }),
+  riskEvent: z.string({ required_error: 'Silakan pilih atau isi kategori risiko.' }).min(1, { message: 'Kategori risiko harus diisi.' }),
+  impactArea: z.string({ required_error: 'Silakan pilih atau isi risiko.' }).min(1, { message: 'Risiko harus diisi.' }),
   areaDampak: z.string({ required_error: 'Area dampak harus diisi.' }).min(1, { message: 'Area dampak harus diisi.' }),
   cause: z.string().min(10, { message: 'Penyebab harus diisi minimal 10 karakter.' }),
   impact: z.string().min(10, { message: 'Dampak harus diisi minimal 10 karakter.' }),
@@ -97,6 +99,11 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
   
   const [isDateManipulationEnabled, setIsDateManipulationEnabled] = useState(false);
 
+  // State for custom inputs
+  const [isCustomRiskEvent, setIsCustomRiskEvent] = useState(false);
+  const [isCustomImpactArea, setIsCustomImpactArea] = useState(false);
+
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -117,22 +124,45 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
   });
 
   const selectedRiskEvent = form.watch('riskEvent');
+  const selectedImpactArea = form.watch('impactArea');
   const frequency = form.watch('frequency');
   const impactMagnitude = form.watch('impactMagnitude');
 
-  useEffect(() => {
-    const riskEventObject = RISK_EVENTS.find(event => event.name === selectedRiskEvent);
-    setAvailableImpactAreas(riskEventObject ? riskEventObject.impactAreas : []);
-    form.setValue('impactArea', '');
-  }, [selectedRiskEvent, form]);
+  const riskEventOptions = useMemo(() => [{ name: CUSTOM_VALUE, impactAreas: [] }, ...RISK_EVENTS], []);
 
   useEffect(() => {
-    setRiskIndicator(getRiskLevel(frequency, impactMagnitude));
-  }, [frequency, impactMagnitude]);
-  
+    if (selectedRiskEvent === CUSTOM_VALUE) {
+        setIsCustomRiskEvent(true);
+        setIsCustomImpactArea(true);
+        form.setValue('impactArea', '');
+        setAvailableImpactAreas([]);
+    } else {
+        setIsCustomRiskEvent(false);
+        const riskEventObject = RISK_EVENTS.find(event => event.name === selectedRiskEvent);
+        setAvailableImpactAreas(riskEventObject ? riskEventObject.impactAreas : []);
+        // Reset impact area if it's not in the new list or if it was a custom one
+        if (selectedImpactArea && !riskEventObject?.impactAreas.includes(selectedImpactArea) || isCustomImpactArea) {
+            form.setValue('impactArea', '');
+            setIsCustomImpactArea(false);
+        }
+    }
+  }, [selectedRiskEvent, form, isCustomImpactArea, selectedImpactArea]);
+
+  useEffect(() => {
+    if (selectedImpactArea === CUSTOM_VALUE) {
+        setIsCustomImpactArea(true);
+    } else if (selectedImpactArea !== '' && isCustomImpactArea) {
+       // if user started typing then switched back to dropdown, reset custom flag
+       const riskEventObject = RISK_EVENTS.find(event => event.name === selectedRiskEvent);
+       if(riskEventObject?.impactAreas.includes(selectedImpactArea)){
+           setIsCustomImpactArea(false);
+       }
+    }
+  }, [selectedImpactArea, selectedRiskEvent, isCustomImpactArea]);
+
   useEffect(() => {
     const { riskEvent, impactArea } = form.getValues();
-    if (riskEvent && impactArea) {
+    if (riskEvent && impactArea && riskEvent !== CUSTOM_VALUE && impactArea !== CUSTOM_VALUE) {
       setIsSentimentLoading(true);
       determineRiskSentiment({ riskCategory: riskEvent, risk: impactArea })
         .then(result => setRiskSentiment(result.sentiment))
@@ -142,6 +172,10 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
       setRiskSentiment(null);
     }
   }, [form.watch('riskEvent'), form.watch('impactArea')]);
+
+  useEffect(() => {
+    setRiskIndicator(getRiskLevel(frequency, impactMagnitude));
+  }, [frequency, impactMagnitude]);
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -155,7 +189,9 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
         await addSurvey({ ...values, surveyType: 1, userId: user.uid, userRole: userProfile.role, riskLevel: indicator.level ?? undefined });
         toast({ title: 'Sukses', description: 'Survei berhasil dikirim.' });
         form.reset();
-        // Reset controls to default order after submission
+        // Reset custom states and controls
+        setIsCustomRiskEvent(false);
+        setIsCustomImpactArea(false);
         setSortedOrganizational(ORGANIZATIONAL_CONTROLS);
         setSortedPeople(PEOPLE_CONTROLS);
         setSortedPhysical(PHYSICAL_CONTROLS);
@@ -254,95 +290,159 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                 />
             </div>
             {/* Risk Category and Specific Risk */}
-            <FormField
-              control={form.control}
-              name="riskEvent"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <div className="flex items-center gap-2">
-                    <FormLabel>Kategori Risiko</FormLabel>
-                    <TooltipProvider>
-                      <Tooltip delayDuration={300}>
-                        <TooltipTrigger type="button">
-                          <Info className="h-4 w-4 text-muted-foreground" />
-                        </TooltipTrigger>
-                        <TooltipContent side="right" className="max-w-xs">
-                          <p>Daftar kategori risiko pada formulir ini mengacu pada standar ISO 31000 dan Cobit 5 untuk memastikan identifikasi yang komprehensif.</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                   <Popover open={riskEventOpen} onOpenChange={setRiskEventOpen}>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value && "text-muted-foreground")}>
-                          {field.value ? RISK_EVENTS.find(event => event.name === field.value)?.name : "Pilih kategori risiko..."}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                      <Command>
-                        <CommandInput placeholder="Cari kategori risiko..." />
-                        <CommandEmpty>Kategori risiko tidak ditemukan.</CommandEmpty>
-                        <CommandList>
-                          <CommandGroup>
-                            {RISK_EVENTS.map((event) => (
-                              <CommandItem key={event.name} value={event.name} onSelect={() => { form.setValue("riskEvent", event.name); setRiskEventOpen(false); }}>
-                                <Check className={cn("mr-2 h-4 w-4", event.name === field.value ? "opacity-100" : "opacity-0")} />
-                                {event.name}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="impactArea"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Risiko</FormLabel>
-                  <Popover open={impactAreaOpen} onOpenChange={setImpactAreaOpen}>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button variant="outline" role="combobox" disabled={!selectedRiskEvent || availableImpactAreas.length === 0} className={cn("w-full justify-between", !field.value && "text-muted-foreground")}>
-                          {field.value ? availableImpactAreas.find((area) => area === field.value) : "Pilih risiko..."}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                      <Command>
-                        <CommandInput placeholder="Cari risiko..." />
-                        <CommandEmpty>Risiko tidak ditemukan.</CommandEmpty>
-                        <CommandList>
-                          <CommandGroup>
-                            {availableImpactAreas.map((area) => (
-                              <CommandItem key={area} value={area} onSelect={() => { form.setValue("impactArea", area); setImpactAreaOpen(false); }}>
-                                <Check className={cn("mr-2 h-4 w-4", area === field.value ? "opacity-100" : "opacity-0")} />
-                                {area}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <div className="h-5 mt-1.5">
-                    {isSentimentLoading ? (<div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /><span>Menganalisis...</span></div>) : 
-                     riskSentiment === 'Positif' ? (<div className="flex items-center gap-2 text-sm text-green-600"><TrendingUp className="h-4 w-4" /><span>Risiko ini bersifat Positif (Peluang)</span></div>) : 
-                     riskSentiment === 'Negatif' ? (<div className="flex items-center gap-2 text-sm text-red-600"><TrendingDown className="h-4 w-4" /><span>Risiko ini bersifat Negatif (Ancaman)</span></div>) : null}
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {isCustomRiskEvent ? (
+                 <FormField
+                    control={form.control}
+                    name="riskEvent"
+                    render={({ field }) => (
+                        <FormItem>
+                            <div className="flex justify-between items-center">
+                                <FormLabel>Kategori Risiko (Manual)</FormLabel>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                        setIsCustomRiskEvent(false);
+                                        form.setValue('riskEvent', '');
+                                    }}
+                                >
+                                    <X className="mr-2 h-4 w-4" /> Batal
+                                </Button>
+                            </div>
+                            <FormControl>
+                                <Input placeholder="Ketik kategori risiko Anda..." {...field} value={field.value === CUSTOM_VALUE ? '' : field.value} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            ) : (
+                <FormField
+                  control={form.control}
+                  name="riskEvent"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <div className="flex items-center gap-2">
+                        <FormLabel>Kategori Risiko</FormLabel>
+                        <TooltipProvider>
+                          <Tooltip delayDuration={300}>
+                            <TooltipTrigger type="button">
+                              <Info className="h-4 w-4 text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent side="right" className="max-w-xs">
+                              <p>Daftar kategori risiko pada formulir ini mengacu pada standar ISO 31000 dan Cobit 5 untuk memastikan identifikasi yang komprehensif.</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                       <Popover open={riskEventOpen} onOpenChange={setRiskEventOpen}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value && "text-muted-foreground")}>
+                              {field.value ? riskEventOptions.find(event => event.name === field.value)?.name : "Pilih kategori risiko..."}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                          <Command>
+                            <CommandInput placeholder="Cari kategori risiko..." />
+                            <CommandEmpty>Kategori risiko tidak ditemukan.</CommandEmpty>
+                            <CommandList>
+                              <CommandGroup>
+                                {riskEventOptions.map((event) => (
+                                  <CommandItem key={event.name} value={event.name} onSelect={(currentValue) => { form.setValue("riskEvent", currentValue); setRiskEventOpen(false); }}>
+                                    <Check className={cn("mr-2 h-4 w-4", event.name === field.value ? "opacity-100" : "opacity-0")} />
+                                    {event.name === CUSTOM_VALUE ? <span className="italic">{event.name}</span> : event.name}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+            )}
+             {isCustomImpactArea ? (
+                <FormField
+                    control={form.control}
+                    name="impactArea"
+                    render={({ field }) => (
+                        <FormItem>
+                           <div className="flex justify-between items-center">
+                            <FormLabel>Risiko (Manual)</FormLabel>
+                            {!isCustomRiskEvent && (
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                        setIsCustomImpactArea(false);
+                                        form.setValue('impactArea', '');
+                                    }}
+                                >
+                                    <X className="mr-2 h-4 w-4" /> Batal
+                                </Button>
+                            )}
+                            </div>
+                            <FormControl>
+                                <Input placeholder="Ketik risiko Anda..." {...field} value={field.value === CUSTOM_VALUE ? '' : field.value} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+             ) : (
+                <FormField
+                  control={form.control}
+                  name="impactArea"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Risiko</FormLabel>
+                      <Popover open={impactAreaOpen} onOpenChange={setImpactAreaOpen}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button variant="outline" role="combobox" disabled={!selectedRiskEvent || availableImpactAreas.length === 0} className={cn("w-full justify-between", !field.value && "text-muted-foreground")}>
+                              {field.value ? availableImpactAreas.find((area) => area === field.value) : "Pilih risiko..."}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                          <Command>
+                            <CommandInput placeholder="Cari risiko..." />
+                            <CommandEmpty>Risiko tidak ditemukan.</CommandEmpty>
+                            <CommandList>
+                              <CommandGroup>
+                                 <CommandItem value={CUSTOM_VALUE} onSelect={() => { form.setValue("impactArea", CUSTOM_VALUE); setImpactAreaOpen(false); }}>
+                                    <Check className={cn("mr-2 h-4 w-4", CUSTOM_VALUE === field.value ? "opacity-100" : "opacity-0")} />
+                                    <span className="italic">{CUSTOM_VALUE}</span>
+                                </CommandItem>
+                                {availableImpactAreas.map((area) => (
+                                  <CommandItem key={area} value={area} onSelect={() => { form.setValue("impactArea", area); setImpactAreaOpen(false); }}>
+                                    <Check className={cn("mr-2 h-4 w-4", area === field.value ? "opacity-100" : "opacity-0")} />
+                                    {area}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <div className="h-5 mt-1.5">
+                        {isSentimentLoading ? (<div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /><span>Menganalisis...</span></div>) : 
+                         riskSentiment === 'Positif' ? (<div className="flex items-center gap-2 text-sm text-green-600"><TrendingUp className="h-4 w-4" /><span>Risiko ini bersifat Positif (Peluang)</span></div>) : 
+                         riskSentiment === 'Negatif' ? (<div className="flex items-center gap-2 text-sm text-red-600"><TrendingDown className="h-4 w-4" /><span>Risiko ini bersifat Negatif (Ancaman)</span></div>) : null}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+             )}
             {/* Impact Area and Date */}
              <FormField control={form.control} name="areaDampak" render={({ field }) => (<FormItem><FormLabel>Area Dampak</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Pilih area dampak" /></SelectTrigger></FormControl><SelectContent>{AREA_DAMPAK_OPTIONS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>)} />
             {/* Cause and Impact with AI */}
