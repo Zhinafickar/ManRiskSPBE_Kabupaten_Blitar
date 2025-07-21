@@ -4,7 +4,7 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { FileText, AreaChart, Building, ClipboardCheck } from "lucide-react";
+import { FileText, AreaChart, Building, ClipboardCheck, Info } from "lucide-react";
 import { RiskAnalysisCard } from "@/app/(app)/_components/risk-analysis-card";
 import { AiRiskSummaryCard } from "@/app/(app)/_components/ai-risk-summary-card";
 
@@ -21,6 +21,32 @@ export default function AdminDashboard() {
       <RiskAnalysisCard />
 
       <AiRiskSummaryCard />
+      
+      <Card>
+          <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                  <Info className="h-6 w-6" />
+                  Panduan Admin
+              </CardTitle>
+              <CardDescription>
+                  Berikut adalah kapabilitas utama yang Anda miliki sebagai admin.
+              </CardDescription>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground space-y-4">
+              <div>
+                  <h4 className="font-semibold text-foreground">1. Pemantauan & Pelaporan Data Global</h4>
+                  <p>Gunakan menu 'Data & Laporan' untuk mengakses semua data survei, rencana kontinuitas, dan visualisasi dari seluruh OPD. Anda memiliki akses penuh ke semua data yang ada di sistem.</p>
+              </div>
+              <div>
+                  <h4 className="font-semibold text-foreground">2. Manajemen Laporan</h4>
+                  <p>Anda dapat mengunduh semua data hasil survei dan rencana kontinuitas dalam format Excel melalui tombol "Download Excel" yang tersedia di halaman masing-masing.</p>
+              </div>
+              <div>
+                  <h4 className="font-semibold text-foreground">3. Pantau Aktivitas OPD</h4>
+                  <p>Menu 'Organisasi' memungkinkan Anda untuk melihat daftar semua OPD, status keterisiannya, dan detail data spesifik untuk setiap OPD yang telah memiliki pengguna terdaftar.</p>
+              </div>
+          </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
