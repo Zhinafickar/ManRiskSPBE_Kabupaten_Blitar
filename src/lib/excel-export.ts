@@ -41,8 +41,7 @@ const createSheetWithHeader = (
     const dataRows = data.map(row => Object.values(row));
 
     const finalSheetData = [...reportHeader, dataHeaders, ...dataRows];
-
-    const ws = XLSX.utils.aoa_to_sheet(finalSheetData);
+    const ws = XLSX.utils.aoa_to_sheet(finalSheetData, { cellStyles: true });
 
     // --- Styling and Formatting ---
     const colWidths = dataHeaders.map((header: string) => {
@@ -52,12 +51,11 @@ const createSheetWithHeader = (
             return value ? String(value).length : 0;
         });
         const maxLength = Math.max(headerLength, ...dataLengths);
-        // Set a max width for very long columns to keep it reasonable
         return { wch: Math.min(maxLength + 5, 60) };
     });
     ws['!cols'] = colWidths;
     
-    // Merge header cells
+    // Merge title header cells
      if (dataHeaders.length > 1) {
         ws['!merges'] = [
             { s: { r: 0, c: 0 }, e: { r: 0, c: dataHeaders.length - 1 } },
@@ -66,22 +64,25 @@ const createSheetWithHeader = (
         ];
     }
 
-    // Apply styles
+    // Apply styles to all cells
     const range = XLSX.utils.decode_range(ws['!ref']!);
     for (let R = range.s.r; R <= range.e.r; ++R) {
         for (let C = range.s.c; C <= range.e.c; ++C) {
             const cell_address = { c: C, r: R };
             const cell_ref = XLSX.utils.encode_cell(cell_address);
             if (!ws[cell_ref]) continue;
-
             if (!ws[cell_ref].s) ws[cell_ref].s = {};
-            
-            // Enable text wrapping for all cells to auto-adjust row height
-            ws[cell_ref].s.alignment = { wrapText: true, vertical: 'top' };
+
+            const isHeaderRow = R < 7;
+            const isDataHeaderRow = R === 7;
+
+            // Apply text wrapping to all data rows
+            if (!isHeaderRow) {
+                ws[cell_ref].s.alignment = { wrapText: true, vertical: 'top' };
+            }
             
             // Make headers bold (Top title headers and table header row)
-            const isHeaderRow = (R >= 0 && R < 7) || R === 7;
-            if (isHeaderRow) {
+            if (isHeaderRow || isDataHeaderRow) {
                  if (!ws[cell_ref].s.font) ws[cell_ref].s.font = {};
                  ws[cell_ref].s.font.bold = true;
             }
