@@ -68,7 +68,7 @@ export default function SuperAdminContinuityResultsPage() {
                 <TableHead className="text-primary-foreground">Risiko</TableHead>
                 <TableHead className="text-primary-foreground">Aktivitas</TableHead>
                 <TableHead className="text-primary-foreground">Target Waktu</TableHead>
-                <TableHead className="text-primary-foreground">PIC</TableHead>
+                <TableHead className="text-primary-foreground">PIC (Person In Charge)</TableHead>
                 <TableHead className="text-primary-foreground">RTO</TableHead>
                 <TableHead className="text-primary-foreground">RPO</TableHead>
                 <TableHead className="text-right text-primary-foreground">Actions</TableHead>

@@ -33,6 +33,7 @@ import type { UserProfile } from '@/types/user';
 import { useEffect, useState, useMemo } from 'react';
 import { updateUserData, getAllUsers } from '@/services/user-service';
 import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   uid: z.string(),
@@ -53,7 +54,8 @@ export function UserForm({ isOpen, setIsOpen, user, allRoles }: UserFormProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const [superAdminExists, setSuperAdminExists] = useState(false);
+  const [rolesLoading, setRolesLoading] = useState(true);
+  const [filteredRoles, setFilteredRoles] = useState<string[]>([]);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -67,16 +69,22 @@ export function UserForm({ isOpen, setIsOpen, user, allRoles }: UserFormProps) {
   });
 
   useEffect(() => {
-    async function checkSuperAdmin() {
-        const users = await getAllUsers();
-        // Check if a superadmin exists and it's not the user currently being edited
-        const aSuperAdminExists = users.some(u => u.role === 'superadmin' && u.uid !== user?.uid);
-        setSuperAdminExists(aSuperAdminExists);
+    async function checkSuperAdminAndSetRoles() {
+      if (!isOpen) return;
+      setRolesLoading(true);
+      const users = await getAllUsers();
+      // Check if a superadmin exists and it's not the user currently being edited
+      const aSuperAdminExists = users.some(u => u.role === 'superadmin' && u.uid !== user?.uid);
+      
+      if (aSuperAdminExists) {
+        setFilteredRoles(allRoles.filter(role => role !== 'superadmin'));
+      } else {
+        setFilteredRoles(allRoles);
+      }
+      setRolesLoading(false);
     }
-    if (isOpen) {
-        checkSuperAdmin();
-    }
-  }, [isOpen, user]);
+    checkSuperAdminAndSetRoles();
+  }, [isOpen, user, allRoles]);
 
   useEffect(() => {
     if (user) {
@@ -93,21 +101,12 @@ export function UserForm({ isOpen, setIsOpen, user, allRoles }: UserFormProps) {
         role: '',
       });
     }
-  }, [user, isOpen, form]);
-
-  const filteredRoles = useMemo(() => {
-    if (superAdminExists) {
-        return allRoles.filter(role => role !== 'superadmin');
-    }
-    return allRoles;
-  }, [allRoles, superAdminExists]);
+  }, [user, form]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
-    // Note: Add user is not implemented as it requires Admin SDK for passwordless creation.
-    // This form only handles updates.
     if (!values.uid) {
-        toast({ variant: 'destructive', title: 'Error', description: 'Adding new users via this form is not supported. Please update an existing user.' });
+        toast({ variant: 'destructive', title: 'Error', description: 'Adding new users via this form is not supported. Users must register first.' });
         setIsLoading(false);
         return;
     }
@@ -116,7 +115,7 @@ export function UserForm({ isOpen, setIsOpen, user, allRoles }: UserFormProps) {
 
     if (result.success) {
       toast({ title: 'Success', description: result.message });
-      router.refresh(); // This will re-run the server component's fetch logic on the page
+      router.refresh(); 
       setIsOpen(false);
     } else {
       toast({ variant: 'destructive', title: 'Error', description: result.message });
@@ -174,8 +173,12 @@ export function UserForm({ isOpen, setIsOpen, user, allRoles }: UserFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Role</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
-                    <FormControl><SelectTrigger><SelectValue placeholder="Select a role" /></SelectTrigger></FormControl>
+                  <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value} disabled={rolesLoading}>
+                    <FormControl>
+                        <SelectTrigger>
+                            <SelectValue placeholder={rolesLoading ? "Loading roles..." : "Select a role"} />
+                        </SelectTrigger>
+                    </FormControl>
                     <SelectContent>
                       {filteredRoles.map((role) => (
                         <SelectItem key={role} value={role}>{role}</SelectItem>
@@ -188,8 +191,8 @@ export function UserForm({ isOpen, setIsOpen, user, allRoles }: UserFormProps) {
             />
             <DialogFooter>
               <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
-              <Button type="submit" disabled={isLoading || !user}>
-                {isLoading ? 'Saving...' : 'Save Changes'}
+              <Button type="submit" disabled={isLoading || rolesLoading || !user}>
+                {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Saving...</> : 'Save Changes'}
               </Button>
             </DialogFooter>
           </form>

@@ -151,7 +151,7 @@ export function DepartmentDetailsDialog({ departmentName, isOpen, onOpenChange }
                       <TableRow>
                         <TableHead>Risiko</TableHead>
                         <TableHead>Aktivitas</TableHead>
-                        <TableHead>PIC</TableHead>
+                        <TableHead>PIC (Person In Charge)</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>

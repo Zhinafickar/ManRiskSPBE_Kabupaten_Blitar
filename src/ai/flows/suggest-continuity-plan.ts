@@ -49,7 +49,7 @@ If you cannot think of a new, distinct, and practical recovery activity, you MUS
 **Instructions:**
 - **Aktivitas:** Be specific and action-oriented. What is the first critical step to recovery?
 - **Target Waktu:** Be realistic. How long should this activity take? (e.g., "2 Jam", "8 Jam", "1 Hari Kerja").
-- **PIC:** Suggest a department or role, not a specific person's name. (e.g., "Tim Jaringan", "Kepala Dinas").
+- **PIC (Person In Charge):** Suggest a department or role, not a specific person's name. (e.g., "Tim Jaringan", "Kepala Dinas").
 - **Sumberdaya:** List the essential resources needed. Be brief.
 
 Provide your suggestions in the specified JSON format.`,

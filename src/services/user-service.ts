@@ -151,7 +151,7 @@ export async function getAdminTokens(): Promise<AdminToken[]> {
     const tokensCollection = collection(db, 'adminTokens');
     const tokenSnapshot = await getDocs(tokensCollection);
     
-    return tokenSnapshot.docs.map(doc => {
+    const tokenList = tokenSnapshot.docs.map(doc => {
         const data = doc.data();
         return {
             id: doc.id,
@@ -161,6 +161,9 @@ export async function getAdminTokens(): Promise<AdminToken[]> {
             createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : new Date().toISOString(),
         };
     });
+    // Sort tokens by creation date, newest first
+    tokenList.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return tokenList;
 }
 
 export async function deleteAdminToken(tokenId: string) {
