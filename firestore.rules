@@ -4,29 +4,27 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Allow unauthenticated reads for user/role checks and token verification
-    match /users/{userId} {
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == userId;
-    }
-
+    // Allow public read on roles and users for registration purposes
     match /roles/{roleId} {
-        allow read: if true;
-        allow create, update, delete: if request.auth != null;
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    match /users/{userId} {
+      allow list, get: if true; // Allow reading user list for role checks
+      allow create: if true; // Allow user creation during registration
+      allow update, delete: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Allow public list/read on adminTokens for verification. Write is protected.
+    match /adminTokens/{tokenId} {
+      allow list, get: if true;
+      allow create, update, delete: if request.auth != null;
     }
 
-    match /adminTokens/{tokenId} {
-        allow read: if true;
-        allow create, delete: if request.auth != null;
-    }
-    
-    // Secure other collections to only allow authenticated access
-    match /surveys/{surveyId} {
+    // Default secure rules for other collections
+    match /{document=**} {
       allow read, write: if request.auth != null;
-    }
-    
-    match /continuityPlans/{planId} {
-       allow read, write: if request.auth != null;
     }
   }
 }

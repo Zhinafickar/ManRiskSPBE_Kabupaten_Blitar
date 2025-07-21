@@ -1,3 +1,4 @@
+
 import { db, isFirebaseConfigured } from '@/lib/firebase';
 import { collection, getDocs, doc, setDoc, deleteDoc, query, where, getDoc, writeBatch, addDoc, serverTimestamp, runTransaction } from 'firebase/firestore';
 import type { UserProfile } from '@/types/user';
@@ -178,32 +179,36 @@ export async function verifyAndConsumeToken(name: string, token: string): Promis
     }
 
     const tokensRef = collection(db, "adminTokens");
-    // Query only by token to avoid composite index requirement.
-    const q = query(tokensRef, where("token", "==", token));
     
     try {
-        const querySnapshot = await getDocs(q);
+        // Fetch all documents and filter on the client side to avoid query permission issues for unauthenticated users.
+        // This is acceptable as the number of admin tokens is expected to be small.
+        const querySnapshot = await getDocs(tokensRef);
 
         if (querySnapshot.empty) {
-            return { success: false, message: 'Token tidak valid.' };
+            return { success: false, message: 'Token tidak valid atau tidak ditemukan.' };
         }
 
-        // Token exists, now verify the name on the client-side.
-        const tokenDoc = querySnapshot.docs[0]; // There should only be one with a unique token.
-        const tokenData = tokenDoc.data();
+        // Find the token that matches the provided token string.
+        const matchingToken = querySnapshot.docs.find(doc => doc.data().token === token);
+        
+        if (!matchingToken) {
+            return { success: false, message: 'Token tidak valid.' };
+        }
+        
+        const tokenData = matchingToken.data();
 
+        // Verify that the name associated with the token also matches.
         if (tokenData.name === name) {
-            // Name and token match.
             return { success: true, message: 'Token berhasil diverifikasi.' };
         } else {
-            // Token is valid, but the name is incorrect.
             return { success: false, message: 'Nama atau token tidak valid.' };
         }
 
     } catch (error: any) {
         console.error("Error during token verification: ", error);
-        if (error.code === 'permission-denied' || error.code === 'failed-precondition') {
-             return { success: false, message: 'Terjadi kesalahan: Izin ditolak. Silakan periksa aturan keamanan Firestore Anda dan pastikan ada indeks yang diperlukan.' };
+        if (error.code === 'permission-denied') {
+             return { success: false, message: 'Terjadi kesalahan: Izin ditolak. Silakan periksa aturan keamanan Firestore Anda.' };
         }
         return { success: false, message: 'Terjadi kesalahan saat verifikasi token.' };
     }
