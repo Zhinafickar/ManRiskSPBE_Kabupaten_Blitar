@@ -37,34 +37,36 @@ const createSheetWithHeader = (
         [],
     ];
 
-    const dataWithHeaders = [Object.keys(data[0]), ...data.map(Object.values)];
-
-    const ws = XLSX.utils.aoa_to_sheet(reportHeader);
-    XLSX.utils.sheet_add_aoa(ws, dataWithHeaders, { origin: 'A8' });
-    
     const dataHeaders = Object.keys(data[0]);
+    const dataRows = data.map(row => Object.values(row));
+
+    const finalSheetData = [...reportHeader, dataHeaders, ...dataRows];
+
+    const ws = XLSX.utils.aoa_to_sheet(finalSheetData);
+
+    // --- Styling and Formatting ---
     const colWidths = dataHeaders.map((header: string) => {
         const headerLength = header ? header.length : 10;
         const dataLengths = data.map(row => {
-            const value = row[header];
+            const value = row[header as keyof typeof row];
             return value ? String(value).length : 0;
         });
         const maxLength = Math.max(headerLength, ...dataLengths);
+        // Set a max width for very long columns to keep it reasonable
         return { wch: Math.min(maxLength + 5, 60) };
     });
     ws['!cols'] = colWidths;
-
-    if (dataHeaders.length > 1) {
+    
+    // Merge header cells
+     if (dataHeaders.length > 1) {
         ws['!merges'] = [
             { s: { r: 0, c: 0 }, e: { r: 0, c: dataHeaders.length - 1 } },
             { s: { r: 1, c: 0 }, e: { r: 1, c: dataHeaders.length - 1 } },
             { s: { r: 2, c: 0 }, e: { r: 2, c: dataHeaders.length - 1 } },
         ];
     }
-    
-    const penyebabIndex = dataHeaders.indexOf('Penyebab');
-    const dampakIndex = dataHeaders.indexOf('Dampak');
 
+    // Apply styles
     const range = XLSX.utils.decode_range(ws['!ref']!);
     for (let R = range.s.r; R <= range.e.r; ++R) {
         for (let C = range.s.c; C <= range.e.c; ++C) {
@@ -74,12 +76,12 @@ const createSheetWithHeader = (
 
             if (!ws[cell_ref].s) ws[cell_ref].s = {};
             
+            // Enable text wrapping for all cells to auto-adjust row height
             ws[cell_ref].s.alignment = { wrapText: true, vertical: 'top' };
             
+            // Make headers bold (Top title headers and table header row)
             const isHeaderRow = (R >= 0 && R < 7) || R === 7;
-            const isTargetColumn = R > 7 && (C === penyebabIndex || C === dampakIndex);
-
-            if (isHeaderRow || isTargetColumn) {
+            if (isHeaderRow) {
                  if (!ws[cell_ref].s.font) ws[cell_ref].s.font = {};
                  ws[cell_ref].s.font.bold = true;
             }
