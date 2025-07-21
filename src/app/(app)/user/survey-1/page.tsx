@@ -218,6 +218,29 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="space-y-6">
+            <FormField
+              control={form.control}
+              name="eventDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Waktu Kejadian</FormLabel>
+                  <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
+                          {field.value ? format(field.value, "dd/MM/yyyy") : <span>Pilih tanggal</span>}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={field.value} onSelect={(date) => { if (date) { field.onChange(date); setDatePickerOpen(false); }}} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} initialFocus />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             {/* Risk Category and Specific Risk */}
             <FormField
               control={form.control}
@@ -310,29 +333,6 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
             />
             {/* Impact Area and Date */}
              <FormField control={form.control} name="areaDampak" render={({ field }) => (<FormItem><FormLabel>Area Dampak</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Pilih area dampak" /></SelectTrigger></FormControl><SelectContent>{AREA_DAMPAK_OPTIONS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>)} />
-            <FormField
-              control={form.control}
-              name="eventDate"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Waktu Kejadian</FormLabel>
-                  <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
-                          {field.value ? format(field.value, "dd/MM/yyyy") : <span>Pilih tanggal</span>}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar mode="single" selected={field.value} onSelect={(date) => { if (date) { field.onChange(date); setDatePickerOpen(false); }}} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} initialFocus />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             {/* Cause and Impact with AI */}
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField control={form.control} name="cause" render={({ field }) => (<FormItem><FormLabel>Penyebab</FormLabel><FormControl><Textarea placeholder="Jelaskan penyebab kejadian risiko..." {...field} /></FormControl><FormMessage /></FormItem>)} />
