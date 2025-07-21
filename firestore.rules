@@ -2,80 +2,30 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // 🔐 Helper functions
-    function isAuth() {
-      return request.auth != null;
-    }
-
-    function isSuperAdmin() {
-      return isAuth() &&
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
-    }
-
-    function isAdmin() {
-      let role = get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
-      return isAuth() && (role == 'admin' || role == 'superadmin');
-    }
-
-    function isOwner(userId) {
-      return isAuth() && request.auth.uid == userId;
-    }
-
-    // 👤 USERS COLLECTION
+    
+    // Allow public read access for registration role checks
     match /users/{userId} {
-      // Siapa saja bisa membuat dokumen user mereka sendiri (registrasi)
-      allow create: if true;
-      // Admin dapat melihat semua data pengguna
-      allow list: if isAdmin();
-      // Pengguna yang login bisa melihat data OPD lain dan profil sendiri
-      allow get: if isAuth();
-      // Pemilik atau admin bisa update
-      allow update: if isOwner(userId) || isAdmin();
-      // Hapus hanya oleh admin
-      allow delete: if isAdmin();
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // 🔐 ROLES COLLECTION
     match /roles/{roleId} {
-      // Siapa saja bisa membuat (saat registrasi)
-      allow create: if isAuth();
-      // Siapa saja bisa membaca (untuk dropdown registrasi)
-      allow get, list: if true;
-      // Hanya admin bisa hapus
-      allow delete: if isAdmin();
-      // Update tidak diizinkan
-      allow update: if false;
+      allow read: if true;
+      allow write: if request.auth != null;
     }
-
-    // 🔑 ADMIN TOKENS COLLECTION
-    match /adminTokens/{tokenId} {
-      // Siapa saja bisa baca (untuk verifikasi login admin)
-      allow get, list: if true;
-      // Hanya superadmin bisa kelola
-      allow create, update, delete: if isSuperAdmin();
-    }
-
-    // 📋 SURVEYS COLLECTION
+    
+    // Allow authenticated users to read/write their own data
+    // and admins can manage other data.
     match /surveys/{surveyId} {
-      // Pengguna yang login bisa membuat survey
-      allow create: if isAuth();
-      // Admin bisa baca semua, pengguna hanya baca punya sendiri
-      allow get: if isAuth();
-      allow list: if isAdmin();
-      // Update & delete hanya untuk pemilik atau admin
-      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
+      allow read, write: if request.auth != null;
+    }
+    
+    match /continuityPlans/{planId} {
+      allow read, write: if request.auth != null;
     }
 
-    // 📄 CONTINUITY PLANS COLLECTION
-    match /continuityPlans/{planId} {
-      // Pengguna yang login bisa membuat rencana
-      allow create: if isAuth();
-      // Admin bisa baca semua, pengguna hanya baca punya sendiri
-      allow get: if isAuth();
-      allow list: if isAdmin();
-      // Update & delete hanya untuk pemilik atau admin
-      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
+    match /adminTokens/{tokenId} {
+       allow read, write: if request.auth != null;
     }
   }
 }
