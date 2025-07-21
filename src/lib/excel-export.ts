@@ -20,10 +20,6 @@ const createSheetWithHeader = (
     headers: string[],
     userProfile: UserProfile | null
 ) => {
-    // Create an empty worksheet with just the data headers to establish columns
-    const ws = XLSX.utils.json_to_sheet([], { header: headers });
-
-    // --- Header Section ---
     const today = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
     const opdName = userProfile?.role || 'N/A';
     const userName = userProfile?.fullName || 'N/A';
@@ -34,57 +30,55 @@ const createSheetWithHeader = (
         [`Organisasi Perangkat Daerah (OPD): ${opdName}`],
         [], // Spacer row
         ['Nama Penginput:', userName],
-        ['Tanggal Laporan:', today]
+        ['Tanggal Laporan:', today],
+        [], // Spacer row
     ];
-    
-    // Add the header rows to the worksheet starting from cell A1
-    XLSX.utils.sheet_add_aoa(ws, headerRows, { origin: 'A1' });
 
-    // Merge cells for the main titles to make them span across the table width
+    const ws = XLSX.utils.aoa_to_sheet(headerRows);
+    
+    // Add the table headers starting after the main header block
+    XLSX.utils.sheet_add_aoa(ws, [headers], { origin: 'A8' });
+    
+    // Add the JSON data starting from the next row, skipping its own header
+    XLSX.utils.sheet_add_json(ws, data, { origin: 'A9', skipHeader: true });
+
+    // --- Styling and Formatting ---
     ws['!merges'] = [
         { s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } },
         { s: { r: 1, c: 0 }, e: { r: 1, c: headers.length - 1 } },
         { s: { r: 2, c: 0 }, e: { r: 2, c: headers.length - 1 } },
     ];
-    
-    // --- Data Section ---
-    // Add the actual JSON data to the sheet, starting after the header block (at row 8, which is A8)
-    XLSX.utils.sheet_add_json(ws, data, { origin: 'A8', skipHeader: true });
 
-    // --- Styling and Formatting ---
     const colWidths = headers.map((header, i) => {
         const keyName = Object.keys(data[0] || {})[i] || '';
         const headerLength = header.length;
         const dataLengths = data.map(row => {
             const value = (row as any)[keyName];
             if (typeof value === 'string' && value.includes('\n')) {
-                // For multiline strings, get the length of the longest line
                 return Math.max(...value.split('\n').map(line => line.length));
             }
             return (value?.toString() || "").length;
         });
 
         return {
-            wch: Math.min(Math.max(...dataLengths, headerLength) + 2, 80) // Set a max width of 80
+            wch: Math.min(Math.max(...dataLengths, headerLength) + 5, 60)
         };
     });
     ws['!cols'] = colWidths;
 
-    // Iterate over all cells to apply word wrap
     const range = XLSX.utils.decode_range(ws['!ref']!);
     for (let R = range.s.r; R <= range.e.r; ++R) {
         for (let C = range.s.c; C <= range.e.c; ++C) {
             const cell_address = { c: C, r: R };
             const cell_ref = XLSX.utils.encode_cell(cell_address);
             if (ws[cell_ref]) {
-                ws[cell_ref].s = { ...ws[cell_ref].s, alignment: { wrapText: true, vertical: 'top' } };
+                if (!ws[cell_ref].s) ws[cell_ref].s = {};
+                ws[cell_ref].s.alignment = { ...ws[cell_ref].s.alignment, wrapText: true, vertical: 'top' };
             }
         }
     }
     
-    // Append the finished worksheet to the workbook
     XLSX.utils.book_append_sheet(workbook, ws, sheetName);
-    return ws; // Return worksheet for further modification if needed
 };
 
 
