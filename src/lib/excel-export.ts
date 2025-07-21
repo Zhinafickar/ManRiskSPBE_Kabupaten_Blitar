@@ -20,7 +20,6 @@ const createSheetWithHeader = (
     userProfile: UserProfile | null
 ) => {
     if (!data || data.length === 0) {
-        // If there's no data, don't create the sheet.
         return;
     }
 
@@ -32,23 +31,18 @@ const createSheetWithHeader = (
         ["Laporan Manajemen Risiko"],
         ["Kabupaten Blitar"],
         [`Organisasi Perangkat Daerah (OPD): ${opdName}`],
-        [], // Spacer
+        [],
         ['Nama Penginput:', userName],
         ['Tanggal Laporan:', today],
-        [], // Spacer
+        [],
     ];
 
-    const dataHeaders = Object.keys(data[0]);
+    const dataWithHeaders = [Object.keys(data[0]), ...data.map(Object.values)];
 
-    // Create worksheet with custom header first, then add data
     const ws = XLSX.utils.aoa_to_sheet(reportHeader);
-    XLSX.utils.sheet_add_json(ws, data, {
-        origin: 'A8', // Start data from row 8
-        header: dataHeaders,
-        skipHeader: false, // We include headers from the JSON itself
-    });
-
-    // --- Styling and Formatting ---
+    XLSX.utils.sheet_add_aoa(ws, dataWithHeaders, { origin: 'A8' });
+    
+    const dataHeaders = Object.keys(data[0]);
     const colWidths = dataHeaders.map((header: string) => {
         const headerLength = header ? header.length : 10;
         const dataLengths = data.map(row => {
@@ -60,7 +54,6 @@ const createSheetWithHeader = (
     });
     ws['!cols'] = colWidths;
 
-    // Merge header cells
     if (dataHeaders.length > 1) {
         ws['!merges'] = [
             { s: { r: 0, c: 0 }, e: { r: 0, c: dataHeaders.length - 1 } },
@@ -68,8 +61,10 @@ const createSheetWithHeader = (
             { s: { r: 2, c: 0 }, e: { r: 2, c: dataHeaders.length - 1 } },
         ];
     }
+    
+    const penyebabIndex = dataHeaders.indexOf('Penyebab');
+    const dampakIndex = dataHeaders.indexOf('Dampak');
 
-    // Apply alignment and bolding to all cells
     const range = XLSX.utils.decode_range(ws['!ref']!);
     for (let R = range.s.r; R <= range.e.r; ++R) {
         for (let C = range.s.c; C <= range.e.c; ++C) {
@@ -79,11 +74,12 @@ const createSheetWithHeader = (
 
             if (!ws[cell_ref].s) ws[cell_ref].s = {};
             
-            // Default alignment
             ws[cell_ref].s.alignment = { wrapText: true, vertical: 'top' };
+            
+            const isHeaderRow = (R >= 0 && R < 7) || R === 7;
+            const isTargetColumn = R > 7 && (C === penyebabIndex || C === dampakIndex);
 
-            // Apply bold to header rows (Report header + Table header)
-            if (R < 7 || R === 7) { 
+            if (isHeaderRow || isTargetColumn) {
                  if (!ws[cell_ref].s.font) ws[cell_ref].s.font = {};
                  ws[cell_ref].s.font.bold = true;
             }
