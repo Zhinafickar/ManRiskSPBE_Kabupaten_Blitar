@@ -290,7 +290,7 @@ export function MainNav() {
                 <SidebarMenuSubButton asChild isActive={pathname === '/user/survey-1'}>
                   <Link href="/user/survey-1">
                     <FilePenLine />
-                    <span>Input Form (Single)</span>
+                    <span>Input Form</span>
                   </Link>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>

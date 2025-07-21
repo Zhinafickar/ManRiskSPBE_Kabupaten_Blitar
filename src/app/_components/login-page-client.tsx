@@ -19,7 +19,7 @@ import { auth, isFirebaseConfigured, db } from '@/lib/firebase';
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getDoc, doc } from 'firebase/firestore';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
@@ -95,63 +95,64 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
       setIsLoading(false);
     }
   }
+  
+  const pageTitle = isAdminLogin ? 'Admin Login' : 'Selamat Datang!';
+  const pageDescription = isAdminLogin ? 'Silakan masuk untuk melanjutkan ke dasbor admin.' : 'Silakan masuk untuk melanjutkan ke dasbor Manajemen Risiko.';
+  const registerLink = isAdminLogin ? '/admuinma/register' : '/register';
+  const registerText = isAdminLogin ? 'Daftar disini' : 'Register';
+  const registerPrompt = isAdminLogin ? 'Belum punya akun admin?' : 'Belum punya akun?';
+
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-8">
-        <div className="flex flex-col items-center text-center">
-          <Image src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png" alt="Logo" width={130} height={130} />
-          <h1 className="text-2xl font-bold mt-4">{isAdminLogin ? 'Admin Login' : 'Selamat Datang!'}</h1>
-          <p className="text-muted-foreground">
-            {isAdminLogin ? 'Silakan masuk untuk melanjutkan ke dasbor admin.' : 'Silakan masuk untuk melanjutkan ke dasbor Manajemen Risiko.'}
-          </p>
-        </div>
-        <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="name@example.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Logging in...' : 'Login'}
-            </Button>
-          </form>
-        </FormProvider>
-        <p className="text-center text-sm text-muted-foreground">
-            {isAdminLogin ? (
-                <span>Belum punya akun admin? <Link href="/admuinma/register" className="font-medium text-primary hover:underline">Daftar disini</Link></span>
-            ) : (
-                <>
-                Belum punya akun?{' '}
-                <Link href="/register" className="font-medium text-primary hover:underline">
-                    Register
+      <Card className="w-full max-w-md shadow-2xl">
+        <CardHeader className="text-center">
+            <Image src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png" alt="Logo" width={130} height={130} className="mx-auto" />
+            <CardTitle className="text-2xl font-bold mt-4">{pageTitle}</CardTitle>
+            <CardDescription>{pageDescription}</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <FormProvider {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                        <Input placeholder="name@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+                <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                        <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Logging in...' : 'Login'}
+                </Button>
+            </form>
+            </FormProvider>
+            <p className="mt-6 text-center text-sm text-muted-foreground">
+                {registerPrompt}{' '}
+                <Link href={registerLink} className="font-medium text-primary hover:underline">
+                    {registerText}
                 </Link>
-                </>
-            )}
-        </p>
-      </div>
+            </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }

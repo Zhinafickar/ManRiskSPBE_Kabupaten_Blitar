@@ -86,7 +86,12 @@ body {
   }
   body {
     @apply bg-background text-foreground;
-    background-image: linear-gradient(to bottom, hsl(var(--background)), hsl(var(--gradient-end)));
-    min-height: 100vh;
+  }
+
+  body:has(> main > div.flex.min-h-screen) {
+     background-image: url('https://static.vecteezy.com/system/resources/previews/018/752/867/non_2x/abstract-background-design-background-texture-design-with-abstract-style-creative-illustration-for-advertising-posters-business-cards-flyers-websites-banners-covers-landings-pages-etc-free-vector.jpg');
+     background-size: cover;
+     background-position: center;
+     background-repeat: no-repeat;
   }
 }
