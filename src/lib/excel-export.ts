@@ -24,9 +24,9 @@ const createSheetWithHeader = (
     const opdName = userProfile?.role || 'N/A';
     const userName = userProfile?.fullName || 'N/A';
 
-    const headerRows = [
-        ['Laporan Manajemen Risiko'],
-        ['Kabupaten Blitar'],
+    const headerContent = [
+        ["Laporan Manajemen Risiko"],
+        ["Kabupaten Blitar"],
         [`Organisasi Perangkat Daerah (OPD): ${opdName}`],
         [], // Spacer row
         ['Nama Penginput:', userName],
@@ -34,86 +34,83 @@ const createSheetWithHeader = (
         [], // Spacer row
     ];
 
-    const ws_data = [
-      ...headerRows,
-      headers,
-      ...data.map(row => headers.map(header => {
-            const key = Object.keys(data[0] || {}).find(k => k.toLowerCase() === header.toLowerCase().replace(/ /g, '')) || header;
-            // A bit of a hack to map headers to keys, ideally keys would be consistent
-             const keyMap: { [key: string]: string } = {
-                'tanggallaporan': 'createdAt',
-                'peranpengguna': 'userRole',
-                'kategoririsiko': 'riskEvent',
-                'risiko': 'risiko' in row ? row.risiko : row.impactArea,
-                'areadampak': 'areaDampak',
-                'penyebab': 'cause',
-                'dampak': 'impact',
-                'frekuensi': 'frequency',
-                'besarandampak': 'impactMagnitude',
-                'tingkatrisiko': 'riskLevel',
-                'kontrolorganisasi': 'kontrolOrganisasi',
-                'kontrolorang': 'kontrolOrang',
-                'kontrolfisik': 'kontrolFisik',
-                'kontrolteknologi': 'kontrolTeknologi',
-                'mitigasi': 'mitigasi',
-                'aktivitas': 'aktivitas',
-                'targetwaktu': 'targetWaktu',
-                'pic': 'pic',
-                'sumberdaya': 'sumberdaya',
-                'rto': 'rto',
-                'rpo': 'rpo',
-                'tanggaldibuat': 'createdAt',
+    const dataForSheet = data.map(row => {
+        const newRow: { [key: string]: any } = {};
+        headers.forEach(header => {
+            const keyMap: { [key: string]: string[] } = {
+                'Tanggal Laporan': ['createdAt'],
+                'Peran Pengguna': ['userRole'],
+                'Kategori Risiko': ['riskEvent'],
+                'Risiko': ['impactArea', 'risiko'], // Check for both possible keys
+                'Area Dampak': ['areaDampak'],
+                'Penyebab': ['cause'],
+                'Dampak': ['impact'],
+                'Frekuensi': ['frequency'],
+                'Besaran Dampak': ['impactMagnitude'],
+                'Tingkat Risiko': ['riskLevel'],
+                'Kontrol Organisasi': ['kontrolOrganisasi'],
+                'Kontrol Orang': ['kontrolOrang'],
+                'Kontrol Fisik': ['kontrolFisik'],
+                'Kontrol Teknologi': ['kontrolTeknologi'],
+                'Mitigasi': ['mitigasi'],
+                'Aktivitas': ['aktivitas'],
+                'Target Waktu': ['targetWaktu'],
+                'PIC': ['pic'],
+                'Sumberdaya': ['sumberdaya'],
+                'RTO': ['rto'],
+                'RPO': ['rpo'],
+                'Tanggal Dibuat': ['createdAt'],
             };
-            const dataKey = keyMap[header.toLowerCase().replace(/ /g, '')];
-            return (row as any)[dataKey] || '';
-      }))
-    ];
+            
+            const possibleKeys = keyMap[header];
+            if (possibleKeys) {
+                // Find the first key that exists in the row object and has a value
+                const key = possibleKeys.find(k => row[k] !== undefined && row[k] !== null);
+                newRow[header] = key ? row[key] : '';
+            } else {
+                 newRow[header] = '';
+            }
+        });
+        return newRow;
+    });
 
-    const ws = XLSX.utils.aoa_to_sheet(ws_data);
-    
+    const ws = XLSX.utils.json_to_sheet(dataForSheet, { header: headers, skipHeader: false });
+    XLSX.utils.sheet_add_aoa(ws, headerContent, { origin: "A1" });
+
     // --- Styling and Formatting ---
-    ws['!merges'] = [
+    const colWidths = headers.map(header => {
+        const headerLength = header.length;
+        const dataLengths = dataForSheet.map(row => (row[header]?.toString() || "").length);
+        const maxLength = Math.max(...dataLengths, headerLength);
+        return { wch: Math.min(maxLength + 5, 60) };
+    });
+    ws['!cols'] = colWidths;
+
+     ws['!merges'] = [
         { s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } },
         { s: { r: 1, c: 0 }, e: { r: 1, c: headers.length - 1 } },
         { s: { r: 2, c: 0 }, e: { r: 2, c: headers.length - 1 } },
     ];
-
-    const colWidths = headers.map((header, i) => {
-        const keyName = Object.keys(data[0] || {})[i] || '';
-        const headerLength = header.length;
-        const dataLengths = data.map(row => {
-            const value = (row as any)[keyName];
-            if (typeof value === 'string' && value.includes('\n')) {
-                return Math.max(...value.split('\n').map(line => line.length));
-            }
-            return (value?.toString() || "").length;
-        });
-
-        return {
-            wch: Math.min(Math.max(...dataLengths, headerLength, 15) + 5, 60)
-        };
-    });
-    ws['!cols'] = colWidths;
-
+    
     const range = XLSX.utils.decode_range(ws['!ref']!);
     for (let R = range.s.r; R <= range.e.r; ++R) {
         for (let C = range.s.c; C <= range.e.c; ++C) {
             const cell_address = { c: C, r: R };
             const cell_ref = XLSX.utils.encode_cell(cell_address);
-            if (ws[cell_ref]) {
-                if (!ws[cell_ref].s) ws[cell_ref].s = {};
-                // Apply word wrap and top alignment to all cells
-                ws[cell_ref].s.alignment = { ...ws[cell_ref].s.alignment, wrapText: true, vertical: 'top' };
-                
-                // Apply bold to header rows (first 3), spacer rows (4,6), info rows(5,7), and table header (8)
-                if (R < 8) { // This now covers all header content and the table header row
-                     if (!ws[cell_ref].s.font) ws[cell_ref].s.font = {};
-                     ws[cell_ref].s.font.bold = true;
-                }
+            if (!ws[cell_ref]) continue;
+
+            if (!ws[cell_ref].s) ws[cell_ref].s = {};
+            ws[cell_ref].s.alignment = { wrapText: true, vertical: 'top' };
+
+            // Apply bold to header rows
+            if (R < 7 || R === 7) { 
+                 if (!ws[cell_ref].s.font) ws[cell_ref].s.font = {};
+                 ws[cell_ref].s.font.bold = true;
             }
         }
     }
-    
+
+
     XLSX.utils.book_append_sheet(workbook, ws, sheetName);
 };
 
