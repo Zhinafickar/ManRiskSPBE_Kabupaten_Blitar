@@ -134,8 +134,8 @@ export default function AdminResultsPage() {
               {surveys.map((survey) => (
                 <TableRow key={survey.id}>
                   <TableCell className="font-medium max-w-xs truncate">{survey.userRole || 'N/A'}</TableCell>
-                  <TableCell className="max-w-xs truncate">{survey.riskEvent}</TableCell>
-                  <TableCell className="max-w-xs truncate">{survey.impactArea}</TableCell>
+                  <TableCell className="max-w-xs whitespace-normal">{survey.riskEvent}</TableCell>
+                  <TableCell className="max-w-xs whitespace-normal">{survey.impactArea}</TableCell>
                   <TableCell className="max-w-xs truncate">{survey.areaDampak || 'N/A'}</TableCell>
                   <TableCell>{survey.frequency}</TableCell>
                   <TableCell>{survey.impactMagnitude}</TableCell>
