@@ -35,16 +35,20 @@ export default function SuperAdminDashboard() {
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground space-y-4">
               <div>
-                  <h4 className="font-semibold text-foreground">1. Manajemen Token Admin</h4>
-                  <p>Buat token unik di menu 'Manajemen Token' untuk mendaftarkan akun admin baru. Berikan token dan nama yang Anda daftarkan kepada calon admin.</p>
+                  <h4 className="font-semibold text-foreground">1. Manajemen Token & Akses Admin</h4>
+                  <p>Buat token unik di menu 'Manajemen Token' untuk mendaftarkan akun admin baru. Berikan token dan nama yang Anda daftarkan kepada calon admin untuk mereka gunakan di halaman login admin.</p>
               </div>
               <div>
                   <h4 className="font-semibold text-foreground">2. Manajemen Pengguna dan Peran</h4>
-                  <p>Lihat, edit, atau hapus pengguna melalui 'Manajemen Pengguna'. Anda juga bisa mengelola peran dan melihat siapa saja yang terdaftar di 'Manajemen Peran'.</p>
+                  <p>Akses 'Manajemen Pengguna' untuk melihat, mengedit (termasuk mengubah peran), atau menghapus semua pengguna. Di 'Manajemen Peran', Anda bisa melihat daftar semua peran dan pengguna yang terdaftar di dalamnya.</p>
               </div>
               <div>
-                  <h4 className="font-semibold text-foreground">3. Pantau Data Organisasi</h4>
-                  <p>Akses semua data survei, rencana kontinuitas, dan visualisasi data dari seluruh OPD melalui menu 'Data & Laporan'.</p>
+                  <h4 className="font-semibold text-foreground">3. Pemantauan & Pelaporan Data Global</h4>
+                  <p>Gunakan menu 'Data & Laporan' untuk mengakses semua data survei, rencana kontinuitas, dan visualisasi dari seluruh OPD. Anda memiliki akses penuh ke semua data yang ada di sistem.</p>
+              </div>
+               <div>
+                  <h4 className="font-semibold text-foreground">4. Akses Penuh sebagai Admin</h4>
+                  <p>Sebagai Super Admin, Anda juga memiliki semua hak akses yang dimiliki oleh peran Admin, termasuk melihat dan mengelola data OPD secara keseluruhan.</p>
               </div>
           </CardContent>
       </Card>
