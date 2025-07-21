@@ -131,36 +131,18 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
   const riskEventOptions = useMemo(() => [{ name: CUSTOM_VALUE, impactAreas: [] }, ...RISK_EVENTS], []);
 
   useEffect(() => {
-    if (selectedRiskEvent === CUSTOM_VALUE) {
-        setIsCustomRiskEvent(true);
-        form.setValue('impactArea', '');
-        setAvailableImpactAreas([]);
-        setIsCustomImpactArea(true); // If category is custom, risk must be custom too.
-    } else {
-        setIsCustomRiskEvent(false);
+    // Only update available impact areas if risk event is not custom
+    if (!isCustomRiskEvent) {
         const riskEventObject = RISK_EVENTS.find(event => event.name === selectedRiskEvent);
         const newImpactAreas = riskEventObject ? riskEventObject.impactAreas : [];
         setAvailableImpactAreas(newImpactAreas);
         
-        // If the current impactArea is not in the new list, reset it.
-        if (selectedImpactArea && !newImpactAreas.includes(selectedImpactArea) && selectedImpactArea !== CUSTOM_VALUE) {
+        // If the current impactArea is not in the new list, and it's not custom, reset it.
+        if (selectedImpactArea && !isCustomImpactArea && !newImpactAreas.includes(selectedImpactArea)) {
             form.setValue('impactArea', '');
-            setIsCustomImpactArea(false);
         }
     }
-  }, [selectedRiskEvent, form, selectedImpactArea]);
-
-  useEffect(() => {
-    if (selectedImpactArea === CUSTOM_VALUE) {
-        setIsCustomImpactArea(true);
-    } else {
-        // This handles the case where the user selects a value from the dropdown after being in custom mode.
-        const riskEventObject = RISK_EVENTS.find(event => event.name === selectedRiskEvent);
-        if (riskEventObject && riskEventObject.impactAreas.includes(selectedImpactArea)) {
-            setIsCustomImpactArea(false);
-        }
-    }
-  }, [selectedImpactArea, selectedRiskEvent]);
+  }, [selectedRiskEvent, isCustomRiskEvent, form, selectedImpactArea, isCustomImpactArea]);
 
 
   useEffect(() => {
@@ -174,7 +156,8 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
     } else {
       setRiskSentiment(null);
     }
-  }, [form.watch('riskEvent'), form.watch('impactArea'), isCustomRiskEvent, isCustomImpactArea]);
+  }, [selectedRiskEvent, selectedImpactArea, isCustomRiskEvent, isCustomImpactArea]);
+
 
   useEffect(() => {
     setRiskIndicator(getRiskLevel(frequency, impactMagnitude));
@@ -317,7 +300,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                                 </Button>
                             </div>
                             <FormControl>
-                                <Input placeholder="Ketik kategori risiko Anda..." {...field} value={field.value === CUSTOM_VALUE ? '' : field.value} />
+                                <Input placeholder="Ketik kategori risiko Anda..." {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -358,7 +341,18 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                             <CommandList>
                               <CommandGroup>
                                 {riskEventOptions.map((event) => (
-                                  <CommandItem key={event.name} value={event.name} onSelect={(currentValue) => { form.setValue("riskEvent", currentValue); setRiskEventOpen(false); }}>
+                                  <CommandItem key={event.name} value={event.name} onSelect={(currentValue) => { 
+                                    if (currentValue === CUSTOM_VALUE.toLowerCase()) {
+                                        setIsCustomRiskEvent(true);
+                                        form.setValue("riskEvent", CUSTOM_VALUE, { shouldValidate: true });
+                                        setIsCustomImpactArea(true);
+                                        form.setValue("impactArea", CUSTOM_VALUE, { shouldValidate: true });
+                                    } else {
+                                        setIsCustomRiskEvent(false);
+                                        form.setValue("riskEvent", event.name, { shouldValidate: true });
+                                    }
+                                    setRiskEventOpen(false); 
+                                  }}>
                                     <Check className={cn("mr-2 h-4 w-4", event.name === field.value ? "opacity-100" : "opacity-0")} />
                                     {event.name === CUSTOM_VALUE ? <span className="italic">{event.name}</span> : event.name}
                                   </CommandItem>
@@ -396,7 +390,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                             )}
                             </div>
                             <FormControl>
-                                <Input placeholder="Ketik risiko Anda..." {...field} value={field.value === CUSTOM_VALUE ? '' : field.value} />
+                                <Input placeholder="Ketik risiko Anda..." {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -424,12 +418,20 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                             <CommandEmpty>Risiko tidak ditemukan.</CommandEmpty>
                             <CommandList>
                               <CommandGroup>
-                                 <CommandItem value={CUSTOM_VALUE} onSelect={() => { form.setValue("impactArea", CUSTOM_VALUE); setImpactAreaOpen(false); }}>
+                                 <CommandItem value={CUSTOM_VALUE} onSelect={() => { 
+                                     setIsCustomImpactArea(true);
+                                     form.setValue("impactArea", CUSTOM_VALUE, { shouldValidate: true });
+                                     setImpactAreaOpen(false); 
+                                }}>
                                     <Check className={cn("mr-2 h-4 w-4", CUSTOM_VALUE === field.value ? "opacity-100" : "opacity-0")} />
                                     <span className="italic">{CUSTOM_VALUE}</span>
                                 </CommandItem>
                                 {availableImpactAreas.map((area) => (
-                                  <CommandItem key={area} value={area} onSelect={() => { form.setValue("impactArea", area); setImpactAreaOpen(false); }}>
+                                  <CommandItem key={area} value={area} onSelect={() => { 
+                                    setIsCustomImpactArea(false);
+                                    form.setValue("impactArea", area, { shouldValidate: true });
+                                    setImpactAreaOpen(false); 
+                                    }}>
                                     <Check className={cn("mr-2 h-4 w-4", area === field.value ? "opacity-100" : "opacity-0")} />
                                     {area}
                                   </CommandItem>
