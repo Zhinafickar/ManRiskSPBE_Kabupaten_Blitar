@@ -15,11 +15,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
-import { getAllUsers } from '@/services/user-service';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ADMIN_ROLES } from '@/constants/admin-data';
 import { useAdminVerification } from '../_components/admin-verification-context';
 import { verifyAdminTokenAction } from '../actions';
 
@@ -48,17 +46,7 @@ export function TokenVerification() {
                 title: 'Verifikasi Berhasil',
                 description: 'Silakan lanjutkan ke otentikasi admin.',
             });
-            
-            // Check for available roles only AFTER successful token verification
-            const users = await getAllUsers();
-            const superAdminExists = users.some(user => user.role === 'superadmin');
-            
-            if (superAdminExists) {
-                setAvailableRoles(ADMIN_ROLES.filter(role => role !== 'superadmin'));
-            } else {
-                setAvailableRoles(ADMIN_ROLES);
-            }
-            
+            setAvailableRoles(result.availableRoles);
             setIsVerified(true);
         } else {
             toast({
@@ -66,15 +54,15 @@ export function TokenVerification() {
                 title: 'Verifikasi Gagal',
                 description: result.message,
             });
-            setIsLoading(false);
         }
     } catch (error) {
         console.error("Error during verification process:", error);
         toast({
             variant: 'destructive',
             title: 'Verifikasi Gagal',
-            description: "Gagal memeriksa peran atau token.",
+            description: "Terjadi kesalahan pada server saat verifikasi.",
         });
+    } finally {
         setIsLoading(false);
     }
   }
