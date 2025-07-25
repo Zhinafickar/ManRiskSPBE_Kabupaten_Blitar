@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -16,6 +17,7 @@ import { auth } from '@/lib/firebase';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { User } from 'lucide-react';
+import { ThemeToggle } from './theme-toggle';
 
 export function UserNav() {
   const { user, userProfile } = useAuth();
@@ -59,6 +61,9 @@ export function UserNav() {
             <DropdownMenuItem onSelect={() => router.push('/user/dashboard')}>
               Dashboard
             </DropdownMenuItem>
+             <div className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
+              <ThemeToggle />
+            </div>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={handleLogout}>

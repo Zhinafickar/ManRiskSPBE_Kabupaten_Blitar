@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,8 +9,8 @@ body {
 
 @layer base {
   :root {
-    --background: 204 100% 93%; /* #D0EFFF */
-    --foreground: 222 84% 12%; /* #0F172A */
+    --background: 220 20% 97%;
+    --foreground: 222 84% 12%;
     --card: 0 0% 100%;
     --card-foreground: 222 84% 12%;
     --popover: 0 0% 100%;
@@ -43,6 +44,7 @@ body {
     --sidebar-ring: 221 83% 53%;
     --gradient-end: 204 100% 93%;
   }
+
   .dark {
     --background: 222 47% 11%;
     --foreground: 210 40% 98%;
@@ -89,9 +91,7 @@ body {
   }
 
   body:has(> main > div.flex.min-h-screen) {
-     background-image: url('https://static.vecteezy.com/system/resources/previews/018/752/867/non_2x/abstract-background-design-background-texture-design-with-abstract-style-creative-illustration-for-advertising-posters-business-cards-flyers-websites-banners-covers-landings-pages-etc-free-vector.jpg');
-     background-size: cover;
-     background-position: center;
-     background-repeat: no-repeat;
+     background-image: none;
+     background-color: hsl(var(--background));
   }
 }
