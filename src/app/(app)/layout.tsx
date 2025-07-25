@@ -34,7 +34,10 @@ function AppLayoutSkeleton() {
       <div className="flex-1 flex flex-col">
         <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background px-4 sm:px-6">
           <Skeleton className="h-8 w-8 rounded-md md:hidden" />
-          <Skeleton className="h-8 w-8 rounded-full ml-auto" />
+          <div className="ml-auto flex items-center gap-2">
+            <Skeleton className="h-8 w-8 rounded-full" />
+            <Skeleton className="h-8 w-8 rounded-full" />
+          </div>
         </header>
         <main className="flex-1 p-4 sm:p-6">
           <div className="space-y-4">
