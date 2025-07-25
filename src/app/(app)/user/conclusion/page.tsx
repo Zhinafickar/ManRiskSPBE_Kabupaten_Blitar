@@ -228,6 +228,7 @@ export default function ReportPage() {
               }
               .printable-area, .printable-area * {
                 visibility: visible;
+                color: black !important;
               }
               .printable-area {
                 position: absolute;
@@ -236,7 +237,6 @@ export default function ReportPage() {
                 width: 100%;
                 padding: 0;
                 margin: 0;
-                color: black;
                 font-size: 11pt;
               }
               .no-print {

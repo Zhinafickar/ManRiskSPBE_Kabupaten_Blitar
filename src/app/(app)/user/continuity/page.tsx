@@ -267,8 +267,8 @@ export default function ContinuityPage() {
                             name={`plans.${index}.pic`}
                             render={({ field }) => (
                                 <FormItem>
-                                <FormLabel>PIC</FormLabel>
-                                <FormControl><Input placeholder="Departemen/Jabatan" {...field} /></FormControl>
+                                <FormLabel>PIC (Person In Charge)</FormLabel>
+                                <FormControl><Input placeholder="Penaggungjawab" {...field} /></FormControl>
                                 <FormMessage />
                                 </FormItem>
                             )}
