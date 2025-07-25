@@ -17,7 +17,7 @@ import { auth } from '@/lib/firebase';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { User } from 'lucide-react';
-import { ThemeToggle } from './theme-toggle';
+import { ThemeSwitcher } from '@/components/theme-switcher';
 
 export function UserNav() {
   const { user, userProfile } = useAuth();
@@ -34,6 +34,7 @@ export function UserNav() {
 
   return (
     <div className="flex items-center gap-2">
+      <ThemeSwitcher />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -58,11 +59,10 @@ export function UserNav() {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem onSelect={() => router.push('/user/dashboard')}>
+            <DropdownMenuItem onSelect={() => router.push('/dashboard')}>
               Dashboard
             </DropdownMenuItem>
              <div className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
-              <ThemeToggle />
             </div>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
