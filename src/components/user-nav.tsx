@@ -16,7 +16,6 @@ import { auth } from '@/lib/firebase';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { User } from 'lucide-react';
-import { ThemeSwitcher } from './theme-switcher';
 
 export function UserNav() {
   const { user, userProfile } = useAuth();
@@ -33,7 +32,6 @@ export function UserNav() {
 
   return (
     <div className="flex items-center gap-2">
-      <ThemeSwitcher />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-8 w-8 rounded-full">
