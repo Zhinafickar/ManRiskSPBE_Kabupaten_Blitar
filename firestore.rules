@@ -4,7 +4,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // 🔐 Helper functions
+    //Helper functions
     function isAuth() {
       return request.auth != null;
     }
@@ -23,9 +23,9 @@ service cloud.firestore {
       return isAuth() && request.auth.uid == userId;
     }
 
-    // 👤 USERS COLLECTION
+    //USERS COLLECTION
     match /users/{userId} {
-      // ✅ Siapa saja (termasuk unauthenticated client) bisa LIST (baca daftar)
+      //Siapa saja (termasuk unauthenticated client) bisa LIST (baca daftar)
       // Ini dibutuhkan untuk halaman registrasi admin untuk mengecek peran.
       allow list: if true;
 
@@ -42,9 +42,9 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // 🔐 ROLES COLLECTION
+    //ROLES COLLECTION
     match /roles/{roleId} {
-      // ✅ Semua orang bisa melihat role (untuk dropdown role saat registrasi)
+      //Semua orang bisa melihat role (untuk dropdown role saat registrasi)
       allow get, list: if true;
 
       // Buat role saat registrasi oleh user terotentikasi
@@ -57,9 +57,9 @@ service cloud.firestore {
       allow update: if false;
     }
 
-    // 🔑 ADMIN TOKENS COLLECTION
+    //ADMIN TOKENS COLLECTION
     match /adminTokens/{tokenId} {
-      // ✅ Izinkan query 'list' untuk verifikasi token oleh unauthenticated users
+      //Izinkan query 'list' untuk verifikasi token oleh unauthenticated users
       // Ini aman karena Server Action yang akan melakukan query-nya
       allow get, list: if true;
 
@@ -67,7 +67,7 @@ service cloud.firestore {
       allow create, update, delete: if isSuperAdmin();
     }
 
-    // 📋 SURVEYS COLLECTION
+    //SURVEYS COLLECTION
     match /surveys/{surveyId} {
       // Semua user yang login bisa membuat survey
       allow create: if isAuth();
@@ -79,7 +79,7 @@ service cloud.firestore {
       allow update, delete: if isOwner(resource.data.userId) || isAdmin();
     }
 
-    // 📄 CONTINUITY PLANS COLLECTION
+    //CONTINUITY PLANS COLLECTION
     match /continuityPlans/{planId} {
        // Semua user yang login bisa membuat
       allow create: if isAuth();
@@ -91,7 +91,7 @@ service cloud.firestore {
       allow update, delete: if isOwner(resource.data.userId) || isAdmin();
     }
 
-    // 🛑 Fallback deny semua untuk path yang tidak terdefinisi
+    //Fallback deny semua untuk path yang tidak terdefinisi
     match /{document=**} {
       allow read, write: if false;
     }

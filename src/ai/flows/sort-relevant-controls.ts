@@ -30,9 +30,9 @@ const prompt = ai.definePrompt({
   name: 'sortRelevantControlsPrompt',
   input: {schema: SortRelevantControlsInputSchema},
   output: {schema: SortRelevantControlsOutputSchema},
-  prompt: `You are an expert ISO 27001 risk management analyst. Your task is to intelligently sort lists of security controls based on the relevance to a specific risk scenario.
+  prompt: `Anda adalah seorang analis risiko ahli ISO 27001. Tugas Anda adalah menyortir daftar kendali keamanan secara cerdas berdasarkan relevansinya terhadap skenario risiko tertentu.
 
-Analyze the provided risk context:
+Analisis konteks risiko yang diberikan:
 -   **Kategori Risiko:** {{riskEvent}}
 -   **Risiko:** {{impactArea}}
 -   **Area Dampak:** {{areaDampak}}
@@ -40,28 +40,28 @@ Analyze the provided risk context:
 -   **Dampak:** {{impact}}
 -   **Tingkat Risiko:** {{riskLevel}}
 
-You are given four complete lists of controls: Organizational, People, Physical, and Technological.
-For each list, you MUST return the **complete, original list** of controls, but re-sorted so that the controls most relevant to mitigating the specific risk described above appear at the top. Do not add or remove any controls from the original lists.
+Anda diberi empat daftar kendali lengkap: Organisasi, Orang, Fisik, dan Teknologi.
+Untuk setiap daftar, Anda HARUS mengembalikan daftar kendali **asli yang lengkap**, tetapi diurutkan ulang sehingga kendali yang paling relevan untuk memitigasi risiko spesifik yang dijelaskan di atas muncul di bagian atas. Jangan menambah atau menghapus kendali apa pun dari daftar asli.
 
-**Example Logic:**
-- If the risk is about "Pencurian data sensitive oleh staf", the "Kontrol Orang" list should prioritize controls like "6.1 Penyaringan", "6.2 Syarat dan ketentuan kerja", and "6.6 Perjanjian kerahasiaan...".
-- If the risk is about "Serangan virus", the "Kontrol Teknologi" list should prioritize "8.7 Perlindungan terhadap malware" and "8.20 Keamanan jaringan".
-- If the risk is about "Bencana alam" like a flood, the "Kontrol Fisik" list should prioritize "7.5 Melindungi dari ancaman fisik dan lingkungan" and "7.11 Utilitas pendukung".
+**Contoh Logika:**
+- Jika risikonya tentang "Pencurian data sensitif oleh staf", daftar "Kontrol Orang" harus memprioritaskan kendali seperti "6.1 Penyaringan", "6.2 Syarat dan ketentuan kerja", dan "6.6 Perjanjian kerahasiaan...".
+- Jika risikonya tentang "Serangan virus", daftar "Kontrol Teknologi" harus memprioritaskan "8.7 Perlindungan terhadap malware" dan "8.20 Keamanan jaringan".
+- Jika risikonya tentang "Bencana alam" seperti banjir, daftar "Kontrol Fisik" harus memprioritaskan "7.5 Melindungi dari ancaman fisik dan lingkungan" dan "7.11 Utilitas pendukung".
 
-Return the four sorted lists in the specified JSON format.
+Kembalikan empat daftar yang telah disortir dalam format JSON yang ditentukan.
 
-**Complete Control Lists (for your reference to ensure all items are returned):**
+**Daftar Kendali Lengkap (sebagai referensi Anda untuk memastikan semua item dikembalikan):**
 
-**Organizational Controls:**
+**Kontrol Organisasi:**
 ${[...ORGANIZATIONAL_CONTROLS].join('\n')}
 
-**People Controls:**
+**Kontrol Orang:**
 ${[...PEOPLE_CONTROLS].join('\n')}
 
-**Physical Controls:**
+**Kontrol Fisik:**
 ${[...PHYSICAL_CONTROLS].join('\n')}
 
-**Technological Controls:**
+**Kontrol Teknologi:**
 ${[...TECHNOLOGICAL_CONTROLS].join('\n')}
 `,
 });
