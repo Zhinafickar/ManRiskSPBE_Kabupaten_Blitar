@@ -287,10 +287,10 @@ export default function ReportPage() {
           `}</style>
           
           <div className="flex justify-between items-center no-print">
-              <h1 className="text-3xl font-bold">Laporan Akhir</h1>
+              <h1 className="text-3xl font-bold">Rekap Inputan User</h1>
               <Button onClick={handlePrint}>
                   <Printer className="mr-2 h-4 w-4" />
-                  Cetak Laporan
+                  Cetak Menjadi Laporan
               </Button>
           </div>
 

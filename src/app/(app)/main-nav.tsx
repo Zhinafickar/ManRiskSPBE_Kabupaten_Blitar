@@ -355,7 +355,7 @@ export function MainNav() {
         <SidebarMenuButton asChild isActive={pathname === '/user/conclusion'} tooltip="Laporan Akhir">
           <Link href="/user/conclusion">
             <Printer />
-            <span>Laporan Akhir</span>
+            <span>Rekap Input</span>
           </Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
