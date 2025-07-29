@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,6 +22,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ForgotPasswordDialog } from './forgot-password-dialog';
+import { Eye, EyeOff } from 'lucide-react';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
@@ -38,6 +40,7 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -128,7 +131,7 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
                       <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                          <Input placeholder="name@example.com" {...field} />
+                          <Input placeholder="name123@example.com" {...field} />
                       </FormControl>
                       <FormMessage />
                       </FormItem>
@@ -141,7 +144,19 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
                       <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} />
+                        <div className="relative">
+                            <Input type={showPassword ? 'text' : 'password'} placeholder="••••••••" {...field} />
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="absolute inset-y-0 right-0 h-full px-3"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
+                            </Button>
+                        </div>
                       </FormControl>
                       <FormMessage />
                       </FormItem>
@@ -159,7 +174,7 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
                   className="px-0 font-medium text-primary hover:underline"
                   onClick={() => setIsForgotPasswordOpen(true)}
                 >
-                  Forgot password?
+                  Lupa password?
                 </Button>
               </div>
               <p className="mt-2 text-center text-sm text-muted-foreground">

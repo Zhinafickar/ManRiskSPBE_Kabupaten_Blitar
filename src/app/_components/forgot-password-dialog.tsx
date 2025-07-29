@@ -74,9 +74,9 @@ export function ForgotPasswordDialog({ isOpen, onOpenChange }: ForgotPasswordDia
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Forgot Your Password?</DialogTitle>
+          <DialogTitle>Lupa Password Anda?</DialogTitle>
           <DialogDescription>
-            No problem. Enter your email address below and we'll send you a link to reset it.
+            Masukkan Alamat Email Anda dan kami akan mengirim link reset email.
           </DialogDescription>
         </DialogHeader>
         <FormProvider {...form}>
@@ -87,7 +87,7 @@ export function ForgotPasswordDialog({ isOpen, onOpenChange }: ForgotPasswordDia
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email</FormLabel>
-                  <FormControl><Input placeholder="name@example.com" {...field} /></FormControl>
+                  <FormControl><Input placeholder="name123@example.com" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -95,7 +95,7 @@ export function ForgotPasswordDialog({ isOpen, onOpenChange }: ForgotPasswordDia
             <DialogFooter>
               <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Sending...</> : 'Send Reset Link'}
+                {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Sending...</> : 'Kirimkan Link Reset'}
               </Button>
             </DialogFooter>
           </form>

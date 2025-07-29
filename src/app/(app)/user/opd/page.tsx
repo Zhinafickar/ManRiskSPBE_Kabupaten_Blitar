@@ -108,7 +108,7 @@ export default function OPDPage() {
                         Daftar Organisasi Perangkat Daerah (OPD)
                     </CardTitle>
                     <CardDescription>
-                        Berikut adalah daftar semua Organisasi Perangkat Daerah (OPD) yang tersedia dalam sistem beserta status keterisiannya.
+                        Berikut adalah daftar semua Organisasi Perangkat Daerah (OPD) yang ada dalam sistem beserta status keterisiannya.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>

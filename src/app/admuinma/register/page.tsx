@@ -33,6 +33,7 @@ import { useAdminVerification } from '../_components/admin-verification-context'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { getAllUsers } from '@/services/user-service';
 import { ADMIN_ROLES } from '@/constants/admin-data';
+import { Eye, EyeOff } from 'lucide-react';
 
 const formSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
@@ -49,6 +50,7 @@ function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [availableAdminRoles, setAvailableAdminRoles] = useState<string[]>([]);
   const [rolesLoading, setRolesLoading] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     async function checkSuperAdminAndSetRoles() {
@@ -188,9 +190,21 @@ function RegisterForm() {
                     render={({ field }) => (
                         <FormItem>
                         <FormLabel>Password</FormLabel>
-                        <FormControl>
-                            <Input type="password" placeholder="••••••••" {...field} />
-                        </FormControl>
+                          <FormControl>
+                            <div className="relative">
+                                <Input type={showPassword ? 'text' : 'password'} placeholder="••••••••" {...field} />
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="absolute inset-y-0 right-0 h-full px-3"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
+                                </Button>
+                            </div>
+                          </FormControl>
                         <FormMessage />
                         </FormItem>
                     )}
