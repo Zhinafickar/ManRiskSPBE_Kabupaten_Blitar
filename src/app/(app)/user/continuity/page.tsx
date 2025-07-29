@@ -115,17 +115,20 @@ export default function ContinuityPage() {
             return;
         }
 
-        const lastPlanIndex = currentPlans.length - 1;
-        const lastPlan = currentPlans[lastPlanIndex];
+        // Find the first plan that is not fully completed
+        const incompletePlanIndex = currentPlans.findIndex(plan => 
+            !plan.aktivitas || !plan.targetWaktu || !plan.pic || !plan.sumberdaya || !plan.rto || !plan.rpo
+        );
 
-        // If the last plan is completely empty, fill it. Otherwise, append a new plan.
-        if (lastPlan && !lastPlan.aktivitas && !lastPlan.targetWaktu && !lastPlan.pic && !lastPlan.sumberdaya) {
-             form.setValue(`plans.${lastPlanIndex}.aktivitas`, suggestion.aktivitas, { shouldValidate: true });
-             form.setValue(`plans.${lastPlanIndex}.targetWaktu`, suggestion.targetWaktu, { shouldValidate: true });
-             form.setValue(`plans.${lastPlanIndex}.pic`, suggestion.pic, { shouldValidate: true });
-             form.setValue(`plans.${lastPlanIndex}.sumberdaya`, suggestion.sumberdaya, { shouldValidate: true });
-             toast({ title: 'Saran Diterapkan', description: 'Saran telah diterapkan pada rencana saat ini.' });
+        if (incompletePlanIndex !== -1) {
+            // If an incomplete plan is found, fill it with the new suggestion
+            form.setValue(`plans.${incompletePlanIndex}.aktivitas`, suggestion.aktivitas, { shouldValidate: true });
+            form.setValue(`plans.${incompletePlanIndex}.targetWaktu`, suggestion.targetWaktu, { shouldValidate: true });
+            form.setValue(`plans.${incompletePlanIndex}.pic`, suggestion.pic, { shouldValidate: true });
+            form.setValue(`plans.${incompletePlanIndex}.sumberdaya`, suggestion.sumberdaya, { shouldValidate: true });
+            toast({ title: 'Saran Diterapkan', description: `Saran telah diterapkan pada Rencana #${incompletePlanIndex + 1}.` });
         } else {
+            // If all plans are complete, append a new one
             append({
                 ...suggestion,
                 rto: '', // RTO and RPO should be filled by user
