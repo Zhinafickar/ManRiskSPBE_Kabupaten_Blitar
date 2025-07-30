@@ -6,7 +6,9 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from '@/components/ui/skeleton';
 import { getAllContinuityPlans, deleteContinuityPlan } from "@/services/continuity-service";
+import { getAllSurveyData } from '@/services/survey-service';
 import type { ContinuityPlan } from '@/types/continuity';
+import type { Survey } from '@/types/survey';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -14,8 +16,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Trash2, FileDown, ChevronDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { exportToCsv, exportToExcel } from '@/lib/excel-export';
+import { useAuth } from '@/hooks/use-auth';
 
 function ResultsTableSkeleton() {
   return (
@@ -30,16 +34,22 @@ function ResultsTableSkeleton() {
 
 export default function AdminContinuityResultsPage() {
   const [plans, setPlans] = useState<ContinuityPlan[]>([]);
+  const [surveys, setSurveys] = useState<Survey[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { userProfile } = useAuth();
 
   useEffect(() => {
-    getAllContinuityPlans()
-      .then(data => {
-        const filteredData = data.filter(plan => plan.userRole !== 'Penguji Coba');
-        setPlans(filteredData);
-      })
-      .finally(() => setLoading(false));
+    setLoading(true);
+    Promise.all([
+        getAllContinuityPlans(),
+        getAllSurveyData()
+    ]).then(([planData, surveyData]) => {
+        const filteredPlans = planData.filter(plan => plan.userRole !== 'Penguji Coba');
+        const filteredSurveys = surveyData.filter(survey => survey.userRole !== 'Penguji Coba');
+        setPlans(filteredPlans);
+        setSurveys(filteredSurveys);
+    }).finally(() => setLoading(false));
   }, []);
 
   const handleDelete = async (planId: string) => {
@@ -52,16 +62,56 @@ export default function AdminContinuityResultsPage() {
     }
   };
 
+  const handleExportExcel = () => {
+    const roleName = userProfile?.role || 'Admin';
+    const fileName = `${roleName}_Hasil_Management_Risiko`;
+    exportToExcel({ surveys, continuityPlans: plans, fileName, userProfile });
+  };
+
+  const handleExportCsv = () => {
+    const roleName = userProfile?.role || 'Admin';
+    const fileName = `${roleName}_Hasil_Rencana_Kontinuitas`;
+    const dataForCsv = plans.map(p => ({
+        'Peran Pengguna': p.userRole,
+        'Risiko': p.risiko,
+        'Aktivitas': p.aktivitas,
+        'Target Waktu': p.targetWaktu,
+        'PIC': p.pic,
+        'Sumberdaya': p.sumberdaya,
+        'RTO': p.rto,
+        'RPO': p.rpo,
+        'Tanggal Dibuat': new Date(p.createdAt).toLocaleString('id-ID'),
+    }));
+    exportToCsv({ data: dataForCsv, fileName });
+  };
+
+  const plansAvailable = plans.length > 0;
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>All Continuity Plans</CardTitle>
-        <CardDescription>A comprehensive list of all continuity plans submitted by all users.</CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+            <CardTitle>All Continuity Plans</CardTitle>
+            <CardDescription>A comprehensive list of all continuity plans submitted by all users.</CardDescription>
+        </div>
+         <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button disabled={!plansAvailable}>
+                    <FileDown className="mr-2 h-4 w-4" />
+                    Download Laporan
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={handleExportExcel}>Download Excel</DropdownMenuItem>
+                <DropdownMenuItem onSelect={handleExportCsv}>Download CSV</DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
       </CardHeader>
       <CardContent>
         {loading ? (
           <ResultsTableSkeleton />
-        ) : plans.length > 0 ? (
+        ) : plansAvailable ? (
           <Table>
             <TableHeader>
               <TableRow className="border-b-primary/20 bg-primary hover:bg-primary/90">

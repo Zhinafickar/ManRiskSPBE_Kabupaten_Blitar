@@ -15,20 +15,31 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Trash2, FileDown, ChevronDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { getUserSurveys } from '@/services/survey-service';
+import { exportToCsv, exportToExcel } from '@/lib/excel-export';
+import type { Survey } from '@/types/survey';
 
 export default function ContinuityResultsPage() {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const [plans, setPlans] = useState<ContinuityPlan[]>([]);
+  const [surveys, setSurveys] = useState<Survey[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
     if (user) {
-      getUserContinuityPlans(user.uid)
-        .then(setPlans)
-        .finally(() => setLoading(false));
+      setLoading(true);
+      Promise.all([
+        getUserContinuityPlans(user.uid),
+        getUserSurveys(user.uid)
+      ]).then(([userPlans, userSurveys]) => {
+        setPlans(userPlans);
+        setSurveys(userSurveys);
+      }).finally(() => setLoading(false));
+    } else {
+        setLoading(false);
     }
   }, [user]);
 
@@ -42,11 +53,50 @@ export default function ContinuityResultsPage() {
     }
   };
 
+  const handleExportExcel = () => {
+    if (!userProfile) return;
+    const fileName = `${userProfile.role}_Hasil_Management_Risiko`;
+    exportToExcel({ surveys, continuityPlans: plans, fileName, userProfile });
+  };
+
+  const handleExportCsv = () => {
+    if (!userProfile) return;
+    const fileName = `${userProfile.role}_Hasil_Rencana_Kontinuitas`;
+    const dataForCsv = plans.map(p => ({
+        'Risiko': p.risiko,
+        'Aktivitas': p.aktivitas,
+        'Target Waktu': p.targetWaktu,
+        'PIC': p.pic,
+        'Sumberdaya': p.sumberdaya,
+        'RTO': p.rto,
+        'RPO': p.rpo,
+        'Tanggal Dibuat': new Date(p.createdAt).toLocaleString('id-ID'),
+    }));
+    exportToCsv({ data: dataForCsv, fileName });
+  };
+
+  const plansAvailable = plans.length > 0;
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Rencana Kontinuitas</CardTitle>
-        <CardDescription>Berikut adalah semua rencana kontinuitas yang telah Anda kirimkan.</CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+            <CardTitle>Rencana Kontinuitas</CardTitle>
+            <CardDescription>Berikut adalah semua rencana kontinuitas yang telah Anda kirimkan.</CardDescription>
+        </div>
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button disabled={!plansAvailable}>
+                    <FileDown className="mr-2 h-4 w-4" />
+                    Download Laporan
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={handleExportExcel}>Download Excel</DropdownMenuItem>
+                <DropdownMenuItem onSelect={handleExportCsv}>Download CSV</DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
       </CardHeader>
       <CardContent>
         {loading ? (
@@ -55,7 +105,7 @@ export default function ContinuityResultsPage() {
                 <Skeleton className="h-10 w-full" />
                 <Skeleton className="h-10 w-full" />
             </div>
-        ) : plans.length > 0 ? (
+        ) : plansAvailable ? (
           <Table>
             <TableHeader>
               <TableRow className="border-b-primary/20 bg-primary hover:bg-primary/90">
