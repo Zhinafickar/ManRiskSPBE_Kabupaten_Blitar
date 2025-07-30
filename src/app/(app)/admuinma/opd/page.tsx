@@ -10,7 +10,7 @@ import { getAllSurveyData } from '@/services/survey-service';
 import { ROLES } from '@/constants/data';
 import type { UserProfile } from '@/types/user';
 import type { Survey } from '@/types/survey';
-import { Building, Search, FileDown } from 'lucide-react';
+import { Building, Search, FileDown, ChevronDown } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,14 @@ import { Button } from '@/components/ui/button';
 import { DepartmentDetailsDialog } from './_components/department-details-dialog';
 import * as XLSX from 'xlsx';
 import { useAuth } from '@/hooks/use-auth';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { exportToCsv } from '@/lib/excel-export';
+
 
 function OPDTableSkeleton() {
     return (
@@ -101,7 +109,7 @@ export default function OPDPage() {
 
     }, [users, surveys, searchTerm]);
     
-    const handleExport = () => {
+    const handleExportExcel = () => {
         const dataForSheet = filteredDepartments.map(dept => ({
             'OPD': dept.name,
             'Status': dept.status,
@@ -114,6 +122,15 @@ export default function OPDPage() {
 
         XLSX.utils.book_append_sheet(wb, ws, 'Status OPD');
         XLSX.writeFile(wb, `${userProfile?.role}_Status_OPD.xlsx`);
+    };
+
+    const handleExportCsv = () => {
+        const fileName = `${userProfile?.role}_Status_OPD`;
+        const dataForCsv = filteredDepartments.map(dept => ({
+            'OPD': dept.name,
+            'Status': dept.status,
+        }));
+        exportToCsv({ data: dataForCsv, fileName });
     };
 
     return (
@@ -129,10 +146,19 @@ export default function OPDPage() {
                             Berikut adalah daftar semua Organisasi Perangkat Daerah (OPD) yang tersedia dalam sistem beserta status keterisiannya.
                         </CardDescription>
                     </div>
-                     <Button onClick={handleExport} disabled={loading}>
-                        <FileDown className="mr-2 h-4 w-4" />
-                        Download Excel
-                    </Button>
+                     <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button disabled={loading}>
+                                <FileDown className="mr-2 h-4 w-4" />
+                                Download Laporan
+                                <ChevronDown className="ml-2 h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onSelect={handleExportExcel}>Download Excel</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={handleExportCsv}>Download CSV</DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </CardHeader>
                 <CardContent>
                     {loading ? (

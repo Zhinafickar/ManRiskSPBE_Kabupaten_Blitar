@@ -13,6 +13,11 @@ interface ExportParams {
     userProfile: UserProfile | null;
 }
 
+interface CsvExportParams {
+    data: any[];
+    fileName: string;
+}
+
 const createSheetWithHeader = (
     workbook: XLSX.WorkBook,
     sheetName: string,
@@ -140,5 +145,24 @@ export const exportToExcel = ({ surveys, continuityPlans, fileName, userProfile 
     
     if (wb.SheetNames.length > 0) {
         XLSX.writeFile(wb, `${fileName}.xlsx`);
+    }
+};
+
+export const exportToCsv = ({ data, fileName }: CsvExportParams) => {
+    if (!data || data.length === 0) return;
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const csvString = XLSX.utils.sheet_to_csv(ws);
+
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `${fileName}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 };

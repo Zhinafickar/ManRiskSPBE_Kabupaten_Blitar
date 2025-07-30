@@ -18,10 +18,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Trash2, FileDown } from 'lucide-react';
+import { MoreHorizontal, Trash2, FileDown, ChevronDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { exportToExcel } from '@/lib/excel-export';
+import { exportToExcel, exportToCsv } from '@/lib/excel-export';
 import { useAuth } from '@/hooks/use-auth';
 
 function ResultsTableSkeleton() {
@@ -92,11 +92,27 @@ export default function AdminResultsPage() {
     }
   };
 
-  const handleExport = () => {
+  const handleExportExcel = () => {
     const roleName = userProfile?.role || 'Admin';
     const fileName = `${roleName}_Hasil_Management_Risiko`;
     exportToExcel({ surveys, continuityPlans, fileName, userProfile });
   };
+
+  const handleExportCsv = () => {
+    const roleName = userProfile?.role || 'Admin';
+    const fileName = `${roleName}_Hasil_Survei`;
+    const dataForCsv = surveys.map(s => ({
+        'Peran Pengguna': s.userRole,
+        'Kategori Risiko': s.riskEvent,
+        'Risiko': s.impactArea,
+        'Area Dampak': s.areaDampak,
+        'Tingkat Risiko': s.riskLevel,
+        'Mitigasi': s.mitigasi,
+        'Tanggal': s.createdAt ? new Date(s.createdAt).toLocaleDateString('id-ID') : 'N/A',
+    }));
+    exportToCsv({ data: dataForCsv, fileName });
+  };
+
 
   const surveysAvailable = surveys.length > 0;
 
@@ -107,10 +123,19 @@ export default function AdminResultsPage() {
           <CardTitle>All Survey Results</CardTitle>
           <CardDescription>A comprehensive list of all surveys submitted by all users.</CardDescription>
         </div>
-        <Button onClick={handleExport} disabled={!surveysAvailable}>
-            <FileDown className="mr-2 h-4 w-4" />
-            Download Excel
-        </Button>
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button disabled={!surveysAvailable}>
+                    <FileDown className="mr-2 h-4 w-4" />
+                    Download Laporan
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={handleExportExcel}>Download Excel</DropdownMenuItem>
+                <DropdownMenuItem onSelect={handleExportCsv}>Download CSV</DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
       </CardHeader>
       <CardContent>
         {loading ? (
