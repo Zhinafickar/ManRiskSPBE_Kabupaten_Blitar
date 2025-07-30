@@ -102,13 +102,21 @@ export default function AdminResultsPage() {
     const roleName = userProfile?.role || 'Admin';
     const fileName = `${roleName}_Hasil_Survei`;
     const dataForCsv = surveys.map(s => ({
+        'Tanggal Laporan': s.createdAt ? new Date(s.createdAt).toLocaleDateString('id-ID') : 'N/A',
         'Peran Pengguna': s.userRole,
         'Kategori Risiko': s.riskEvent,
         'Risiko': s.impactArea,
         'Area Dampak': s.areaDampak,
+        'Penyebab': s.cause,
+        'Dampak': s.impact,
+        'Frekuensi': s.frequency,
+        'Besaran Dampak': s.impactMagnitude,
         'Tingkat Risiko': s.riskLevel,
+        'Kontrol Organisasi': s.kontrolOrganisasi?.join('\n') || 'N/A',
+        'Kontrol Orang': s.kontrolOrang?.join('\n') || 'N/A',
+        'Kontrol Fisik': s.kontrolFisik?.join('\n') || 'N/A',
+        'Kontrol Teknologi': s.kontrolTeknologi?.join('\n') || 'N/A',
         'Mitigasi': s.mitigasi,
-        'Tanggal': s.createdAt ? new Date(s.createdAt).toLocaleDateString('id-ID') : 'N/A',
     }));
     exportToCsv({ data: dataForCsv, fileName });
   };
