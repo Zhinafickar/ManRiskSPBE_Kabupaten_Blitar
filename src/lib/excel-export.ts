@@ -151,7 +151,8 @@ export const exportToExcel = ({ surveys, continuityPlans, fileName, userProfile 
 export const exportToCsv = ({ data, fileName }: CsvExportParams) => {
     if (!data || data.length === 0) return;
 
-    const ws = XLSX.utils.json_to_sheet(data);
+    // Use { skipHeader: true } to export only the data without the header row.
+    const ws = XLSX.utils.json_to_sheet(data, { skipHeader: true });
     const csvString = XLSX.utils.sheet_to_csv(ws);
 
     const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
