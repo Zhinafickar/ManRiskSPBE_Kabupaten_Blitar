@@ -148,7 +148,7 @@ export default function OPDPage() {
                         <DropdownMenuTrigger asChild>
                             <Button disabled={loading}>
                                 <FileDown className="mr-2 h-4 w-4" />
-                                Download Laporan
+                                Download
                                 <ChevronDown className="ml-2 h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>

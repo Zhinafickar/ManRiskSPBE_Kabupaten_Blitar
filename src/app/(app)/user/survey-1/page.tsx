@@ -391,7 +391,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                         className="h-auto px-2 py-1 text-xs"
                     >
                         {isAiControlsLoading ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <RotateCw className="mr-1 h-3 w-3" />}
-                        {isAiControlsLoading ? 'Menyortir...' : 'Sortir Pilihan dengan AI'}
+                        {isAiControlsLoading ? 'Menyortir...' : 'Sortir Pilihan'}
                     </Button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">

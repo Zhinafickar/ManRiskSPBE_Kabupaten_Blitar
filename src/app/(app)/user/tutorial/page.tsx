@@ -54,7 +54,7 @@ export default function TutorialPage({}: {}) {
                 <li>
                   Pilih <strong>Input Form</strong> untuk melaporkan satu kejadian risiko secara rinci.
                 </li>
-                <li>Isi semua kolom yang diperlukan. Manfaatkan tombol <strong>"✨ Beri Saran (AI)"</strong> untuk mendapatkan bantuan mengisi kolom Penyebab dan Dampak, atau <strong>"🔄 Sortir Pilihan dengan AI"</strong> untuk mengurutkan daftar kontrol berdasarkan relevansi.</li>
+                <li>Isi semua kolom yang diperlukan. Manfaatkan tombol <strong>"Beri Saran (AI)"</strong> untuk mendapatkan bantuan mengisi kolom Penyebab dan Dampak, atau <strong>"Sortir Pilihan dengan AI"</strong> untuk mengurutkan daftar kontrol berdasarkan relevansi.</li>
                 <li>Perhatikan bahwa <strong>Tingkat Risiko</strong> akan dihitung secara otomatis setelah Anda memilih Frekuensi dan Besaran Dampak.</li>
                 <li>Setelah selesai, klik tombol "Kirim Survei". Anda dapat melihat hasil input Anda di menu <strong>Hasil Survey Anda</strong>.</li>
               </ol>

@@ -134,7 +134,7 @@ export default function SuperAdminResultsPage() {
             <DropdownMenuTrigger asChild>
                 <Button disabled={!surveysAvailable}>
                     <FileDown className="mr-2 h-4 w-4" />
-                    Download Laporan
+                    Download
                     <ChevronDown className="ml-2 h-4 w-4" />
                 </Button>
             </DropdownMenuTrigger>
