@@ -23,7 +23,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Wrench, PlusCircle, ChevronDown, ChevronRight, Loader2 } from 'lucide-react';
 import { addRisk, getRiskEvents } from '@/services/risk-service';
 import type { RiskEvent } from '@/types/risk';
@@ -80,8 +80,8 @@ function RiskTable({ riskEvents, loading }: { riskEvents: RiskEvent[], loading: 
             </TableHeader>
             <TableBody>
                 {riskEvents.map(event => (
-                    <>
-                        <TableRow key={event.name} onClick={() => toggleCategory(event.name)} className="cursor-pointer hover:bg-muted/50">
+                    <React.Fragment key={event.name}>
+                        <TableRow onClick={() => toggleCategory(event.name)} className="cursor-pointer hover:bg-muted/50">
                             <TableCell className="font-medium flex items-center gap-2">
                                 {expandedCategories.has(event.name) ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                                 {event.name}
@@ -99,7 +99,7 @@ function RiskTable({ riskEvents, loading }: { riskEvents: RiskEvent[], loading: 
                                 </TableCell>
                             </TableRow>
                         )}
-                    </>
+                    </React.Fragment>
                 ))}
             </TableBody>
         </Table>
