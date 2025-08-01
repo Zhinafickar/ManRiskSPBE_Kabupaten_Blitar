@@ -3,97 +3,50 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    //Helper functions
-    function isAuth() {
-      return request.auth != null;
-    }
-
-    function isSuperAdmin() {
-      return isAuth() &&
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
-    }
-
+    
+    // Helper function to check if a user is an admin or superadmin
     function isAdmin() {
-      let role = get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
-      return isAuth() && (role == 'admin' || role == 'superadmin');
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'superadmin'];
     }
 
-    function isOwner(userId) {
-      return isAuth() && request.auth.uid == userId;
-    }
-
-    //USERS COLLECTION
+    // Users can read/write their own profile, admins can read all profiles.
     match /users/{userId} {
-      //Siapa saja (termasuk unauthenticated client) bisa LIST (baca daftar)
-      // Ini dibutuhkan untuk halaman registrasi admin untuk mengecek peran.
-      allow list: if true;
-
-      // Hanya user yang login bisa GET (baca 1 dokumen)
-      allow get: if isAuth();
-
-      // Buat user hanya saat registrasi
-      allow create: if request.auth != null && request.auth.uid == userId;
-
-      // Update hanya oleh pemilik atau admin
-      allow update: if isOwner(userId) || isAdmin();
-
-      // Hapus hanya oleh admin
-      allow delete: if isAdmin();
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow write: if request.auth != null && (request.auth.uid == userId || isAdmin());
     }
 
-    //ROLES COLLECTION
+    // Anyone can read the list of taken roles for the registration form.
+    // Only authenticated users can create a role lock (on registration).
+    // Only the user who owns the lock or an admin can delete it.
     match /roles/{roleId} {
-      //Semua orang bisa melihat role (untuk dropdown role saat registrasi)
-      allow get, list: if true;
-
-      // Buat role saat registrasi oleh user terotentikasi
-      allow create: if isAuth();
-
-      // Hapus hanya oleh admin
-      allow delete: if isAdmin();
-      
-      // Update tidak diizinkan
-      allow update: if false;
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow delete: if request.auth != null && (resource.data.uid == request.auth.uid || isAdmin());
     }
 
-    //ADMIN TOKENS COLLECTION
-    match /adminTokens/{tokenId} {
-      //Izinkan query 'list' untuk verifikasi token oleh unauthenticated users
-      // Ini aman karena Server Action yang akan melakukan query-nya
-      allow get, list: if true;
-
-      // Hanya superadmin bisa kelola (buat, update, hapus)
-      allow create, update, delete: if isSuperAdmin();
+    // Risk categories are public to populate forms. Only admins can modify them.
+    match /risk_categories/{categoryId} {
+      allow read: if true;
+      allow write: if request.auth != null && isAdmin();
     }
-
-    //SURVEYS COLLECTION
+    
+    // Surveys can be created by any authenticated user.
+    // They can only be read or deleted by the user who created them or an admin.
     match /surveys/{surveyId} {
-      // Semua user yang login bisa membuat survey
-      allow create: if isAuth();
-
-      // Semua user yang login bisa membaca semua survey
-      allow read: if isAuth();
-
-      // Update & delete hanya untuk pemilik atau admin
-      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if request.auth != null;
+      allow read, delete: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
-    //CONTINUITY PLANS COLLECTION
+    // Continuity plans can be created by any authenticated user.
+    // They can only be read or deleted by the user who created them or an admin.
     match /continuityPlans/{planId} {
-       // Semua user yang login bisa membuat
-      allow create: if isAuth();
-
-      // Semua user yang login bisa membaca semua
-      allow read: if isAuth();
-      
-      // Update & delete hanya untuk pemilik atau admin
-      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if request.auth != null;
+      allow read, delete: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
-    //Fallback deny semua untuk path yang tidak terdefinisi
-    match /{document=**} {
-      allow read, write: if false;
+    // Admin tokens should only be managed by superadmins.
+    match /adminTokens/{tokenId} {
+      allow read, create, delete: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
     }
   }
 }
