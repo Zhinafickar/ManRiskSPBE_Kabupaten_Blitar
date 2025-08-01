@@ -17,7 +17,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { 
-    RISK_EVENTS,
     ORGANIZATIONAL_CONTROLS,
     PEOPLE_CONTROLS,
     PHYSICAL_CONTROLS,
@@ -27,9 +26,23 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ListTree, ShieldCheck, Zap } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useEffect, useState } from "react";
+import { getRiskEvents } from "@/services/risk-service";
+import type { RiskEvent } from "@/types/risk";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 export default function ReferensiInputPage() {
+  const [riskEvents, setRiskEvents] = useState<RiskEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getRiskEvents()
+      .then(setRiskEvents)
+      .finally(() => setLoading(false));
+  }, []);
+
+
   return (
     <div className="space-y-6">
       <Card>
@@ -52,20 +65,28 @@ export default function ReferensiInputPage() {
                       </TableRow>
                   </TableHeader>
                   <TableBody>
-                      {RISK_EVENTS.flatMap((event, eventIndex) =>
-                          event.impactAreas.map((area, areaIndex) => (
-                              <TableRow key={`${event.name}-${areaIndex}`}>
-                                  {areaIndex === 0 && (
-                                      <TableCell 
-                                          rowSpan={event.impactAreas.length} 
-                                          className="font-medium align-top bg-muted/50"
-                                      >
-                                          {event.name}
-                                      </TableCell>
-                                  )}
-                                  <TableCell>{area}</TableCell>
-                              </TableRow>
-                          ))
+                      {loading ? (
+                          <>
+                            <TableRow><TableCell colSpan={2}><Skeleton className="h-8 w-full" /></TableCell></TableRow>
+                            <TableRow><TableCell colSpan={2}><Skeleton className="h-8 w-full" /></TableCell></TableRow>
+                            <TableRow><TableCell colSpan={2}><Skeleton className="h-8 w-full" /></TableCell></TableRow>
+                          </>
+                      ) : (
+                        riskEvents.flatMap((event) =>
+                            event.impactAreas.map((area, areaIndex) => (
+                                <TableRow key={`${event.id}-${areaIndex}`}>
+                                    {areaIndex === 0 && (
+                                        <TableCell 
+                                            rowSpan={event.impactAreas.length} 
+                                            className="font-medium align-top bg-muted/50"
+                                        >
+                                            {event.name}
+                                        </TableCell>
+                                    )}
+                                    <TableCell>{area}</TableCell>
+                                </TableRow>
+                            ))
+                        )
                       )}
                   </TableBody>
               </Table>
