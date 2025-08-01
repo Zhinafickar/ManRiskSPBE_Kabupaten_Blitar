@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -5,6 +6,7 @@ import * as LabelPrimitive from "@radix-ui/react-label"
 import { Slot } from "@radix-ui/react-slot"
 import {
   Controller,
+  FormProvider,
   useFormContext,
   type ControllerProps,
   type FieldPath,
@@ -13,6 +15,8 @@ import {
 
 import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
+
+const Form = FormProvider
 
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
@@ -165,6 +169,7 @@ FormMessage.displayName = "FormMessage"
 
 export {
   useFormField,
+  Form,
   FormItem,
   FormLabel,
   FormControl,
