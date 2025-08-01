@@ -74,8 +74,8 @@ function RiskTable({ riskEvents, loading }: { riskEvents: RiskEvent[], loading: 
         <Table>
             <TableHeader>
                 <TableRow className="border-b-primary/20 bg-primary hover:bg-primary/90">
-                    <TableHead className="w-[40%] text-primary-foreground">Kategori Risiko</TableHead>
-                    <TableHead className="text-primary-foreground">Jumlah Risiko</TableHead>
+                    <TableHead className="text-primary-foreground">Kategori Risiko</TableHead>
+                    <TableHead className="w-[150px] text-right text-primary-foreground">Jumlah Risiko</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -86,7 +86,7 @@ function RiskTable({ riskEvents, loading }: { riskEvents: RiskEvent[], loading: 
                                 {expandedCategories.has(event.name) ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                                 {event.name}
                             </TableCell>
-                            <TableCell>{event.impactAreas.length}</TableCell>
+                            <TableCell className="text-right">{event.impactAreas.length}</TableCell>
                         </TableRow>
                         {expandedCategories.has(event.name) && (
                              <TableRow>
