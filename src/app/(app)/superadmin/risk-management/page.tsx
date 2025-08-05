@@ -4,7 +4,7 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import React, { useEffect, useState } from 'react';
 import { Wrench, ChevronDown, ChevronRight } from 'lucide-react';
-import { RISK_EVENTS } from '@/constants/data';
+import { RISK_EVENTS } from '@/constants/risks';
 import {
   Table,
   TableBody,
