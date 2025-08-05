@@ -114,13 +114,15 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
         isOpen={isForgotPasswordOpen}
         onOpenChange={setIsForgotPasswordOpen}
       />
-      <div 
-        className="flex min-h-screen items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
-        style={{
-            backgroundImage: `url('https://cdn-2.tstatic.net/mataraman/foto/bank/images/Kantor-DPUPR-Kabupaten-Blitar-di-Kanigoro-Blitar.jpg')`,
-        }}
-      >
-        <Card className="w-full max-w-md shadow-2xl">
+      <div className="relative flex min-h-screen items-center justify-center p-4">
+        <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{
+                backgroundImage: `url('https://cdn-2.tstatic.net/mataraman/foto/bank/images/Kantor-DPUPR-Kabupaten-Blitar-di-Kanigoro-Blitar.jpg')`,
+            }}
+        />
+        <div className="absolute inset-0 bg-black/50" />
+        <Card className="w-full max-w-md shadow-2xl z-10">
           <CardHeader className="text-center">
               <Image src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png" alt="Logo" width={130} height={130} className="mx-auto" />
               <CardTitle className="text-2xl font-bold mt-4">{pageTitle}</CardTitle>
