@@ -115,12 +115,9 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
         onOpenChange={setIsForgotPasswordOpen}
       />
       <div 
-        className="flex min-h-screen items-center justify-center p-4"
+        className="flex min-h-screen items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
         style={{
             backgroundImage: `url('https://cdn-2.tstatic.net/mataraman/foto/bank/images/Kantor-DPUPR-Kabupaten-Blitar-di-Kanigoro-Blitar.jpg')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
         }}
       >
         <Card className="w-full max-w-md shadow-2xl">
