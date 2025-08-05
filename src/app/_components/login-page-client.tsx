@@ -117,7 +117,7 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
       <div 
         className="flex min-h-screen items-center justify-center p-4"
         style={{
-            backgroundImage: `url('https://cdn.kibrispdr.org/data/79/kantor-bupati-blitar-terbaru-3.jpg')`,
+            backgroundImage: `url('https://tse1.mm.bing.net/th?id=OIP.E4T4vSgB2r4y7r-3W8c9YgHaE8&pid=Api')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
