@@ -52,6 +52,7 @@ import { determineRiskSentiment } from '@/ai/flows/determine-risk-sentiment';
 import { sortRelevantControls } from '@/ai/flows/sort-relevant-controls';
 import type { SortRelevantControlsInput } from '@/types/controls';
 import { Switch } from '@/components/ui/switch';
+import { suggestMitigation } from '@/ai/flows/suggest-mitigation';
 
 const formSchema = z.object({
   riskEvent: z.string({ required_error: 'Kategori risiko harus diisi.' }).min(1),
@@ -75,6 +76,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
   const [isLoading, setIsLoading] = useState(false);
   const [isAiCauseImpactLoading, setIsAiCauseImpactLoading] = useState(false);
   const [isAiControlsLoading, setIsAiControlsLoading] = useState(false);
+  const [isAiMitigationLoading, setIsAiMitigationLoading] = useState(false);
 
   // State for popovers
   const [riskEventOpen, setRiskEventOpen] = useState(false);
@@ -220,6 +222,26 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
       } finally {
           setIsAiControlsLoading(false);
       }
+  };
+  
+  const handleMitigationSuggestion = async () => {
+    const { riskEvent, impactArea, cause, impact, frequency, impactMagnitude } = form.getValues();
+    const { level: riskLevel } = getRiskLevel(frequency, impactMagnitude);
+
+    if (!riskEvent || !impactArea || !cause || !impact || !riskLevel || !riskSentiment) {
+        toast({ variant: 'destructive', title: 'Data Kurang Lengkap', description: 'Harap isi semua kolom identifikasi risiko (sampai besaran dampak) untuk mendapatkan saran mitigasi.' });
+        return;
+    }
+    setIsAiMitigationLoading(true);
+    try {
+      const result = await suggestMitigation({ riskEvent, impactArea, cause, impact, riskLevel, sentiment: riskSentiment });
+      form.setValue('mitigasi', result.mitigation, { shouldValidate: true });
+      toast({ title: 'Saran Diterapkan', description: `Mitigasi "${result.mitigation}" telah dipilih oleh AI.` });
+    } catch (error) {
+      toast({ variant: 'destructive', title: 'Gagal', description: 'Gagal mendapatkan saran mitigasi dari AI.' });
+    } finally {
+      setIsAiMitigationLoading(false);
+    }
   };
 
 
@@ -409,25 +431,38 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                 name="mitigasi"
                 render={({ field }) => (
                     <FormItem>
-                    <div className="flex items-center gap-2">
-                        <FormLabel>Mitigasi</FormLabel>
-                        <TooltipProvider>
-                            <Tooltip delayDuration={300}>
-                                <TooltipTrigger type="button">
-                                    <Info className="h-4 w-4 text-muted-foreground" />
-                                </TooltipTrigger>
-                                <TooltipContent side="right" align="start" className="max-w-xs">
-                                    <div className="space-y-2 p-2">
-                                        {MITIGATION_OPTIONS.map((option) => (
-                                            <div key={option.name}>
-                                                <p className="font-bold">{option.name}</p>
-                                                <p>{option.description}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <FormLabel>Mitigasi</FormLabel>
+                            <TooltipProvider>
+                                <Tooltip delayDuration={300}>
+                                    <TooltipTrigger type="button">
+                                        <Info className="h-4 w-4 text-muted-foreground" />
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right" align="start" className="max-w-xs">
+                                        <div className="space-y-2 p-2">
+                                            {MITIGATION_OPTIONS.map((option) => (
+                                                <div key={option.name}>
+                                                    <p className="font-bold">{option.name}</p>
+                                                    <p>{option.description}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </div>
+                         <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleMitigationSuggestion}
+                            disabled={isAiMitigationLoading || !riskIndicator.level || !riskSentiment}
+                            className="h-auto px-2 py-1 text-xs -translate-y-1"
+                        >
+                            <Sparkles className="mr-1 h-3 w-3" />
+                            {isAiMitigationLoading ? 'Memproses...' : 'Beri Saran (AI)'}
+                        </Button>
                     </div>
                     <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
