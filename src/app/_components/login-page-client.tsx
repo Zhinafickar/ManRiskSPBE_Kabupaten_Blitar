@@ -118,7 +118,7 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
         <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{
-                backgroundImage: `url('https://cdn-2.tstatic.net/mataraman/foto/bank/images/Kantor-DPUPR-Kabupaten-Blitar-di-Kanigoro-Blitar.jpg')`,
+                backgroundImage: `url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjJqJzmRkB3dJmJbHjMvTxP0SNo53SA_7S_5i_sJ_mYFm1Ua-4Jg7gX1g7c_QvX9n5aY8cZ5o_X5v3b9w-cZ8X8a7gZ9x9q3k2bY8n8X9c8b7a6/s1600/kantor-bupati-blitar.jpg')`,
             }}
         />
         <div className="absolute inset-0 bg-black/50" />
