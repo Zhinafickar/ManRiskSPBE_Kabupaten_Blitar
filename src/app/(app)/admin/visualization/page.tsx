@@ -9,7 +9,7 @@ import type { Survey } from '@/types/survey';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, type ChartConfig } from "@/components/ui/chart";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, LabelList } from 'recharts';
 import { TrendingUp } from 'lucide-react';
-import { ROLES } from '@/constants/data';
+import { ROLES } from '@/constants/roles';
 
 // --- Chart Configs ---
 const riskLevelColors = {

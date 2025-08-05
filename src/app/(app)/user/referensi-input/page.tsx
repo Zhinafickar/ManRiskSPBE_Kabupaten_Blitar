@@ -21,9 +21,9 @@ import {
     PEOPLE_CONTROLS,
     PHYSICAL_CONTROLS,
     TECHNOLOGICAL_CONTROLS,
-    MITIGATION_OPTIONS,
-    RISK_EVENTS,
-} from "@/constants/data";
+} from "@/constants/controls";
+import { MITIGATION_OPTIONS } from "@/constants/mitigation";
+import { RISK_EVENTS } from "@/constants/risks";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ListTree, ShieldCheck, Zap } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

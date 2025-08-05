@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { getAllUsers } from '@/services/user-service';
 import { getAllSurveyData } from '@/services/survey-service';
-import { ROLES } from '@/constants/data';
+import { ROLES } from '@/constants/roles';
 import type { UserProfile } from '@/types/user';
 import type { Survey } from '@/types/survey';
 import { Building, Search } from 'lucide-react';

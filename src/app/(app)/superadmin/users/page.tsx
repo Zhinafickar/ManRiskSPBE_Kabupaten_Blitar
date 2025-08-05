@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { getAllUsers } from "@/services/user-service";
-import { ROLES } from "@/constants/data";
+import { ROLES } from "@/constants/roles";
 import { UserTable } from "./_components/user-table";
 import type { UserProfile } from '@/types/user';
 import { Skeleton } from '@/components/ui/skeleton';

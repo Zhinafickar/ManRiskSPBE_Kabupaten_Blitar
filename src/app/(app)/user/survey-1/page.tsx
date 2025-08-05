@@ -25,14 +25,16 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import {
     FREQUENCY_LEVELS,
     IMPACT_MAGNITUDES,
+    AREA_DAMPAK_OPTIONS,
+} from '@/constants/analysis';
+import {
     ORGANIZATIONAL_CONTROLS,
     PEOPLE_CONTROLS,
     PHYSICAL_CONTROLS,
     TECHNOLOGICAL_CONTROLS,
-    MITIGATION_OPTIONS,
-    AREA_DAMPAK_OPTIONS,
-    RISK_EVENTS,
-} from '@/constants/data';
+} from '@/constants/controls';
+import { MITIGATION_OPTIONS } from '@/constants/mitigation';
+import { RISK_EVENTS } from '@/constants/risks';
 import { addSurvey } from '@/services/survey-service';
 import { useAuth } from '@/hooks/use-auth';
 import { useEffect, useState, useMemo } from 'react';

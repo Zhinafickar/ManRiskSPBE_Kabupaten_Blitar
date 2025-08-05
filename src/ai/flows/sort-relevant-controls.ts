@@ -19,7 +19,7 @@ import {
   PEOPLE_CONTROLS,
   PHYSICAL_CONTROLS,
   TECHNOLOGICAL_CONTROLS
-} from '@/constants/data';
+} from '@/constants/controls';
 
 
 export async function sortRelevantControls(input: SortRelevantControlsInput): Promise<SortRelevantControlsOutput> {

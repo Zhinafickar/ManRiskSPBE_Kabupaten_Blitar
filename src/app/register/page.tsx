@@ -21,7 +21,7 @@ import { createUserWithEmailAndPassword, sendEmailVerification, signOut } from '
 import { doc, writeBatch } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import { useState, useEffect } from 'react';
-import { ROLES } from '@/constants/data';
+import { ROLES } from '@/constants/roles';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Check, ChevronsUpDown, Eye, EyeOff } from 'lucide-react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';

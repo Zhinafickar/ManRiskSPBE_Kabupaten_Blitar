@@ -1,49 +1,3 @@
-export const ROLES = [
-  "Inspektorat Daerah",
-  "Sekretariat Dewan Perwakilan Rakyat Daerah",
-  "Badan Kepegawaian Dan Pengembangan Sumber Daya Manusia",
-  "Badan Kesatuan Bangsa dan Politik",
-  "Badan Pengelolaan Keuangan Dan Aset Daerah",
-  "Badan Pendapatan Daerah",
-  "Badan Perencanaan Pembangunan Daerah, Penelitian, Dan Pengembangan",
-  "Dinas Pekerjaan Umum Dan Penataan Ruang",
-  "Badan Penanggulangan Bencana Daerah",
-  "Dinas Kebudayaan dan Pariwisata",
-  "Dinas Kependudukan dan Pencatatan Sipil",
-  "Dinas Kesehatan",
-  "Dinas Ketahanan Pangan dan Pertanian",
-  "Dinas Tenaga Kerja",
-  "Dinas Komunikasi, Informatika, Statistik Dan Persandian",
-  "Dinas Koperasi Usaha Kecil Dan Menengah",
-  "Dinas Lingkungan Hidup",
-  "Dinas Pemberdayaan Perempuan, Perlindungan Anak, Pengendalian Penduduk Dan Keluarga Berencana",
-  "Dinas Kepemudaan Dan Olahraga",
-  "Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu",
-  "Dinas Pendidikan",
-  "Dinas Perindustrian Dan Perdagangan",
-  "Dinas Perhubungan",
-  "Dinas Perumahan Rakyat, Kawasan Permukiman Dan Pertanahan",
-  "Dinas Sosial",
-  "Dinas Perpustakaan Dan Arsip",
-  "Satuan Polisi Pamong Praja Dan Pemadam Kebakaran",
-  "Rumah Sakit Umum Daerah Ngudi Waluyo Wlingi",
-  "Rumah Sakit Umum Daerah Srengat",
-  "Kecamatan Kanigoro",
-  "Kelurahan Satreyan",
-  "Dinas Peternakan Dan Perikanan",
-  "Bagian Organisasi",
-  "Bagian Protokol dan Komunikasi Pimpinan",
-  "Bagian Umum",
-  "Bagian Perencanaan dan Keuangan",
-  "Bagian Perekonomian",
-  "Bagian Administrasi Pembangunan",
-  "Bagian Pengadaan Barang dan Jasa",
-  "Bagian Tata Pemerintahan",
-  "Bagian Hukum",
-  "Bagian Kesejahteraan Rakyat",
-  "Penguji Coba",
-  "Dinas Pemberdayaan Masyarakat Dan Desa"
-];
 
 export const RISK_EVENTS = [
   { name: "Penyusunan dan pemeliharaan portofolio", 
@@ -76,7 +30,7 @@ export const RISK_EVENTS = [
     "Ketergantungan terhadap orang atau pegawai (bukan sistem)",
     "Organisasi tidak memiliki kemampuan untuk meningkatkan keterampilan pegawai"] },
   { name: "Operasi yang dilakukan staf (human error dan niat jahat)", 
-    impactAreas: [ "Penyalahgunaan hak akses oleh staff",
+    impactAreas: [ "Penyalahgunaan hak akses oleh staf",
     "Peralatan TI rusak secara tidak sengaja oleh staf",
     "Sistem error oleh staf",
     "Informasi yang dimasukkan salah oleh pengguna",
@@ -174,33 +128,6 @@ export const RISK_EVENTS = [
 ] },
 ];
 
-
-export const FREQUENCY_LEVELS = [
-  'Hampir Tidak Terjadi',
-  'Jarang Terjadi',
-  'Kadang Terjadi',
-  'Sering Terjadi',
-  'Sangat Sering Terjadi',
-];
-
-export const IMPACT_MAGNITUDES = [
-  'Tidak Signifikan',
-  'Kurang Signifikan',
-  'Cukup Signifikan',
-  'Signifikan',
-  'Sangat Signifikan',
-];
-
-export const AREA_DAMPAK_OPTIONS = [
-  "Finansial",
-  "Reputasi",
-  "Kinerja",
-  "Layanan Organisasi",
-  "Operasional dan Aset TIK",
-  "Hukum dan Regulasi",
-  "Sumber Daya Manusia"
-];
-
 export const IMPACT_AREAS = [
     "Program kerja atau sumber daya tidak sejalan dengan strategi dan prioritas organisasi.",
     "Terdapat duplikasi dalam inisatif",
@@ -227,7 +154,7 @@ export const IMPACT_AREAS = [
     "Keluarnya pegawai yang berkompetensi",
     "Ketergantungan terhadap orang atau pegawai (bukan sistem)",
     "Organisasi tidak memiliki kemampuan untuk meningkatkan keterampilan pegawai",
-    "Penyalahgunaan hak akses oleh staff",
+    "Penyalahgunaan hak akses oleh staf",
     "Peralatan TI rusak secara tidak sengaja oleh staf",
     "Sistem error oleh staf",
     "Informasi yang dimasukkan salah oleh pengguna",
@@ -307,117 +234,4 @@ export const IMPACT_AREAS = [
     "Gempa bumi; tsunami; badai besar dan siklon tropis; kebakaran besar; banjir; water table",
     "Tren teknologi yang penting dan baru tidak dapat diidentifikasi",
     "Terjadi kegagalan ketika mengadopsi software baru"
-];
-
-export const ORGANIZATIONAL_CONTROLS = [
-  "5.1 Kebijakan untuk keamanan informasi",
-  "5.2 Peran dan tanggung jawab keamanan informasi",
-  "5.3 Pemisahan tugas",
-  "5.4 Tanggung jawab Manajemen",
-  "5.5 Kontak dengan pihak berwenang",
-  "5.6 Kontak dengan kelompok minat khusus",
-  "5.7 Intelijen ancaman",
-  "5.8 Keamanan informasi dalam Manajemen proyek",
-  "5.9 Inventarisasi informasi dan aset terkait lainnya",
-  "5.10 Penggunaan informasi dan aset terkait lainnya yang dapat diterima",
-  "5.11 Pengembalian aset",
-  "5.12 Klasifikasi informasi",
-  "5.13 Pelabelan informasi",
-  "5.14 Transfer informasi",
-  "5.15 Kontrol akses",
-  "5.16 Manajemen identitas",
-  "5.17 Informasi otentikasi",
-  "5.18 Hak akses",
-  "5.19 Keamanan informasi dalam hubungan pemasok",
-  "5.20 Mengatasi keamanan informasi dalam perjanjian pemasok",
-  "5.21 Mengelola keamanan informasi dalam rantai pasokan TIK",
-  "5.22 Memantau, meninjau, dan mengubah Manajemen layanan pemasok",
-  "5.23 Keamanan informasi untuk penggunaan layanan cloud",
-  "5.24 Perencanaan dan persiapan Manajemen insiden keamanan informasi",
-  "5.25 Penilaian dan keputusan tentang peristiwa keamanan informasi",
-  "5.26 Tanggapan terhadap insiden keamanan informasi",
-  "5.27 Belajar dari insiden keamanan informasi",
-  "5.28 Pengumpulan bukti",
-  "5.29 Keamanan informasi selama gangguan",
-  "5.30 Kesiapan TIK untuk kelangsungan bisnis",
-  "5.31 Persyaratan hukum, undang-undang, peraturan, dan kontrak",
-  "5.32 Hak kekayaan intelektual",
-  "5.33 Perlindungan catatan",
-  "5.34 Privasi dan perlindungan PII",
-  "5.35 Tinjauan independen terhadap keamanan informasi",
-  "5.36 Kepatuhan terhadap kebijakan, aturan, dan standar untuk keamanan informasi",
-  "5.37 Prosedur operasi terdokumentasi"
-];
-
-export const PEOPLE_CONTROLS = [
-  "6.1 Penyaringan",
-  "6.2 Syarat dan ketentuan kerja",
-  "6.3 Kesadaran, pendidikan dan pelatihan keamanan informasi",
-  "6.4 Proses pendisiplinan",
-  "6.5 Tanggung Jawab Setelah Pemutusan Hubungan Kerja atau Perubahan Pekerjaan",
-  "6.6 Perjanjian kerahasiaan atau tidak mengungkapkan",
-  "6.7 Kerja jarak jauh",
-  "6.8 Pelaporan peristiwa keamanan informasi"
-];
-
-export const PHYSICAL_CONTROLS = [
-  "7.1 Batas keamanan fisik",
-  "7.2 Masuk fisik",
-  "7.3 Mengamankan kantor, ruangan dan fasilitas",
-  "7.4 Pemantauan keamanan fisik",
-  "7.5 Melindungi dari ancaman fisik dan lingkungan",
-  "7.6 Bekerja di area aman",
-  "7.7 Mengosongkan meja dan mengosongkan layar",
-  "7.8 Penempatan dan perlindungan peralatan",
-  "7.9 Keamanan aset di luar lokasi",
-  "7.10 Media penyimpanan",
-  "7.11 Utilitas pendukung",
-  "7.12 Keamanan kabel",
-  "7.13 Pemeliharaan peralatan",
-  "7.14 Pembuangan atau penggunaan kembali peralatan secara aman"
-];
-
-export const TECHNOLOGICAL_CONTROLS = [
-    "8.1 Perangkat titik akhir (endpoint) pengguna",
-    "8.2 Hak akses istimewa",
-    "8.3 Pembatasan akses informasi",
-    "8.4 Akses ke kode sumber (source code)",
-    "8.5 Otentikasi yang aman",
-    "8.6 Manajemen kapasitas",
-    "8.7 Perlindungan terhadap malware",
-    "8.8 Manajemen kerentanan teknis",
-    "8.9 Manajemen konfigurasi.",
-    "8.10 Penghapusan informasi",
-    "8.11 Penyamaran data",
-    "8.12 Pencegahan kebocoran data",
-    "8.13 Pencadangan informasi",
-    "8.14 Redundansi fasilitas pemrosesan informasi",
-    "8.15 Pencatatan (logging)",
-    "8.16 Kegiatan pemantauan",
-    "8.17 Sinkronisasi waktu",
-    "8.18 Penggunaan program utilitas istimewa",
-    "8.19 Instalasi perangkat lunak pada sistem operasional",
-    "8.20 Keamanan jaringan",
-    "8.21 Keamanan layanan jaringan",
-    "8.22 Pemisahan jaringan.",
-    "8.23 Pemfilteran / penyaringan web",
-    "8.24 Penggunaan kriptografi",
-    "8.25 Siklus hidup pengembangan yang aman",
-    "8.26 Persyaratan keamanan aplikasi",
-    "8.27 Mengamankan arsitektur sistem dan prinsip-prinsip rekayasa",
-    "8.28 Pengkodean yang aman",
-    "8.29 Pengujian keamanan dalam pengembangan dan penerimaan",
-    "8.30 Pengembangan yang dialihdayakan.",
-    "8.31 Pemisahan lingkungan pengembangan, pengujian dan produksi",
-    "8.32 Manajemen perubahan",
-    "8.33 Informasi pengujian",
-    "8.34 Perlindungan sistem informasi selama pengujian audit",
-];
-
-export const MITIGATION_OPTIONS = [
-  { name: "Eskalasi Risiko", description: "Menyerahkan tanggung jawab penanganan risiko kepada tingkat otoritas yang lebih tinggi (misalnya, dewan direksi) ketika risiko tersebut berada di luar lingkup atau kapasitas unit saat ini." },
-  { name: "Eksploitasi Risiko", description: "(Untuk risiko positif/peluang) Mengambil tindakan proaktif untuk memastikan peluang terwujud dan mendapatkan manfaat maksimal dari risiko tersebut." },
-  { name: "Peningkatan Risiko", description: "Mengurangi kemungkinan atau dampak dari suatu risiko dengan menerapkan kontrol atau tindakan pencegahan. Ini adalah strategi yang paling umum." },
-  { name: "Pembagian Risiko", description: "Memindahkan sebagian dampak atau kepemilikan risiko kepada pihak ketiga, misalnya melalui asuransi, kemitraan, atau outsourcing." },
-  { name: "Penerimaan Risiko", description: "Secara sadar menerima risiko tanpa mengambil tindakan lebih lanjut, biasanya karena biaya penanganan lebih besar daripada potensi kerugian atau dampaknya sangat rendah." }
 ];
