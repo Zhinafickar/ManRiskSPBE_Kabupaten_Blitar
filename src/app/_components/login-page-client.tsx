@@ -117,7 +117,7 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
       <div 
         className="flex min-h-screen items-center justify-center p-4"
         style={{
-            backgroundImage: `url('https://cdn.kibrispdr.org/data/7/gambar-patung-bung-karno-di-blitar-43.jpg')`,
+            backgroundImage: `url('https://cdn-2.tstatic.net/mataraman/foto/bank/images/Kantor-DPUPR-Kabupaten-Blitar-di-Kanigoro-Blitar.jpg')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',

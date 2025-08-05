@@ -34,6 +34,12 @@ const nextConfig: NextConfig = {
         hostname: 'blogger.googleusercontent.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn-2.tstatic.net',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
