@@ -31,6 +31,7 @@ import {
     TECHNOLOGICAL_CONTROLS,
     MITIGATION_OPTIONS,
     AREA_DAMPAK_OPTIONS,
+    RISK_EVENTS,
 } from '@/constants/data';
 import { addSurvey } from '@/services/survey-service';
 import { useAuth } from '@/hooks/use-auth';
@@ -49,8 +50,6 @@ import { determineRiskSentiment } from '@/ai/flows/determine-risk-sentiment';
 import { sortRelevantControls } from '@/ai/flows/sort-relevant-controls';
 import type { SortRelevantControlsInput } from '@/types/controls';
 import { Switch } from '@/components/ui/switch';
-import { getRiskEvents } from '@/services/risk-service';
-import type { RiskEvent } from '@/types/risk';
 
 const formSchema = z.object({
   riskEvent: z.string({ required_error: 'Kategori risiko harus diisi.' }).min(1),
@@ -84,7 +83,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
   const [kontrolFisikOpen, setKontrolFisikOpen] = useState(false);
   const [kontrolTeknologiOpen, setKontrolTeknologiOpen] = useState(false);
   
-  const [riskEvents, setRiskEvents] = useState<RiskEvent[]>([]);
+  const [riskEvents, setRiskEvents] = useState(RISK_EVENTS);
   const [availableImpactAreas, setAvailableImpactAreas] = useState<string[]>([]);
   const [riskIndicator, setRiskIndicator] = useState<RiskIndicator>({ level: null, color: '' });
   const [riskSentiment, setRiskSentiment] = useState<'Positif' | 'Negatif' | 'Netral' | null>(null);
@@ -97,10 +96,6 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
   const [sortedTechnological, setSortedTechnological] = useState(TECHNOLOGICAL_CONTROLS);
   
   const [isDateManipulationEnabled, setIsDateManipulationEnabled] = useState(false);
-
-  useEffect(() => {
-    getRiskEvents().then(setRiskEvents);
-  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -301,7 +296,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                         <CommandList>
                           <CommandGroup>
                             {riskEvents.map((event) => (
-                              <CommandItem key={event.id} value={event.name} onSelect={() => { form.setValue("riskEvent", event.name); setRiskEventOpen(false); }}>
+                              <CommandItem key={event.name} value={event.name} onSelect={() => { form.setValue("riskEvent", event.name); setRiskEventOpen(false); }}>
                                 <Check className={cn("mr-2 h-4 w-4", event.name === field.value ? "opacity-100" : "opacity-0")} />
                                 {event.name}
                               </CommandItem>

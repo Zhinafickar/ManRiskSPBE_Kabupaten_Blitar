@@ -58,13 +58,13 @@ export function MainNav() {
   const [isContinuityMenuOpen, setIsContinuityMenuOpen] = useState(false);
 
   // Admin Menu States
-  const isActiveAdminDataMenu = ['/admuinma/results', '/admuinma/continuity-results', '/admuinma/visualization', '/admuinma/opd', '/admuinma/risk-management'].some(p => pathname.startsWith(p));
+  const isActiveAdminDataMenu = ['/admuinma/results', '/admuinma/continuity-results', '/admuinma/visualization', '/admuinma/opd'].some(p => pathname.startsWith(p));
   const [isAdminDataMenuOpen, setIsAdminDataMenuOpen] = useState(false);
 
   // Super Admin Menu States
   const isActiveSuperAdminAccessMenu = ['/superadmin/users', '/superadmin/role-management', '/superadmin/token-management'].some(p => pathname.startsWith(p));
   const [isSuperAdminAccessMenuOpen, setIsSuperAdminAccessMenuOpen] = useState(false);
-  const isActiveSuperAdminDataMenu = ['/superadmin/results', '/superadmin/continuity-results', '/superadmin/visualization', '/superadmin/opd', '/superadmin/risk-management'].some(p => pathname.startsWith(p));
+  const isActiveSuperAdminDataMenu = ['/superadmin/results', '/superadmin/continuity-results', '/superadmin/visualization', '/superadmin/opd'].some(p => pathname.startsWith(p));
   const [isSuperAdminDataMenuOpen, setIsSuperAdminDataMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -117,11 +117,6 @@ export function MainNav() {
                              <SidebarMenuSubItem>
                                 <SidebarMenuSubButton asChild isActive={pathname === '/admuinma/opd'}>
                                     <Link href="/admuinma/opd"><Building /><span>OPD</span></Link>
-                                </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                             <SidebarMenuSubItem>
-                                <SidebarMenuSubButton asChild isActive={pathname === '/admuinma/risk-management'}>
-                                    <Link href="/admuinma/risk-management"><Wrench /><span>Manajemen Risiko</span></Link>
                                 </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
                         </SidebarMenuSub>
@@ -204,11 +199,6 @@ export function MainNav() {
                              <SidebarMenuSubItem>
                                 <SidebarMenuSubButton asChild isActive={pathname === '/superadmin/opd'}>
                                     <Link href="/superadmin/opd"><Building /><span>OPD</span></Link>
-                                </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                            <SidebarMenuSubItem>
-                                <SidebarMenuSubButton asChild isActive={pathname.startsWith('/superadmin/risk-management')}>
-                                    <Link href="/superadmin/risk-management"><Wrench /><span>Manajemen Risiko</span></Link>
                                 </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
                         </SidebarMenuSub>

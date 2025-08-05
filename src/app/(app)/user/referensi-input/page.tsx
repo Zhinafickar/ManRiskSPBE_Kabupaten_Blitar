@@ -21,25 +21,25 @@ import {
     PEOPLE_CONTROLS,
     PHYSICAL_CONTROLS,
     TECHNOLOGICAL_CONTROLS,
-    MITIGATION_OPTIONS
+    MITIGATION_OPTIONS,
+    RISK_EVENTS,
 } from "@/constants/data";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ListTree, ShieldCheck, Zap } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
-import { getRiskEvents } from "@/services/risk-service";
-import type { RiskEvent } from "@/types/risk";
 import { Skeleton } from "@/components/ui/skeleton";
 
 
 export default function ReferensiInputPage() {
-  const [riskEvents, setRiskEvents] = useState<RiskEvent[]>([]);
+  const [riskEvents, setRiskEvents] = useState(RISK_EVENTS);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getRiskEvents()
-      .then(setRiskEvents)
-      .finally(() => setLoading(false));
+    // Simulate loading
+    setTimeout(() => {
+        setLoading(false);
+    }, 500);
   }, []);
 
 
@@ -74,7 +74,7 @@ export default function ReferensiInputPage() {
                       ) : (
                         riskEvents.flatMap((event) =>
                             event.impactAreas.map((area, areaIndex) => (
-                                <TableRow key={`${event.id}-${areaIndex}`}>
+                                <TableRow key={`${event.name}-${areaIndex}`}>
                                     {areaIndex === 0 && (
                                         <TableCell 
                                             rowSpan={event.impactAreas.length} 
