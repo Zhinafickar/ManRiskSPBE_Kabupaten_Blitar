@@ -20,15 +20,19 @@ import { auth, isFirebaseConfigured, db } from '@/lib/firebase';
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
 import { ForgotPasswordDialog } from './forgot-password-dialog';
 import { Eye, EyeOff } from 'lucide-react';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
-  password: z
-    .string()
-    .min(1, { message: 'Password is required.' }),
+  password: z.string().min(1, { message: 'Password is required.' }),
 });
 
 interface LoginPageClientProps {
@@ -54,13 +58,13 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
     setIsLoading(true);
 
     if (!isFirebaseConfigured || !auth || !db) {
-        toast({
-            variant: 'destructive',
-            title: 'Firebase Not Configured',
-            description: 'Please check your .env file to configure Firebase.',
-        });
-        setIsLoading(false);
-        return;
+      toast({
+        variant: 'destructive',
+        title: 'Firebase Not Configured',
+        description: 'Please check your .env file to configure Firebase.',
+      });
+      setIsLoading(false);
+      return;
     }
 
     try {
@@ -69,25 +73,29 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
         values.email,
         values.password
       );
-      
+
       const user = userCredential.user;
 
       if (!user.emailVerified) {
         toast({
           variant: 'destructive',
           title: 'Verification Required',
-          description: 'Please verify your email address before logging in. Check your inbox for a verification link.',
+          description:
+            'Please verify your email address before logging in. Check your inbox for a verification link.',
         });
         await auth.signOut();
         setIsLoading(false);
         return;
       }
-      
-      router.push('/dashboard');
 
+      router.push('/dashboard');
     } catch (error: any) {
       let description = 'An unknown error occurred.';
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+      if (
+        error.code === 'auth/user-not-found' ||
+        error.code === 'auth/wrong-password' ||
+        error.code === 'auth/invalid-credential'
+      ) {
         description = 'Invalid email or password. Please try again.';
       } else {
         description = error.message;
@@ -100,99 +108,125 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
       setIsLoading(false);
     }
   }
-  
+
   const pageTitle = isAdminLogin ? 'Admin Login' : 'Selamat Datang!';
-  const pageDescription = isAdminLogin ? 'Silakan masuk untuk melanjutkan ke dasbor admin.' : 'Silakan masuk untuk melanjutkan ke dasbor Manajemen Risiko.';
+  const pageDescription = isAdminLogin
+    ? 'Silakan masuk untuk melanjutkan ke dasbor admin.'
+    : 'Silakan masuk untuk melanjutkan ke dasbor Manajemen Risiko.';
   const registerLink = isAdminLogin ? '/admuinma/register' : '/register';
   const registerText = isAdminLogin ? 'Daftar disini' : 'Register';
-  const registerPrompt = isAdminLogin ? 'Belum punya akun admin?' : 'Belum punya akun?';
-
+  const registerPrompt = isAdminLogin
+    ? 'Belum punya akun admin?'
+    : 'Belum punya akun?';
 
   return (
     <>
-      <ForgotPasswordDialog 
+      <ForgotPasswordDialog
         isOpen={isForgotPasswordOpen}
         onOpenChange={setIsForgotPasswordOpen}
       />
-      <div
-        className="relative min-h-screen bg-cover bg-center"
-        style={{
-          backgroundImage: "url('https://tse1.mm.bing.net/th?id=OIP.s3eI8aLpS-G-F-j4N_J-ZgHaE8&pid=Api&P=0&h=220')",
-        }}
-      >
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="relative z-10 flex min-h-screen items-center justify-center p-4">
-          <Card className="w-full max-w-md shadow-2xl bg-background/80 backdrop-blur-sm">
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
+          <Card className="w-full max-w-md shadow-2xl">
             <CardHeader className="text-center">
-                <Image src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png" alt="Logo" width={130} height={130} className="mx-auto" />
-                <CardTitle className="text-2xl font-bold mt-4">{pageTitle}</CardTitle>
-                <CardDescription>{pageDescription}</CardDescription>
+              <Image
+                src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png"
+                alt="Logo"
+                width={130}
+                height={130}
+                className="mx-auto"
+              />
+              <CardTitle className="text-2xl font-bold mt-4">
+                {pageTitle}
+              </CardTitle>
+              <CardDescription>{pageDescription}</CardDescription>
             </CardHeader>
             <CardContent>
-                <FormProvider {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <FormField
+              <FormProvider {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-4"
+                >
+                  <FormField
                     control={form.control}
                     name="email"
                     render={({ field }) => (
-                        <FormItem>
+                      <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                            <Input placeholder="name123@example.com" {...field} />
+                          <Input
+                            placeholder="name123@example.com"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
-                        </FormItem>
+                      </FormItem>
                     )}
-                    />
-                    <FormField
+                  />
+                  <FormField
                     control={form.control}
                     name="password"
                     render={({ field }) => (
-                        <FormItem>
+                      <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
                           <div className="relative">
-                              <Input type={showPassword ? 'text' : 'password'} placeholder="••••••••" {...field} />
-                              <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="icon"
-                                  className="absolute inset-y-0 right-0 h-full px-3"
-                                  onClick={() => setShowPassword(!showPassword)}
-                              >
-                                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                  <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
-                              </Button>
+                            <Input
+                              type={showPassword ? 'text' : 'password'}
+                              placeholder="••••••••"
+                              {...field}
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="absolute inset-y-0 right-0 h-full px-3"
+                              onClick={() =>
+                                setShowPassword(!showPassword)
+                              }
+                            >
+                              {showPassword ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                              <span className="sr-only">
+                                {showPassword
+                                  ? 'Hide password'
+                                  : 'Show password'}
+                              </span>
+                            </Button>
                           </div>
                         </FormControl>
                         <FormMessage />
-                        </FormItem>
+                      </FormItem>
                     )}
-                    />
-                    <Button type="submit" className="w-full" disabled={isLoading}>
+                  />
+                  <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? 'Logging in...' : 'Login'}
-                    </Button>
-                </form>
-                </FormProvider>
-                <div className="mt-4 text-center text-sm">
-                  <Button
-                    variant="link"
-                    type="button"
-                    className="px-0 font-medium text-primary hover:underline"
-                    onClick={() => setIsForgotPasswordOpen(true)}
-                  >
-                    Lupa password?
                   </Button>
-                </div>
-                <p className="mt-2 text-center text-sm text-muted-foreground">
-                    {registerPrompt}{' '}
-                    <Link href={registerLink} className="font-medium text-primary hover:underline">
-                        {registerText}
-                    </Link>
-                </p>
+                </form>
+              </FormProvider>
+              <div className="mt-4 text-center text-sm">
+                <Button
+                  variant="link"
+                  type="button"
+                  className="px-0 font-medium text-primary hover:underline"
+                  onClick={() => setIsForgotPasswordOpen(true)}
+                >
+                  Lupa password?
+                </Button>
+              </div>
+              <p className="mt-2 text-center text-sm text-muted-foreground">
+                {registerPrompt}{' '}
+                <Link
+                  href={registerLink}
+                  className="font-medium text-primary hover:underline"
+                >
+                  {registerText}
+                </Link>
+              </p>
             </CardContent>
           </Card>
-        </div>
       </div>
     </>
   );
