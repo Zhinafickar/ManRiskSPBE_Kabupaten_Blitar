@@ -4,7 +4,7 @@ Repositori ini berisi source code dari sistem web untuk manajemen risiko. Aplika
 
 📄 Lihat file konfigurasi rule firestore database: [firestore.rules](./firestore.rules) (Masukkan di "Firestore Database" bagian Rulenya)
 
-📄 Contoh konfigurasi .env: [.env.example](./.env.example)
+📄 Contoh konfigurasi .env: [.env.example](./Other/.env.example)
 
 ---
 
