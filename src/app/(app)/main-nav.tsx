@@ -41,7 +41,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export function MainNav() {
   const { userProfile } = useAuth();
@@ -49,32 +49,23 @@ export function MainNav() {
 
   // User Menu States
   const isActiveInfoMenu = ['/user/data', '/user/tutorial', '/user/opd', '/user/referensi-input'].some(p => pathname === p);
-  const [isInfoMenuOpen, setIsInfoMenuOpen] = useState(false);
+  const [isInfoMenuOpen, setIsInfoMenuOpen] = useState(isActiveInfoMenu);
 
   const isActiveRiskMenu = pathname.startsWith('/user/survey') || pathname === '/user/results';
-  const [isRiskMenuOpen, setIsRiskMenuOpen] = useState(false);
+  const [isRiskMenuOpen, setIsRiskMenuOpen] = useState(isActiveRiskMenu);
   
   const isActiveContinuityMenu = pathname.startsWith('/user/continuity');
-  const [isContinuityMenuOpen, setIsContinuityMenuOpen] = useState(false);
+  const [isContinuityMenuOpen, setIsContinuityMenuOpen] = useState(isActiveContinuityMenu);
 
   // Admin Menu States
   const isActiveAdminDataMenu = ['/admuinma/results', '/admuinma/continuity-results', '/admuinma/visualization', '/admuinma/opd'].some(p => pathname.startsWith(p));
-  const [isAdminDataMenuOpen, setIsAdminDataMenuOpen] = useState(false);
+  const [isAdminDataMenuOpen, setIsAdminDataMenuOpen] = useState(isActiveAdminDataMenu);
 
   // Super Admin Menu States
   const isActiveSuperAdminAccessMenu = ['/superadmin/users', '/superadmin/role-management', '/superadmin/token-management'].some(p => pathname.startsWith(p));
-  const [isSuperAdminAccessMenuOpen, setIsSuperAdminAccessMenuOpen] = useState(false);
+  const [isSuperAdminAccessMenuOpen, setIsSuperAdminAccessMenuOpen] = useState(isActiveSuperAdminAccessMenu);
   const isActiveSuperAdminDataMenu = ['/superadmin/results', '/superadmin/continuity-results', '/superadmin/visualization', '/superadmin/opd'].some(p => pathname.startsWith(p));
-  const [isSuperAdminDataMenuOpen, setIsSuperAdminDataMenuOpen] = useState(false);
-
-  useEffect(() => {
-    setIsInfoMenuOpen(isActiveInfoMenu);
-    setIsRiskMenuOpen(isActiveRiskMenu);
-    setIsContinuityMenuOpen(isActiveContinuityMenu);
-    setIsAdminDataMenuOpen(isActiveAdminDataMenu);
-    setIsSuperAdminAccessMenuOpen(isActiveSuperAdminAccessMenu);
-    setIsSuperAdminDataMenuOpen(isActiveSuperAdminDataMenu);
-  }, [pathname, isActiveInfoMenu, isActiveRiskMenu, isActiveContinuityMenu, isActiveAdminDataMenu, isActiveSuperAdminAccessMenu, isActiveSuperAdminDataMenu]);
+  const [isSuperAdminDataMenuOpen, setIsSuperAdminDataMenuOpen] = useState(isActiveSuperAdminDataMenu);
 
   if (userProfile?.role === 'admin') {
     return (
