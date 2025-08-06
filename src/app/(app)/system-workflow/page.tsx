@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Workflow, User, Server, Cpu, Database, BarChart3, Users } from 'lucide-react';
+import { Workflow, User, Server, Cpu, Database, Users, Route } from 'lucide-react';
 
 export default function SystemWorkflowPage() {
     return (
@@ -95,6 +95,23 @@ export default function SystemWorkflowPage() {
                                 <li><strong>Manajemen Pengguna</strong>: Superadmin dapat mengedit atau menghapus data pengguna langsung di koleksi `users`. Perubahan pada peran juga akan memperbarui koleksi `roles` untuk menjaga konsistensi data.</li>
                                 <li><strong>Visualisasi Data</strong>: Halaman visualisasi mengambil semua data survei, lalu melakukan agregasi dan kalkulasi di sisi klien menggunakan `react` (`useMemo`) dan menampilkannya dengan library <strong>Recharts</strong>.</li>
                                 <li><strong>Analisis AI Global</strong>: Dasbor admin memicu flow Genkit `summarizeRisksAndPlans` yang menganalisis seluruh data survei dan kontinuitas untuk memberikan ringkasan tren risiko secara global.</li>
+                            </ul>
+                        </AccordionContent>
+                    </AccordionItem>
+                     <AccordionItem value="item-6">
+                        <AccordionTrigger>
+                            <div className="flex items-center gap-3">
+                                <Route className="h-5 w-5 text-primary" />
+                                <span className="font-semibold text-lg">6. Alur Kerja Pengguna (User Workflow)</span>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="pl-8 space-y-2 text-muted-foreground">
+                            <p>Alur kerja pengguna dirancang untuk memandu mereka melalui proses manajemen risiko secara sistematis, dari identifikasi hingga pelaporan.</p>
+                             <ul className="list-disc pl-5 space-y-1">
+                                <li><strong>Dashboard Pengguna</strong>: Setelah login, pengguna melihat ringkasan aktivitas mereka. Data ini diambil dari koleksi `surveys` dan `continuityPlans` di Firestore, difilter berdasarkan `userId` pengguna yang login.</li>
+                                <li><strong>Input Survei</strong>: Pengguna mengisi formulir di `/user/survey-1`. Data dari formulir ini, termasuk pilihan kontrol dan mitigasi (yang dibantu oleh flow AI `suggestMitigation` dan `sortRelevantControls`), dikirim dan disimpan sebagai dokumen baru di koleksi `surveys` Firestore.</li>
+                                <li><strong>Input Rencana Kontinuitas</strong>: Pengguna memilih risiko yang sudah diinput dari survei mereka. Flow AI `suggestContinuityPlan` dapat dipanggil untuk memberikan saran. Data rencana kemudian disimpan sebagai dokumen baru di koleksi `continuityPlans` Firestore.</li>
+                                <li><strong>Tinjauan Hasil & Laporan</strong>: Halaman "Grafik" dan "Laporan Akhir" mengambil semua data survei dan rencana kontinuitas milik pengguna. Data diagregasi di sisi klien untuk menghasilkan visualisasi (dengan Recharts) dan ringkasan laporan (dibantu oleh flow AI `summarizeUserRisksAndPlans`).</li>
                             </ul>
                         </AccordionContent>
                     </AccordionItem>
