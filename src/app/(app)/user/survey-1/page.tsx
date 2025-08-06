@@ -139,7 +139,6 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
   const [sortedTechnological, setSortedTechnological] = useState(TECHNOLOGICAL_CONTROLS);
   
   const [isDateManipulationEnabled, setIsDateManipulationEnabled] = useState(false);
-  const [isSelfInputEnabled, setIsSelfInputEnabled] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -163,12 +162,16 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
     },
   });
 
-  const selectedRiskEvent = form.watch('riskEvent');
-  const selectedImpactArea = form.watch('impactArea');
-  const manualRiskEvent = form.watch('riskEventManual');
-  const manualImpactArea = form.watch('impactAreaManual');
-  const frequency = form.watch('frequency');
-  const impactMagnitude = form.watch('impactMagnitude');
+  const { isSelfInputEnabled, selectedRiskEvent, selectedImpactArea, manualRiskEvent, manualImpactArea, frequency, impactMagnitude } = useMemo(() => {
+    const isSelfInputEnabled = form.watch('isSelfInputEnabled');
+    const selectedRiskEvent = form.watch('riskEvent');
+    const selectedImpactArea = form.watch('impactArea');
+    const manualRiskEvent = form.watch('riskEventManual');
+    const manualImpactArea = form.watch('impactAreaManual');
+    const frequency = form.watch('frequency');
+    const impactMagnitude = form.watch('impactMagnitude');
+    return { isSelfInputEnabled, selectedRiskEvent, selectedImpactArea, manualRiskEvent, manualImpactArea, frequency, impactMagnitude };
+  }, [form.watch()]);
 
   const currentRiskEvent = isSelfInputEnabled ? manualRiskEvent : selectedRiskEvent;
   const currentImpactArea = isSelfInputEnabled ? manualImpactArea : selectedImpactArea;
@@ -240,7 +243,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
         setSortedPhysical(PHYSICAL_CONTROLS);
         setSortedTechnological(TECHNOLOGICAL_CONTROLS);
         setIsDateManipulationEnabled(false);
-        setIsSelfInputEnabled(false);
+        form.setValue('isSelfInputEnabled', false);
     } catch (error) {
         toast({ variant: 'destructive', title: 'Error', description: 'Gagal mengirim survei.' });
     } finally {
@@ -470,10 +473,20 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
 
              <div className="flex items-center justify-end gap-2 pt-2">
                 <label htmlFor="self-input-switch" className="text-xs text-muted-foreground">Isi Kategori Risiko dan Risiko Lain</label>
-                <Switch
-                    id="self-input-switch"
-                    checked={isSelfInputEnabled}
-                    onCheckedChange={setIsSelfInputEnabled}
+                <FormField
+                    control={form.control}
+                    name="isSelfInputEnabled"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormControl>
+                                <Switch
+                                    id="self-input-switch"
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                />
+                            </FormControl>
+                        </FormItem>
+                    )}
                 />
             </div>
 
