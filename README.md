@@ -2,7 +2,7 @@
 
 Repositori ini berisi source code dari sistem web untuk manajemen risiko. Aplikasi ini dikembangkan menggunakan **Next.js 14**, **Firebase**, dan **Genkit**.
 
-📄 Lihat file konfigurasi rule firestore database: [firestore.rules](./firestore.rules)
+📄 Lihat file konfigurasi rule firestore database: [firestore.rules](./firestore.rules) (Masukkan di "Firestore Database" bagian Rulenya)
 📄 Contoh konfigurasi .env: [.env.example](./.env.example)
 
 ---
