@@ -1,0 +1,54 @@
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+  
+    // Helper function to check for admin roles
+    function isAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'superadmin'];
+    }
+
+    // Users can only read/write their own profile
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow update: if request.auth.uid == userId;
+      // Allow creation during registration
+      allow create: if request.auth.uid == userId;
+      // Admins can manage users
+      allow write: if isAdmin();
+    }
+    
+    // Role locks: Prevent multiple users from taking the same non-admin role
+    match /roles/{role} {
+       allow read: if request.auth != null;
+       // Allow creation only if the role is not taken yet
+       allow create: if !exists(/databases/$(database)/documents/roles/$(role));
+       // Allow deletion only by the user who owns the lock, or an admin
+       allow delete: if resource.data.uid == request.auth.uid || isAdmin();
+    }
+    
+    // Admin tokens can only be read/written by superadmins
+    match /adminTokens/{tokenId} {
+        allow read, write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
+    }
+
+    // Surveys: Users can manage their own, admins can manage all
+    match /surveys/{surveyId} {
+      allow read, create: if request.auth != null;
+      allow update, delete: if resource.data.userId == request.auth.uid || isAdmin();
+    }
+
+    // Continuity Plans: Users can manage their own, admins can manage all
+    match /continuityPlans/{planId} {
+      allow read, create: if request.auth != null;
+      allow update, delete: if resource.data.userId == request.auth.uid || isAdmin();
+    }
+    
+    // Risk Events: Read-only for authenticated users, writable for admins
+    match /risk_events/{eventId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+  }
+}
