@@ -354,16 +354,6 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                 />
             </div>
 
-            <div className="space-y-2 rounded-lg border p-4">
-                <div className="flex items-center justify-between">
-                    <FormLabel>Isi Sendiri (Input Manual)</FormLabel>
-                    <Switch
-                        checked={isSelfInputEnabled}
-                        onCheckedChange={setIsSelfInputEnabled}
-                    />
-                </div>
-            </div>
-
             {isSelfInputEnabled ? (
                 <>
                     <FormField
@@ -371,7 +361,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                         name="riskEventManual"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Kategori Risiko (Manual)</FormLabel>
+                                <FormLabel>Kategori Risiko (Lain)</FormLabel>
                                 <FormControl><Input placeholder="Masukkan kategori risiko..." {...field} /></FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -382,7 +372,7 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                         name="impactAreaManual"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Risiko (Manual)</FormLabel>
+                                <FormLabel>Risiko (Lain)</FormLabel>
                                 <FormControl><Input placeholder="Masukkan risiko spesifik..." {...field} /></FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -477,6 +467,15 @@ export default function Survey1Page({ params, searchParams }: { params: any, sea
                     />
                 </>
             )}
+
+             <div className="flex items-center justify-end gap-2 pt-2">
+                <label htmlFor="self-input-switch" className="text-xs text-muted-foreground">Isi Kategori Risiko dan Risiko Lain</label>
+                <Switch
+                    id="self-input-switch"
+                    checked={isSelfInputEnabled}
+                    onCheckedChange={setIsSelfInputEnabled}
+                />
+            </div>
 
             <div className="h-5 mt-1.5">
                 {isSentimentLoading ? (<div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /><span>Menganalisis...</span></div>) : 
