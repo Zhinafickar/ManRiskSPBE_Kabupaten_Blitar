@@ -25,7 +25,7 @@ export default function DataPage({}: {}) {
             </h2>
             <table className="min-w-full border-collapse border border-border text-center text-sm">
               <thead>
-                <tr className="border-b-primary/20 bg-[#00B0F0] text-primary-foreground">
+                <tr className="border-b-primary/20 bg-primary text-primary-foreground">
                   <th className="border border-border p-2 font-bold">No.</th>
                   <th className="border border-border p-2 font-bold">Frekuensi Kejadian</th>
                   <th className="border border-border p-2 font-bold">Persentase Kemungkinan Terjadinya dalam Satu Tahun</th>
@@ -74,12 +74,12 @@ export default function DataPage({}: {}) {
             </h2>
             <table className="min-w-full border-collapse border border-border text-center text-sm">
                 <thead>
-                    <tr className="border-b-primary/20 bg-[#00B0F0] text-primary-foreground">
+                    <tr className="border-b-primary/20 bg-primary text-primary-foreground">
                         <th className="border border-border p-2 font-bold" rowSpan={2}>Area Dampak</th>
                         <th className="border border-border p-2 font-bold" rowSpan={2}></th>
                         <th className="border border-border p-2 font-bold" colSpan={5}>Level Dampak</th>
                     </tr>
-                    <tr className="border-b-primary/20 bg-[#00B0F0] text-primary-foreground">
+                    <tr className="border-b-primary/20 bg-primary text-primary-foreground">
                         <th className="border border-border p-2 font-bold">1<br/>Tidak Signifikan</th>
                         <th className="border border-border p-2 font-bold">2<br/>Kurang Signifikan</th>
                         <th className="border border-border p-2 font-bold">3<br/>Cukup Signifikan</th>
@@ -218,7 +218,7 @@ export default function DataPage({}: {}) {
           <div className="overflow-x-auto p-2">
             <table className="min-w-full border-collapse border border-border text-center text-sm">
               <tbody>
-                <tr className="border-b-primary/20 bg-[#00B0F0] text-primary-foreground">
+                <tr className="border-b-primary/20 bg-primary text-primary-foreground">
                   <th
                     className="border border-border p-2 font-bold align-middle"
                     rowSpan={2}
@@ -230,7 +230,7 @@ export default function DataPage({}: {}) {
                     Level Dampak
                   </th>
                 </tr>
-                <tr className="border-b-primary/20 bg-[#00B0F0] text-primary-foreground">
+                <tr className="border-b-primary/20 bg-primary text-primary-foreground">
                   <th className="border border-border p-2 font-bold">1<br />Tidak Signifikan</th>
                   <th className="border border-border p-2 font-bold">2<br />Kurang Signifikan</th>
                   <th className="border border-border p-2 font-bold">3<br />Cukup Signifikan</th>
