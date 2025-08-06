@@ -27,8 +27,6 @@ import {
   Database,
   BookOpen,
   FilePenLine,
-  TableProperties,
-  FilePlus2,
   ClipboardCheck,
   Printer,
   Shield,
@@ -38,6 +36,7 @@ import {
   BarChart,
   ListTree,
   Wrench,
+  Workflow,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -113,6 +112,15 @@ export function MainNav() {
                         </SidebarMenuSub>
                     </CollapsibleContent>
                 </Collapsible>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/system-workflow'} tooltip="Alur Kerja Sistem">
+                <Link href="/system-workflow">
+                    <Workflow />
+                    <span>Alur Kerja Sistem</span>
+                </Link>
+                </SidebarMenuButton>
             </SidebarMenuItem>
         </SidebarMenu>
     )
@@ -195,6 +203,15 @@ export function MainNav() {
                         </SidebarMenuSub>
                     </CollapsibleContent>
                 </Collapsible>
+            </SidebarMenuItem>
+
+             <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === '/system-workflow'} tooltip="Alur Kerja Sistem">
+                <Link href="/system-workflow">
+                    <Workflow />
+                    <span>Alur Kerja Sistem</span>
+                </Link>
+                </SidebarMenuButton>
             </SidebarMenuItem>
         </SidebarMenu>
     )
@@ -350,6 +367,14 @@ export function MainNav() {
           </Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
+       <SidebarMenuItem>
+            <SidebarMenuButton asChild isActive={pathname === '/system-workflow'} tooltip="Alur Kerja Sistem">
+            <Link href="/system-workflow">
+                <Workflow />
+                <span>Alur Kerja Sistem</span>
+            </Link>
+            </SidebarMenuButton>
+        </SidebarMenuItem>
     </SidebarMenu>
   );
 }
