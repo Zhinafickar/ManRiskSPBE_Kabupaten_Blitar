@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -360,14 +359,6 @@ export function MainNav() {
           </Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
-       <SidebarMenuItem>
-            <SidebarMenuButton asChild isActive={pathname === '/system-workflow'} tooltip="Alur Kerja Sistem">
-            <Link href="/system-workflow">
-                <Workflow />
-                <span>Alur Kerja Sistem</span>
-            </Link>
-            </SidebarMenuButton>
-        </SidebarMenuItem>
     </SidebarMenu>
   );
 }
