@@ -37,6 +37,7 @@ import {
   ListTree,
   Wrench,
   Workflow,
+  FilePlus2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -47,24 +48,16 @@ export function MainNav() {
   const pathname = usePathname();
 
   // User Menu States
-  const isActiveInfoMenu = ['/user/data', '/user/tutorial', '/user/opd', '/user/referensi-input'].some(p => pathname === p);
-  const [isInfoMenuOpen, setIsInfoMenuOpen] = useState(isActiveInfoMenu);
-
-  const isActiveRiskMenu = pathname.startsWith('/user/survey') || pathname === '/user/results';
-  const [isRiskMenuOpen, setIsRiskMenuOpen] = useState(isActiveRiskMenu);
-  
-  const isActiveContinuityMenu = pathname.startsWith('/user/continuity');
-  const [isContinuityMenuOpen, setIsContinuityMenuOpen] = useState(isActiveContinuityMenu);
+  const [isInfoMenuOpen, setIsInfoMenuOpen] = useState(false);
+  const [isRiskMenuOpen, setIsRiskMenuOpen] = useState(false);
+  const [isContinuityMenuOpen, setIsContinuityMenuOpen] = useState(false);
 
   // Admin Menu States
-  const isActiveAdminDataMenu = ['/admuinma/results', '/admuinma/continuity-results', '/admuinma/visualization', '/admuinma/opd'].some(p => pathname.startsWith(p));
-  const [isAdminDataMenuOpen, setIsAdminDataMenuOpen] = useState(isActiveAdminDataMenu);
+  const [isAdminDataMenuOpen, setIsAdminDataMenuOpen] = useState(false);
 
   // Super Admin Menu States
-  const isActiveSuperAdminAccessMenu = ['/superadmin/users', '/superadmin/role-management', '/superadmin/token-management'].some(p => pathname.startsWith(p));
-  const [isSuperAdminAccessMenuOpen, setIsSuperAdminAccessMenuOpen] = useState(isActiveSuperAdminAccessMenu);
-  const isActiveSuperAdminDataMenu = ['/superadmin/results', '/superadmin/continuity-results', '/superadmin/visualization', '/superadmin/opd'].some(p => pathname.startsWith(p));
-  const [isSuperAdminDataMenuOpen, setIsSuperAdminDataMenuOpen] = useState(isActiveSuperAdminDataMenu);
+  const [isSuperAdminAccessMenuOpen, setIsSuperAdminAccessMenuOpen] = useState(false);
+  const [isSuperAdminDataMenuOpen, setIsSuperAdminDataMenuOpen] = useState(false);
 
   if (userProfile?.role === 'admin') {
     return (
@@ -81,7 +74,7 @@ export function MainNav() {
             <SidebarMenuItem>
                 <Collapsible open={isAdminDataMenuOpen} onOpenChange={setIsAdminDataMenuOpen}>
                     <CollapsibleTrigger asChild>
-                        <SidebarMenuButton isActive={isActiveAdminDataMenu} className="[&[data-state=open]>svg:last-of-type]:rotate-180">
+                        <SidebarMenuButton isActive={pathname.startsWith('/admuinma/results') || pathname.startsWith('/admuinma/continuity-results') || pathname.startsWith('/admuinma/visualization') || pathname.startsWith('/admuinma/opd')} className="[&[data-state=open]>svg:last-of-type]:rotate-180">
                             <BarChart />
                             <span className="mr-auto group-data-[collapsible=icon]:hidden">Data & Laporan</span>
                             <ChevronDown className="size-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden" />
@@ -141,7 +134,7 @@ export function MainNav() {
             <SidebarMenuItem>
                 <Collapsible open={isSuperAdminAccessMenuOpen} onOpenChange={setIsSuperAdminAccessMenuOpen}>
                     <CollapsibleTrigger asChild>
-                        <SidebarMenuButton isActive={isActiveSuperAdminAccessMenu} className="[&[data-state=open]>svg:last-of-type]:rotate-180">
+                        <SidebarMenuButton isActive={pathname.startsWith('/superadmin/users') || pathname.startsWith('/superadmin/role-management') || pathname.startsWith('/superadmin/token-management')} className="[&[data-state=open]>svg:last-of-type]:rotate-180">
                             <Fingerprint />
                             <span className="mr-auto group-data-[collapsible=icon]:hidden">Akses & Pengguna</span>
                             <ChevronDown className="size-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden" />
@@ -172,7 +165,7 @@ export function MainNav() {
             <SidebarMenuItem>
                 <Collapsible open={isSuperAdminDataMenuOpen} onOpenChange={setIsSuperAdminDataMenuOpen}>
                     <CollapsibleTrigger asChild>
-                        <SidebarMenuButton isActive={isActiveSuperAdminDataMenu} className="[&[data-state=open]>svg:last-of-type]:rotate-180">
+                        <SidebarMenuButton isActive={pathname.startsWith('/superadmin/results') || pathname.startsWith('/superadmin/continuity-results') || pathname.startsWith('/superadmin/visualization') || pathname.startsWith('/superadmin/opd')} className="[&[data-state=open]>svg:last-of-type]:rotate-180">
                             <BarChart />
                             <span className="mr-auto group-data-[collapsible=icon]:hidden">Data & Laporan</span>
                             <ChevronDown className="size-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden" />
@@ -233,7 +226,7 @@ export function MainNav() {
         <Collapsible open={isInfoMenuOpen} onOpenChange={setIsInfoMenuOpen}>
           <CollapsibleTrigger asChild>
             <SidebarMenuButton
-              isActive={isActiveInfoMenu}
+              isActive={pathname === '/user/data' || pathname === '/user/tutorial' || pathname === '/user/opd' || pathname === '/user/referensi-input'}
               className="[&[data-state=open]>svg:last-of-type]:rotate-180"
             >
               <Info />
@@ -284,7 +277,7 @@ export function MainNav() {
         <Collapsible open={isRiskMenuOpen} onOpenChange={setIsRiskMenuOpen}>
           <CollapsibleTrigger asChild>
             <SidebarMenuButton
-              isActive={isActiveRiskMenu}
+              isActive={pathname.startsWith('/user/survey') || pathname === '/user/results'}
               className="[&[data-state=open]>svg:last-of-type]:rotate-180"
             >
               <ClipboardList />
@@ -319,7 +312,7 @@ export function MainNav() {
         <Collapsible open={isContinuityMenuOpen} onOpenChange={setIsContinuityMenuOpen}>
             <CollapsibleTrigger asChild>
                 <SidebarMenuButton
-                isActive={isActiveContinuityMenu}
+                isActive={pathname.startsWith('/user/continuity')}
                 className="[&[data-state=open]>svg:last-of-type]:rotate-180"
                 >
                     <Recycle />
