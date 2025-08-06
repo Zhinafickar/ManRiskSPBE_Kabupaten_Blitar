@@ -8,7 +8,7 @@ Repositori ini berisi source code dari sistem web untuk manajemen risiko. Aplika
 
 ---
 
-## 🚀 1. Interaksi Pengguna (Frontend)
+## 1. Interaksi Pengguna (Frontend)
 
 Sisi klien dibangun menggunakan **Next.js 14** dengan **App Router**, memungkinkan navigasi cepat dan rendering sisi server (SSR) yang efisien. State global dikelola melalui **React Context** khususnya untuk autentikasi pengguna.
 
@@ -18,7 +18,7 @@ Sisi klien dibangun menggunakan **Next.js 14** dengan **App Router**, memungkink
 
 ---
 
-## 🔗 2. Komunikasi ke Backend
+## 2. Komunikasi ke Backend
 
 Aplikasi memanfaatkan fitur-fitur modern dari **Next.js** dan **Firebase** untuk komunikasi antara frontend dan backend:
 
@@ -28,7 +28,7 @@ Aplikasi memanfaatkan fitur-fitur modern dari **Next.js** dan **Firebase** untuk
 
 ---
 
-## 🗂 3. Penyimpanan Data (Backend)
+## 3. Penyimpanan Data (Backend)
 
 Data aplikasi disimpan secara persisten di **Google Firestore**, sebuah database NoSQL yang fleksibel dan skalabel.
 
@@ -42,7 +42,7 @@ Data aplikasi disimpan secara persisten di **Google Firestore**, sebuah database
 
 ---
 
-## 🧠 4. Pemrosesan AI dengan Genkit
+## 4. Pemrosesan AI dengan Genkit
 
 Fitur cerdas dalam sistem ini didukung oleh [**Genkit**](https://ai.google.dev/genkit), framework dari Google untuk workflow AI yang efisien.
 
@@ -52,7 +52,7 @@ Fitur cerdas dalam sistem ini didukung oleh [**Genkit**](https://ai.google.dev/g
 
 ---
 
-## 🔐 5. Alur Kerja Admin & Superadmin
+## 5. Alur Kerja Admin & Superadmin
 
 Admin dan Superadmin memiliki kapabilitas lanjutan untuk mengelola data secara menyeluruh:
 
@@ -63,7 +63,7 @@ Admin dan Superadmin memiliki kapabilitas lanjutan untuk mengelola data secara m
 
 ---
 
-## 👥 6. Alur Kerja Pengguna (User Workflow)
+## 6. Alur Kerja Pengguna (User Workflow)
 
 Alur kerja pengguna dirancang untuk memandu mereka melalui proses manajemen risiko secara sistematis, dari identifikasi hingga pelaporan.
 
@@ -74,7 +74,7 @@ Alur kerja pengguna dirancang untuk memandu mereka melalui proses manajemen risi
 
 ---
 
-## 🛠 Teknologi yang Digunakan
+## Teknologi yang Digunakan
 
 - **Next.js 14 (App Router, Server Actions)**
 - **Firebase (Authentication, Firestore)**
@@ -85,13 +85,13 @@ Alur kerja pengguna dirancang untuk memandu mereka melalui proses manajemen risi
 
 ---
 
-## ✅ Status Proyek
+## Status Proyek
 
-🔧 *Masih dalam tahap pengembangan aktif.*
+ *Masih dalam tahap pengembangan aktif.*
 
 ---
 
-## 🤝 Kontribusi
+## Kontribusi
 
 Pull request terbuka untuk:
 - Menambahkan fitur baru
@@ -102,6 +102,6 @@ Silakan buat issue jika ingin berdiskusi sebelum kontribusi.
 
 ---
 
-## 📜 Lisensi
+## Lisensi
 
 Proyek ini menggunakan [MIT License](LICENSE).
