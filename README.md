@@ -115,7 +115,3 @@ Ingin coba membuat untuk Daerah Lain? cek disini
 [Tutorial Download sampai akses](./Other/tutorial.md)
 
 ---
-
-## Lisensi
-
-Proyek ini menggunakan [MIT License](LICENSE).
