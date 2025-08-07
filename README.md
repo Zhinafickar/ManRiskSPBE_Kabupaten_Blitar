@@ -37,7 +37,6 @@ Data aplikasi disimpan secara persisten di **Google Firestore**, sebuah database
   - `surveys`
   - `continuityPlans`
   - `roles`
-  - `adminTokens`
 - **Aturan Keamanan**: Akses ke Firestore diatur menggunakan **Firestore Security Rules** untuk memastikan hanya pengguna yang berwenang yang dapat membaca atau menulis data sesuai UID dan peran mereka.
 
 ---
