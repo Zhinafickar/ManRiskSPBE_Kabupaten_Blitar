@@ -131,7 +131,7 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
             "url('https://www.blitarkab.go.id/wp-content/uploads/2017/02/pendopo-kanigoro.jpg')",
         }}
       >
-        <Card className="w-full max-w-md shadow-2xl bg-white bg-opacity-90 backdrop-blur-md">
+        <Card className="w-full max-w-md shadow-xl border border-white/30 bg-white bg-opacity-95 backdrop-blur-md rounded-xl">
           <CardHeader className="text-center">
             <Image
               src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png"
@@ -158,10 +158,7 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="name123@example.com"
-                          {...field}
-                        />
+                        <Input placeholder="name123@example.com" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -193,9 +190,7 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
                               <Eye className="h-4 w-4" />
                             )}
                             <span className="sr-only">
-                              {showPassword
-                                ? 'Hide password'
-                                : 'Show password'}
+                              {showPassword ? 'Hide password' : 'Show password'}
                             </span>
                           </Button>
                         </div>
