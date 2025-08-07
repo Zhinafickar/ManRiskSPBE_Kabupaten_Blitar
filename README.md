@@ -5,6 +5,26 @@ Repositori ini berisi source code dari sistem web untuk manajemen risiko. Aplika
 - Lihat file konfigurasi rule firestore database: [firestore Database Rules](./Other/rulefirestoredatabase.rule) (Masukkan di "Firestore Database" bagian Rulenya)
 
 - Contoh konfigurasi .env: [.env.example](./Other/.env.example)
+---
+
+## 0. Landasan Kerangka Kerja Internasional
+
+Sistem ini dibangun di atas praktik terbaik dan standar internasional untuk memastikan pendekatan yang terstruktur dan komprehensif terhadap manajemen risiko.
+
+### Identifikasi Risiko (ISO 31000 & COBIT 5)
+Daftar kategori risiko dan risiko spesifik yang tersedia di formulir mengadopsi prinsip dari **ISO 31000** (Manajemen Risiko) dan **COBIT 5 for Risk**. Hal ini memastikan bahwa semua area potensial risiko dalam konteks teknologi informasi dan pemerintahan telah tercakup secara sistematis.
+
+### Kontrol & Mitigasi (ISO 27001)
+Opsi kontrol kendali yang dapat dipilih (Organisasi, Orang, Fisik, Teknologi) diambil langsung dari **lampiran A standar ISO 27001:2022**. Ini membantu pengguna dalam memilih tindakan mitigasi yang relevan dan diakui secara global untuk mengamankan aset informasi.  
+Fitur AI untuk menyortir kontrol juga beroperasi pada daftar standar ini.
+
+### Kelangsungan Bisnis (ISO 22301)
+Proses pembuatan rencana kontinuitas terinspirasi dari prinsip-prinsip dalam **ISO 22301**, dengan fokus pada:
+- Identifikasi aktivitas pemulihan kritis
+- **RTO** (*Recovery Time Objective*)
+- **RPO** (*Recovery Point Objective*)  
+
+Semua aspek tersebut ditujukan untuk risiko yang telah dinilai secara sistematis.
 
 ---
 
