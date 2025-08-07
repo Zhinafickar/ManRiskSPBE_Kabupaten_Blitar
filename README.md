@@ -109,15 +109,10 @@ Alur kerja pengguna dirancang untuk memandu mereka melalui proses manajemen risi
 
 ---
 
-## Kontribusi
+## Instalasi
 
-Pull request terbuka untuk:
-- Menambahkan fitur baru
-- Perbaikan bug
-- Penyempurnaan dokumentasi
-
-Silakan buat issue jika ingin berdiskusi sebelum kontribusi.
-
+Ingin coba membuat untuk Daerah Lain? cek disini
+ [Tutorial Download sampai akses](./Other/tutorial.md)
 ---
 
 ## Lisensi
