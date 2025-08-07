@@ -57,15 +57,10 @@ export function TokenVerification() {
     } catch (error: any) {
         console.error("Error during verification process:", error);
         
-        let errorMessage = "Gagal memeriksa peran atau token.";
-        if (error.message && error.message.includes('firestore/indexes')) {
-            errorMessage = "Terjadi kesalahan pada server. Kemungkinan memerlukan pembuatan indeks Firestore. Silakan periksa log server untuk detailnya.";
-        }
-
         toast({
             variant: 'destructive',
             title: 'Verifikasi Gagal',
-            description: errorMessage,
+            description: "Terjadi kesalahan yang tidak terduga. Silakan coba lagi.",
         });
     } finally {
         setIsLoading(false);
