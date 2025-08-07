@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -164,7 +165,7 @@ export default function AdminRegisterPage() {
           "url('https://www.blitarkab.go.id/wp-content/uploads/2017/02/pendopo-kanigoro.jpg')",
       }}
     >
-      <Card className="w-full max-w-md shadow-2xl bg-white bg-opacity-90 backdrop-blur-md">
+      <Card className="w-full max-w-md shadow-xl backdrop-blur-sm bg-card/80">
         <CardHeader className="text-center">
           <Image
             src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png"
