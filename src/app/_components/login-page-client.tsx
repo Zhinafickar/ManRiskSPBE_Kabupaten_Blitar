@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -131,7 +132,7 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
             "url('https://www.blitarkab.go.id/wp-content/uploads/2017/02/pendopo-kanigoro.jpg')",
         }}
       >
-        <Card className="w-full max-w-md shadow-xl border border-white/30 bg-white bg-opacity-95 backdrop-blur-md rounded-xl">
+        <Card className="w-full max-w-md shadow-xl backdrop-blur-sm bg-card/80">
           <CardHeader className="text-center">
             <Image
               src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png"
@@ -227,7 +228,7 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
         </Card>
 
         {/* Credit Section */}
-        <div className="mt-4 flex items-center justify-center gap-3 text-white">
+        <div className="mt-4 flex items-center justify-center gap-3 text-card-foreground bg-card/80 px-4 py-2 rounded-lg">
           <span className="text-sm font-medium">Collaboration</span>
           <Image
             src="https://diskominfo.penajamkab.go.id/wp-content/uploads/2020/02/logo-kominfo.png"
