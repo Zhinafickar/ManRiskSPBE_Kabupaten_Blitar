@@ -1,4 +1,3 @@
-
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -125,108 +124,112 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
         isOpen={isForgotPasswordOpen}
         onOpenChange={setIsForgotPasswordOpen}
       />
-      <div className="flex min-h-screen items-center justify-center bg-background p-4">
-          <Card className="w-full max-w-md shadow-2xl">
-            <CardHeader className="text-center">
-              <Image
-                src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png"
-                alt="Logo"
-                width={130}
-                height={130}
-                className="mx-auto"
-              />
-              <CardTitle className="text-2xl font-bold mt-4">
-                {pageTitle}
-              </CardTitle>
-              <CardDescription>{pageDescription}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <FormProvider {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-4"
-                >
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
+      <div
+        className="flex min-h-screen items-center justify-center p-4 bg-cover bg-center"
+        style={{
+          backgroundImage:
+            "url('https://www.blitarkab.go.id/wp-content/uploads/2017/02/pendopo-kanigoro.jpg')",
+        }}
+      >
+        <Card className="w-full max-w-md shadow-2xl bg-white bg-opacity-90 backdrop-blur-md">
+          <CardHeader className="text-center">
+            <Image
+              src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png"
+              alt="Logo"
+              width={130}
+              height={130}
+              className="mx-auto"
+            />
+            <CardTitle className="text-2xl font-bold mt-4">
+              {pageTitle}
+            </CardTitle>
+            <CardDescription>{pageDescription}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <FormProvider {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="name123@example.com"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <div className="relative">
                           <Input
-                            placeholder="name123@example.com"
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="••••••••"
                             {...field}
                           />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Input
-                              type={showPassword ? 'text' : 'password'}
-                              placeholder="••••••••"
-                              {...field}
-                            />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="absolute inset-y-0 right-0 h-full px-3"
-                              onClick={() =>
-                                setShowPassword(!showPassword)
-                              }
-                            >
-                              {showPassword ? (
-                                <EyeOff className="h-4 w-4" />
-                              ) : (
-                                <Eye className="h-4 w-4" />
-                              )}
-                              <span className="sr-only">
-                                {showPassword
-                                  ? 'Hide password'
-                                  : 'Show password'}
-                              </span>
-                            </Button>
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? 'Logging in...' : 'Login'}
-                  </Button>
-                </form>
-              </FormProvider>
-              <div className="mt-4 text-center text-sm">
-                <Button
-                  variant="link"
-                  type="button"
-                  className="px-0 font-medium text-primary hover:underline"
-                  onClick={() => setIsForgotPasswordOpen(true)}
-                >
-                  Lupa password?
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute inset-y-0 right-0 h-full px-3"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                            <span className="sr-only">
+                              {showPassword
+                                ? 'Hide password'
+                                : 'Show password'}
+                            </span>
+                          </Button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? 'Logging in...' : 'Login'}
                 </Button>
-              </div>
-              <p className="mt-2 text-center text-sm text-muted-foreground">
-                {registerPrompt}{' '}
-                <Link
-                  href={registerLink}
-                  className="font-medium text-primary hover:underline"
-                >
-                  {registerText}
-                </Link>
-              </p>
-            </CardContent>
-          </Card>
+              </form>
+            </FormProvider>
+            <div className="mt-4 text-center text-sm">
+              <Button
+                variant="link"
+                type="button"
+                className="px-0 font-medium text-primary hover:underline"
+                onClick={() => setIsForgotPasswordOpen(true)}
+              >
+                Lupa password?
+              </Button>
+            </div>
+            <p className="mt-2 text-center text-sm text-muted-foreground">
+              {registerPrompt}{' '}
+              <Link
+                href={registerLink}
+                className="font-medium text-primary hover:underline"
+              >
+                {registerText}
+              </Link>
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </>
   );
