@@ -93,6 +93,3 @@ vercel --prod
 ## 📄 Lisensi
 
 Proyek ini dilindungi oleh lisensi MIT. Silakan gunakan, modifikasi, dan sebarkan dengan menyertakan atribusi kepada pembuat.
----
-
-```
