@@ -13,7 +13,7 @@ Project ini merupakan aplikasi berbasis Next.js yang terintegrasi dengan Firebas
    👉 [https://console.firebase.google.com](https://console.firebase.google.com)
 
 2. **Ambil API key dari Firebase Console dan API Gemini**
-   - Masukkan ke dalam file `.env` sesuai contoh di file [`.env.example`](./Other/.env.example)
+   - Masukkan ke dalam file `.env` sesuai contoh di file [`.env.example`](./.env.example)
 
 3. **Aktifkan Authentication dan Firestore Database di Firebase**
    - Masuk ke menu **Build > Authentication** lalu aktifkan sign-in method (misalnya Email/Password)
@@ -21,7 +21,7 @@ Project ini merupakan aplikasi berbasis Next.js yang terintegrasi dengan Firebas
 
 4. **Atur Firestore Rules**
    - Salin aturan (rules) dari file berikut:  
-     📄 [`firestore.rules`](./Other/firestore.rules)
+     📄 [`Rule Firestore Database`](./firestore)
 
 ---
 
@@ -47,7 +47,7 @@ git clone https://github.com/username/repo-name.git
 ### 3. **Masukkan API Firebase dan Gemini ke file `.env`**
 
 Lihat contoh di:
-📄 [`Other/.env.example`](./Other/.env.example)
+📄 [`.env.example`](./.env.example)
 
 Buat file `.env` di root project dan salin format tersebut.
 
@@ -90,23 +90,9 @@ vercel --prod
 
 ---
 
-## 📁 Struktur Folder Penting
-
-```bash
-Other/
-├── .env.example        # Contoh konfigurasi API
-├── firestore.rules     # Firestore Database Rules
-```
-
----
-
 ## 📄 Lisensi
 
 Proyek ini dilindungi oleh lisensi MIT. Silakan gunakan, modifikasi, dan sebarkan dengan menyertakan atribusi kepada pembuat.
-
-```
-
 ---
 
-Kalau kamu ingin aku bantu **buatkan file `README.md` ini langsung**, tinggal bilang aja mau dibuatkan file `.md`-nya.
 ```
