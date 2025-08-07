@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -24,15 +23,24 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword, sendEmailVerification, signOut } from 'firebase/auth';
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  signOut,
+} from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 import Image from 'next/image';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
 import { getAllUsers } from '@/services/user-service';
 import { ADMIN_ROLES } from '@/constants/admin-data';
 import { Eye, EyeOff } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
 
 const formSchema = z.object({
   fullName: z.string().min(1, { message: 'Full name is required.' }),
@@ -40,9 +48,10 @@ const formSchema = z.object({
   password: z
     .string()
     .min(6, { message: 'Password must be at least 6 characters.' }),
-  role: z.string({ required_error: 'Please select an admin role.' }).min(1, {message: "Please select an admin role."}),
+  role: z
+    .string({ required_error: 'Please select an admin role.' })
+    .min(1, { message: 'Please select an admin role.' }),
 });
-
 
 export default function AdminRegisterPage() {
   const { toast } = useToast();
@@ -57,22 +66,22 @@ export default function AdminRegisterPage() {
       setRolesLoading(true);
       try {
         const users = await getAllUsers();
-        const aSuperAdminExists = users.some(u => u.role === 'superadmin');
-        
+        const aSuperAdminExists = users.some((u) => u.role === 'superadmin');
+
         const roles = aSuperAdminExists
-          ? ADMIN_ROLES.filter(role => role !== 'superadmin')
+          ? ADMIN_ROLES.filter((role) => role !== 'superadmin')
           : ADMIN_ROLES;
-        
+
         setAvailableAdminRoles(roles);
       } catch (error) {
-          console.error("Failed to fetch users for role check:", error);
-          toast({
-              variant: 'destructive',
-              title: 'Error',
-              description: 'Gagal memuat peran yang tersedia. Silakan coba lagi.'
-          });
-          // Fallback to only allowing 'admin' role if check fails
-          setAvailableAdminRoles(['admin']);
+        console.error('Failed to fetch users for role check:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description:
+            'Gagal memuat peran yang tersedia. Silakan coba lagi.',
+        });
+        setAvailableAdminRoles(['admin']);
       } finally {
         setRolesLoading(false);
       }
@@ -97,12 +106,13 @@ export default function AdminRegisterPage() {
         toast({
           variant: 'destructive',
           title: 'Firebase Not Configured',
-          description: 'Please add your Firebase credentials to the .env file to enable registration.',
+          description:
+            'Please add your Firebase credentials to the .env file to enable registration.',
         });
         setIsLoading(false);
         return;
       }
-      
+
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         values.email,
@@ -111,23 +121,24 @@ export default function AdminRegisterPage() {
       const user = userCredential.user;
 
       await sendEmailVerification(user);
-      
+
       const userRef = doc(db, 'users', user.uid);
       await setDoc(userRef, {
         uid: user.uid,
         fullName: values.fullName,
         email: values.email,
         role: values.role,
-        phoneNumber: '', // Initialize phone number for admins
+        phoneNumber: '',
       });
 
       await signOut(auth);
 
       toast({
         title: 'Admin Registration Successful',
-        description: 'Please check your email to verify your account before logging in.',
+        description:
+          'Please check your email to verify your account before logging in.',
       });
-      
+
       router.push('/admuinma/login');
     } catch (error: any) {
       let description = 'An unknown error occurred.';
@@ -146,106 +157,147 @@ export default function AdminRegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-       <Card className="w-full max-w-md shadow-2xl">
+    <div
+      className="flex min-h-screen items-center justify-center p-4 bg-cover bg-center"
+      style={{
+        backgroundImage:
+          "url('https://www.blitarkab.go.id/wp-content/uploads/2017/02/pendopo-kanigoro.jpg')",
+      }}
+    >
+      <Card className="w-full max-w-md shadow-2xl bg-white bg-opacity-90 backdrop-blur-md">
         <CardHeader className="text-center">
-            <Image src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png" alt="Logo" width={130} height={130} className="mx-auto" />
-            <CardTitle className="text-2xl font-bold mt-4">Create Admin Account</CardTitle>
-            <CardDescription>
-                This form is for admin registration only.
-            </CardDescription>
+          <Image
+            src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm96r3FWka5963AzMK6SrYozoB5UTcMNGM2yUF7Isid0BsVcecBHk6lhVBGouTkSfBFuNPW-jPyWW_k2umwKI6sN3frHLk7g1Nd_Ubi0qz_a0G6svusKAmc3hy0-up0RPZGrk-MYnrl5g/s1600/kabupaten-blitar-vector-logo-idngrafis.png"
+            alt="Logo"
+            width={130}
+            height={130}
+            className="mx-auto"
+          />
+          <CardTitle className="text-2xl font-bold mt-4">
+            Create Admin Account
+          </CardTitle>
+          <CardDescription>
+            This form is for admin registration only.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-            <FormProvider {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <FormField
-                    control={form.control}
-                    name="fullName"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>Full Name</FormLabel>
-                        <FormControl>
-                            <Input placeholder="Admin Name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
-                    <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                            <Input placeholder="admin@example.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
-                    <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                                <Input type={showPassword ? 'text' : 'password'} placeholder="••••••••" {...field} />
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    className="absolute inset-y-0 right-0 h-full px-3"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                >
-                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                    <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
-                                </Button>
-                            </div>
-                          </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
-                    <FormField
-                    control={form.control}
-                    name="role"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>Admin Role</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value} disabled={rolesLoading}>
-                            <FormControl>
-                            <SelectTrigger>
-                                <SelectValue placeholder={rolesLoading ? "Loading roles..." : "Select admin role"} />
-                            </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                            {availableAdminRoles.map((role) => (
-                                <SelectItem key={role} value={role}>
-                                {role.charAt(0).toUpperCase() + role.slice(1)}
-                                </SelectItem>
-                            ))}
-                            </SelectContent>
-                        </Select>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
-                    <Button type="submit" className="w-full" disabled={isLoading || rolesLoading}>
-                    {isLoading ? 'Creating account...' : 'Create Admin Account'}
-                    </Button>
-                </form>
-            </FormProvider>
-            <p className="mt-6 text-center text-sm text-muted-foreground">
+          <FormProvider {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="fullName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Admin Name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="admin@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder="••••••••"
+                          {...field}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute inset-y-0 right-0 h-full px-3"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                          <span className="sr-only">
+                            {showPassword ? 'Hide password' : 'Show password'}
+                          </span>
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Admin Role</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={rolesLoading}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue
+                            placeholder={
+                              rolesLoading
+                                ? 'Loading roles...'
+                                : 'Select admin role'
+                            }
+                          />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {availableAdminRoles.map((role) => (
+                          <SelectItem key={role} value={role}>
+                            {role.charAt(0).toUpperCase() + role.slice(1)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isLoading || rolesLoading}
+              >
+                {isLoading ? 'Creating account...' : 'Create Admin Account'}
+              </Button>
+            </form>
+          </FormProvider>
+          <p className="mt-6 text-center text-sm text-muted-foreground">
             Already have an admin account?{' '}
-            <Link href="/admuinma/login" className="font-medium text-primary hover:underline">
-                Login here
+            <Link
+              href="/admuinma/login"
+              className="font-medium text-primary hover:underline"
+            >
+              Login here
             </Link>
-            </p>
+          </p>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
