@@ -60,7 +60,7 @@ export default function SystemWorkflowPage() {
                         <AccordionContent className="pl-8 space-y-2 text-muted-foreground">
                             <p>Seluruh data persisten aplikasi disimpan di <strong>Google Firestore</strong>, sebuah database NoSQL yang fleksibel dan skalabel.</p>
                              <ul className="list-disc pl-5 space-y-1">
-                                <li><strong>Koleksi Utama</strong>: `users`, `surveys`, `continuityPlans`, `roles`, dan `adminTokens` adalah koleksi utama yang menyimpan data aplikasi.</li>
+                                <li><strong>Koleksi Utama</strong>: `users`, `surveys`, `continuityPlans`, dan `roles` adalah koleksi utama yang menyimpan data aplikasi.</li>
                                 <li><strong>Aturan Keamanan</strong>: Akses ke data Firestore diatur oleh <strong>Firestore Security Rules</strong> (didefinisikan dalam `firestore.rules`). Aturan ini memastikan bahwa pengguna hanya dapat membaca/menulis data yang diizinkan sesuai dengan UID (User ID) dan peran mereka.</li>
                             </ul>
                         </AccordionContent>
