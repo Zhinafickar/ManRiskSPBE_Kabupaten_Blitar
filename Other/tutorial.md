@@ -19,9 +19,9 @@ Project ini merupakan aplikasi berbasis Next.js yang terintegrasi dengan Firebas
    - Masuk ke menu **Build > Authentication** lalu aktifkan sign-in method (misalnya Email/Password)
    - Masuk ke **Build > Firestore Database**, lalu klik **Create Database**
 
-4. **Atur Firestore Rules**
+4. **Atur Firestore Database Rules**
    - Salin aturan (rules) dari file berikut:  
-     📄 [`Rule Firestore Database`](./firestore)
+     📄 [`Rule Firestore Database`](./rulefirestoredatabase.rule)
 
 ---
 
@@ -39,7 +39,7 @@ Ikuti panduan resmi Next.js:
 Clone atau unduh repositori ini dari GitHub.
 
 ```bash
-git clone https://github.com/username/repo-name.git
+git clone https://github.com/Zhinafickar/ManRiskSPBE_Kabupaten_Blitar.git
 ````
 
 ### 2. **Ekstrak** (jika file dalam format `.zip`)
