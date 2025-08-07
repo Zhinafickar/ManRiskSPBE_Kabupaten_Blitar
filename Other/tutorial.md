@@ -1,7 +1,4 @@
-Berikut ini adalah contoh `README.md` dalam format yang rapi dan profesional, sesuai dengan instruksi dan tahapan instalasi Firebase + Next.js yang kamu berikan:
-
----
-# Project Web dengan Next.js + Firebase + Gemini API
+# Web dengan Next.js + Firebase
 
 Project ini merupakan aplikasi berbasis Next.js yang terintegrasi dengan Firebase Authentication, Firestore Database, dan Gemini API. Aplikasi ini dapat dijalankan secara lokal maupun dideploy ke hosting seperti [Vercel](https://vercel.com/).
 
