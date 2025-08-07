@@ -16,7 +16,6 @@ Daftar kategori risiko dan risiko spesifik yang tersedia di formulir mengadopsi 
 
 ### Kontrol & Mitigasi (ISO 27001)
 Opsi kontrol kendali yang dapat dipilih (Organisasi, Orang, Fisik, Teknologi) diambil langsung dari **lampiran A standar ISO 27001:2022**. Ini membantu pengguna dalam memilih tindakan mitigasi yang relevan dan diakui secara global untuk mengamankan aset informasi.  
-Fitur AI untuk menyortir kontrol juga beroperasi pada daftar standar ini.
 
 ### Kelangsungan Bisnis (ISO 22301)
 Proses pembuatan rencana kontinuitas terinspirasi dari prinsip-prinsip dalam **ISO 22301**, dengan fokus pada:
