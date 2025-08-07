@@ -112,8 +112,8 @@ Alur kerja pengguna dirancang untuk memandu mereka melalui proses manajemen risi
 ## Instalasi
 
 Ingin coba membuat untuk Daerah Lain? cek disini
-
 [Tutorial Download sampai akses](./Other/tutorial.md)
+
 ---
 
 ## Lisensi
