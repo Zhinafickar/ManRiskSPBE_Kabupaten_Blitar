@@ -125,7 +125,7 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
         onOpenChange={setIsForgotPasswordOpen}
       />
       <div
-        className="flex min-h-screen items-center justify-center p-4 bg-cover bg-center"
+        className="flex min-h-screen flex-col items-center justify-center p-4 bg-cover bg-center"
         style={{
           backgroundImage:
             "url('https://www.blitarkab.go.id/wp-content/uploads/2017/02/pendopo-kanigoro.jpg')",
@@ -225,6 +225,24 @@ export function LoginPageClient({ isAdminLogin }: LoginPageClientProps) {
             </p>
           </CardContent>
         </Card>
+
+        {/* Credit Section */}
+        <div className="mt-4 flex items-center justify-center gap-3 text-white">
+          <span className="text-sm font-medium">Collaboration</span>
+          <Image
+            src="https://diskominfo.penajamkab.go.id/wp-content/uploads/2020/02/logo-kominfo.png"
+            alt="Logo 1"
+            width={40}
+            height={40}
+          />
+          <span className="text-sm font-medium">&</span>
+          <Image
+            src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/35574985-86cb-4a95-8103-3e4d240fb5be/dg0hbf8-1f3be10c-c786-4261-adb9-d05a4200cfa0.png/v1/fill/w_1280,h_1393/logo_uin_malang_terbaru_ulul_albab_by_sahlannags_dg0hbf8-fullview.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTM5MyIsInBhdGgiOiJcL2ZcLzM1NTc0OTg1LTg2Y2ItNGE5NS04MTAzLTNlNGQyNDBmYjViZVwvZGcwaGJmOC0xZjNiZTEwYy1jNzg2LTQyNjEtYWRiOS1kMDVhNDIwMGNmYTAucG5nIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.5iC6ylWFkZqNrml8RCCjDT-HgerS03lWlt7FYqQQz1E"
+            alt="Logo 2"
+            width={40}
+            height={40}
+          />
+        </div>
       </div>
     </>
   );
