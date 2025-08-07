@@ -25,8 +25,7 @@ Project ini merupakan aplikasi berbasis Next.js yang terintegrasi dengan Firebas
 ## 💻 Instalasi Web (Next.js)
 
 ### 0. Install Next.js (jika belum)
-
-Ikuti panduan resmi Next.js:  
+ 
 [https://nodejs.org/id](https://nodejs.org/id)
 
 ---
