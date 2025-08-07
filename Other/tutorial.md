@@ -1,16 +1,16 @@
 Berikut ini adalah contoh `README.md` dalam format yang rapi dan profesional, sesuai dengan instruksi dan tahapan instalasi Firebase + Next.js yang kamu berikan:
 
 ---
-# 🚀 Project Web dengan Next.js + Firebase + Gemini API
+# Project Web dengan Next.js + Firebase + Gemini API
 
 Project ini merupakan aplikasi berbasis Next.js yang terintegrasi dengan Firebase Authentication, Firestore Database, dan Gemini API. Aplikasi ini dapat dijalankan secara lokal maupun dideploy ke hosting seperti [Vercel](https://vercel.com/).
 
 ---
 
-## 🔐 Instalasi Auth dan Database (Firebase)
+## Instalasi Auth dan Database (Firebase)
 
 1. **Buat akun dan project di Firebase Console**  
-   👉 [https://console.firebase.google.com](https://console.firebase.google.com)
+   [https://console.firebase.google.com](https://console.firebase.google.com)
 
 2. **Ambil API key dari Firebase Console dan API Gemini**
    - Masukkan ke dalam file `.env` sesuai contoh di file [`.env.example`](./.env.example)
@@ -21,7 +21,7 @@ Project ini merupakan aplikasi berbasis Next.js yang terintegrasi dengan Firebas
 
 4. **Atur Firestore Database Rules**
    - Salin aturan (rules) dari file berikut:  
-     📄 [`Rule Firestore Database`](./rulefirestoredatabase.rule)
+     [`Rule Firestore Database`](./rulefirestoredatabase.rule)
 
 ---
 
@@ -30,7 +30,7 @@ Project ini merupakan aplikasi berbasis Next.js yang terintegrasi dengan Firebas
 ### 0. Install Next.js (jika belum)
 
 Ikuti panduan resmi Next.js:  
-👉 [https://nextjs.org/docs/getting-started](https://nextjs.org/docs/getting-started)
+[https://nextjs.org/docs/getting-started](https://nextjs.org/docs/getting-started)
 
 ---
 
@@ -47,7 +47,7 @@ git clone https://github.com/Zhinafickar/ManRiskSPBE_Kabupaten_Blitar.git
 ### 3. **Masukkan API Firebase dan Gemini ke file `.env`**
 
 Lihat contoh di:
-📄 [`.env.example`](./.env.example)
+[`.env.example`](./.env.example)
 
 Buat file `.env` di root project dan salin format tersebut.
 
@@ -83,13 +83,13 @@ vercel --prod
 
 ---
 
-## 🌐 Tambahan
+## Tambahan
 
 * Kamu dapat menambahkan **custom domain** melalui dashboard Vercel.
 * Jika ingin reset Firebase, pastikan kamu menghapus dokumen di Firestore dan atur ulang Authentication jika diperlukan.
 
 ---
 
-## 📄 Lisensi
+## Lisensi
 
 Proyek ini dilindungi oleh lisensi MIT. Silakan gunakan, modifikasi, dan sebarkan dengan menyertakan atribusi kepada pembuat.
