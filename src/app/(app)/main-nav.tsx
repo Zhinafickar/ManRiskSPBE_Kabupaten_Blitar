@@ -133,7 +133,7 @@ export function MainNav() {
             <SidebarMenuItem>
                 <Collapsible open={isSuperAdminAccessMenuOpen} onOpenChange={setIsSuperAdminAccessMenuOpen}>
                     <CollapsibleTrigger asChild>
-                        <SidebarMenuButton isActive={pathname.startsWith('/superadmin/users') || pathname.startsWith('/superadmin/role-management') || pathname.startsWith('/superadmin/token-management')} className="[&[data-state=open]>svg:last-of-type]:rotate-180">
+                        <SidebarMenuButton isActive={pathname.startsWith('/superadmin/users') || pathname.startsWith('/superadmin/role-management')} className="[&[data-state=open]>svg:last-of-type]:rotate-180">
                             <Fingerprint />
                             <span className="mr-auto group-data-[collapsible=icon]:hidden">Akses & Pengguna</span>
                             <ChevronDown className="size-4 shrink-0 transition-transform duration-200 group-data-[collapsible=icon]:hidden" />
@@ -149,11 +149,6 @@ export function MainNav() {
                             <SidebarMenuSubItem>
                                 <SidebarMenuSubButton asChild isActive={pathname.startsWith('/superadmin/role-management')}>
                                     <Link href="/superadmin/role-management"><Shield /><span>Role Management</span></Link>
-                                </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                            <SidebarMenuSubItem>
-                                <SidebarMenuSubButton asChild isActive={pathname.startsWith('/superadmin/token-management')}>
-                                    <Link href="/superadmin/token-management"><KeyRound /><span>Token Management</span></Link>
                                 </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
                         </SidebarMenuSub>
